@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ApiError } from '@/lib/api';
 import type { Ejercicio } from '@/lib/api';
+import { useAtlasApi } from '../api/contexto';
 import { useEjercicio } from '../api/hooks';
 import { EstadoError } from '../EstadoError';
 import { mensajeDeErrorAtlas } from '../mensajes';
@@ -197,6 +199,15 @@ export function FichaPage() {
   const { id } = useParams();
   const numero = id && /^\d+$/.test(id) ? Number(id) : null;
   const ficha = useEjercicio(numero);
+  const api = useAtlasApi();
+
+  // Una visita por ficha abierta (RF_032). Se espera a que la ficha exista para no contar
+  // enlaces rotos. El efecto depende solo del id, así que un refetch no la repite.
+  const fichaId = ficha.data?.id;
+  useEffect(() => {
+    if (fichaId === undefined) return;
+    void api.registrarVisita(fichaId).catch(() => {});
+  }, [api, fichaId]);
 
   if (numero === null) return <NoDisponible />;
   if (ficha.isPending) {

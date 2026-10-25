@@ -53,7 +53,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 3.1 Vista de ficha completa por secciones (información general, protocolo clínico, ejecución, dosificación)
 - [x] 3.2 Reproductor de video y galería de imágenes con visor
 - [x] 3.3 Barra de búsqueda con debounce y resultados que llevan a la ficha
-- [ ] 3.4 Registro de visita al abrir una ficha
+- [x] 3.4 Registro de visita al abrir una ficha
 
 ## Fase 4 — Panel de administración (HU-04 a HU-15)
 - [ ] 4.1 Lista de fichas con filtros por estado, región y categoría (todas las de todos los admin)

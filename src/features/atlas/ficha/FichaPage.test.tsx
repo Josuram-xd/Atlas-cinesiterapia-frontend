@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { renderAtlas } from '@/test/renderAtlas';
 import { crearMockAtlasApi } from '../api/mockAtlasApi';
 import { FichaPage } from './FichaPage';
@@ -108,5 +108,46 @@ describe('FichaPage', () => {
     );
     expect(await screen.findByText('<img src=x onerror=alert(1)>')).toBeInTheDocument();
     expect(document.querySelector('img[src="x"]')).toBeNull();
+  });
+});
+
+describe('FichaPage: registro de visita', () => {
+  function montarConEspia(ruta: string) {
+    const api = crearMockAtlasApi();
+    const espia = vi.spyOn(api, 'registrarVisita');
+    renderAtlas(
+      <Routes>
+        <Route path="/ejercicios/:id" element={<FichaPage />} />
+      </Routes>,
+      api,
+      ruta,
+    );
+    return espia;
+  }
+
+  it('registra una visita al abrir la ficha, una sola vez', async () => {
+    const espia = montarConEspia('/ejercicios/1');
+    await screen.findByRole('heading', { level: 1 });
+    expect(espia).toHaveBeenCalledTimes(1);
+    expect(espia).toHaveBeenCalledWith(1);
+  });
+
+  it('no registra nada si la ficha no existe', async () => {
+    const espia = montarConEspia('/ejercicios/99999');
+    await screen.findByRole('heading', { name: /no está disponible/i });
+    expect(espia).not.toHaveBeenCalled();
+  });
+
+  it('un fallo al registrar no afecta a la lectura de la ficha', async () => {
+    const api = crearMockAtlasApi();
+    api.registrarVisita = () => Promise.reject(new Error('caído'));
+    renderAtlas(
+      <Routes>
+        <Route path="/ejercicios/:id" element={<FichaPage />} />
+      </Routes>,
+      api,
+      '/ejercicios/1',
+    );
+    expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument();
   });
 });

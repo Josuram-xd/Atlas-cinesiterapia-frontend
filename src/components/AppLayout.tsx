@@ -38,7 +38,7 @@ export function AppLayout({ children, actions, centro }: AppLayoutProps) {
           <Wordmark className="text-lg sm:text-xl" />
         </Link>
         {centro ? (
-          <div className="order-last w-full md:order-none md:max-w-md md:flex-1">
+          <div className="order-last w-full lg:order-none lg:max-w-md lg:flex-1">
             {centro}
           </div>
         ) : null}
