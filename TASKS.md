@@ -77,7 +77,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [ ] 6.3 Ranking de ejercicios más consultados
 - [ ] 6.4 Usuarios activos por rol
 - [ ] 6.5 Tiempo promedio de uso por sesión
-- [ ] 6.6 Ping de sesión para alimentar la métrica de tiempo
+- [x] 6.6 Ping de sesión para alimentar la métrica de tiempo
 
 ## Fase 7 — Offline, calidad y despliegue (RNF_003, RNF_004)
 - [ ] 7.1 PWA: manifest, íconos, service worker, caché de app y de GET del atlas
