@@ -50,7 +50,7 @@ describe('guardas de rutas', () => {
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
     expect(
-      await screen.findByRole('heading', { name: 'Panel de administración' }),
+      await screen.findByRole('heading', { name: 'Fichas de ejercicios' }),
     ).toBeInTheDocument();
   });
 
@@ -77,7 +77,7 @@ describe('guardas de rutas', () => {
     conSesion(admin);
     renderWithRouter(routes, ['/admin']);
     expect(
-      await screen.findByRole('heading', { name: 'Panel de administración' }),
+      await screen.findByRole('heading', { name: 'Fichas de ejercicios' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Administración' })).toBeInTheDocument();
   });
