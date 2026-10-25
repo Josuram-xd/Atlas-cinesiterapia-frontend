@@ -1,0 +1,201 @@
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import { crearMockAtlasApi } from '../../atlas/api/mockAtlasApi';
+import { renderWithRouter } from '@/test/renderWithRouter';
+import type { AdminApi } from '../api/adminApi';
+import { crearMockAdminApi } from '../api/mockAdminApi';
+import { FichaFormPage } from './FichaFormPage';
+
+const rutas = [
+  { path: '/admin', element: <p>Lista de fichas</p> },
+  { path: '/admin/fichas/nueva', element: <FichaFormPage /> },
+  { path: '/admin/fichas/:id', element: <FichaFormPage /> },
+];
+
+function montar(ruta: string, api: AdminApi = crearMockAdminApi()) {
+  const utils = renderWithRouter(rutas, [ruta], crearMockAtlasApi(), api);
+  return { api, user: userEvent.setup(), ...utils };
+}
+
+async function completarGeneral(user: ReturnType<typeof userEvent.setup>) {
+  await screen.findAllByRole('option', { name: 'Rodilla' });
+  await user.type(screen.getByLabelText('Nombre del ejercicio'), 'Sentadilla asistida');
+  await user.selectOptions(screen.getByLabelText('Región anatómica'), '11');
+  await user.selectOptions(screen.getByLabelText('Categoría terapéutica'), '4');
+}
+
+describe('FichaFormPage: nueva ficha', () => {
+  it('muestra los seis pasos y arranca en información general', async () => {
+    montar('/admin/fichas/nueva');
+    const pasos = screen.getByRole('navigation', { name: 'Pasos de la ficha' });
+    expect(
+      within(pasos)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual([
+      'Información general',
+      'Protocolo clínico',
+      'Ejecución',
+      'Dosificación y progresión',
+      'Multimedia',
+      'Metadatos académicos',
+    ]);
+    expect(
+      within(pasos).getByRole('button', { name: 'Información general' }),
+    ).toHaveAttribute('aria-current', 'step');
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Información general' }),
+    ).toBeInTheDocument();
+  });
+
+  it('cambia de paso con la barra y con los botones anterior y siguiente', async () => {
+    const { user } = montar('/admin/fichas/nueva');
+    await user.click(screen.getByRole('button', { name: 'Paso siguiente' }));
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Protocolo clínico' }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Indicaciones')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Dosificación y progresión' }));
+    expect(screen.getByLabelText('Series')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Paso anterior' }));
+    expect(screen.getByLabelText('Posición del paciente')).toBeInTheDocument();
+  });
+
+  it('no guarda sin nombre, región y categoría y lleva al paso del error', async () => {
+    const { user, api } = montar('/admin/fichas/nueva');
+    const crear = vi.spyOn(api, 'crearFicha');
+    await user.click(screen.getByRole('button', { name: 'Metadatos académicos' }));
+    await user.click(screen.getByRole('button', { name: 'Guardar borrador' }));
+    expect(await screen.findByText('Revisa los campos marcados.')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Información general' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Escribe el nombre del ejercicio.')).toBeInTheDocument();
+    expect(screen.getByText('Elige la región.')).toBeInTheDocument();
+    expect(crear).not.toHaveBeenCalled();
+  });
+
+  it('guarda el borrador con el cuerpo del contrato y pasa a la dirección de la ficha', async () => {
+    const { user, api, router } = montar('/admin/fichas/nueva');
+    const crear = vi.spyOn(api, 'crearFicha');
+    await completarGeneral(user);
+    await user.click(screen.getByRole('button', { name: 'Guardar borrador' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toMatch(/^\/admin\/fichas\/\d+$/),
+    );
+    expect(crear).toHaveBeenCalledOnce();
+    expect(crear.mock.calls[0][0]).toMatchObject({
+      nombre: 'Sentadilla asistida',
+      regionId: 11,
+      categoriaId: 4,
+      indicaciones: null,
+      estudiantesCreadores: [],
+      cohorte: null,
+    });
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Sentadilla asistida' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Borrador')).toBeInTheDocument();
+  });
+
+  it('avisa antes de salir con cambios sin guardar', async () => {
+    const { user, router } = montar('/admin/fichas/nueva');
+    await user.type(screen.getByLabelText('Nombre del ejercicio'), 'Algo');
+    await user.click(screen.getByRole('link', { name: /Volver a las fichas/ }));
+    const dialogo = await screen.findByRole('alertdialog');
+    expect(dialogo).toHaveTextContent('cambios sin guardar');
+    await user.click(within(dialogo).getByRole('button', { name: 'Seguir editando' }));
+    expect(router.state.location.pathname).toBe('/admin/fichas/nueva');
+    await user.click(screen.getByRole('link', { name: /Volver a las fichas/ }));
+    await user.click(await screen.findByRole('button', { name: 'Salir sin guardar' }));
+    expect(await screen.findByText('Lista de fichas')).toBeInTheDocument();
+  });
+
+  it('sin cambios no estorba al salir', async () => {
+    const { user } = montar('/admin/fichas/nueva');
+    await user.click(screen.getByRole('link', { name: /Volver a las fichas/ }));
+    expect(await screen.findByText('Lista de fichas')).toBeInTheDocument();
+  });
+
+  it('agrega y quita estudiantes creadores', async () => {
+    const { user } = montar('/admin/fichas/nueva');
+    await user.click(screen.getByRole('button', { name: 'Metadatos académicos' }));
+    expect(screen.queryByRole('button', { name: /Quitar/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Agregar estudiante' }));
+    expect(screen.getByLabelText('Estudiante 2')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Quitar al estudiante 2' }));
+    expect(screen.queryByLabelText('Estudiante 2')).not.toBeInTheDocument();
+  });
+
+  it('valida el formato de la cohorte antes de enviar', async () => {
+    const { user } = montar('/admin/fichas/nueva');
+    await completarGeneral(user);
+    await user.click(screen.getByRole('button', { name: 'Metadatos académicos' }));
+    await user.type(screen.getByLabelText('Cohorte'), 'abc');
+    await user.click(screen.getByRole('button', { name: 'Guardar borrador' }));
+    expect(await screen.findByText(/año-periodo/)).toBeInTheDocument();
+  });
+
+  it('muestra el error del servidor y conserva lo escrito', async () => {
+    const api = crearMockAdminApi();
+    api.crearFicha = () => Promise.reject(new Error('caído'));
+    const { user } = montar('/admin/fichas/nueva', api);
+    await completarGeneral(user);
+    await user.click(screen.getByRole('button', { name: 'Guardar borrador' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/No se pudo completar/);
+    expect(screen.getByLabelText('Nombre del ejercicio')).toHaveValue(
+      'Sentadilla asistida',
+    );
+  });
+});
+
+describe('FichaFormPage: editar', () => {
+  it('carga la ficha existente en el formulario', async () => {
+    montar('/admin/fichas/3');
+    expect(
+      await screen.findByRole('heading', {
+        level: 1,
+        name: 'Elevación activa en el plano escapular',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Nombre del ejercicio')).toHaveValue(
+      'Elevación activa en el plano escapular',
+    );
+    expect(screen.getByLabelText('Región anatómica')).toHaveValue('2');
+    expect(screen.getByLabelText('Objetivo terapéutico')).toHaveValue(
+      'Recuperar el rango articular.',
+    );
+  });
+
+  it('guarda los cambios con PUT sobre la misma ficha', async () => {
+    const { user, api } = montar('/admin/fichas/3');
+    const actualizar = vi.spyOn(api, 'actualizarFicha');
+    const nombre = await screen.findByLabelText('Nombre del ejercicio');
+    await user.clear(nombre);
+    await user.type(nombre, 'Elevación escapular');
+    await user.click(screen.getByRole('button', { name: 'Guardar borrador' }));
+    expect(await screen.findByText('Borrador guardado.')).toBeInTheDocument();
+    expect(actualizar).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({ nombre: 'Elevación escapular' }),
+    );
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Elevación escapular' }),
+    ).toBeInTheDocument();
+  });
+
+  it('una ficha inexistente muestra un aviso y no el formulario', async () => {
+    montar('/admin/fichas/9999');
+    expect(
+      await screen.findByRole('heading', { name: 'Esta ficha no existe' }),
+    ).toBeInTheDocument();
+  });
+
+  it('un identificador que no es número se trata como inexistente', async () => {
+    montar('/admin/fichas/abc');
+    expect(
+      await screen.findByRole('heading', { name: 'Esta ficha no existe' }),
+    ).toBeInTheDocument();
+  });
+});

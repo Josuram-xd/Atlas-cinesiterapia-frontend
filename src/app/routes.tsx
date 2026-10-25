@@ -1,4 +1,5 @@
 import type { RouteObject } from 'react-router-dom';
+import { FichaFormPage } from '@/features/admin/ficha/FichaFormPage';
 import { ListaFichasPage } from '@/features/admin/lista/ListaFichasPage';
 import { FichaPage } from '@/features/atlas/ficha/FichaPage';
 import { InicioPage } from '@/features/atlas/InicioPage';
@@ -29,7 +30,11 @@ export const routes: RouteObject[] = [
           { path: '/ejercicios/:id', element: <FichaPage /> },
           {
             element: <RequireRole rol="ADMIN" />,
-            children: [{ path: '/admin', element: <ListaFichasPage /> }],
+            children: [
+              { path: '/admin', element: <ListaFichasPage /> },
+              { path: '/admin/fichas/nueva', element: <FichaFormPage /> },
+              { path: '/admin/fichas/:id', element: <FichaFormPage /> },
+            ],
           },
         ],
       },
