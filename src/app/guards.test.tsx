@@ -62,7 +62,7 @@ describe('guardas de rutas', () => {
     conSesion(usuario);
     renderWithRouter(routes, ['/login']);
     expect(
-      await screen.findByRole('heading', { name: /atlas de cinesiterapia/i }),
+      await screen.findByRole('heading', { name: /elige una región/i }),
     ).toBeInTheDocument();
   });
 

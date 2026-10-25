@@ -9,7 +9,9 @@ interface AppLayoutProps {
 
 export function Wordmark({ className = '' }: { className?: string }) {
   return (
-    <span className={`font-display leading-none tracking-tight ${className}`}>
+    <span
+      className={`font-display leading-none tracking-tight whitespace-nowrap ${className}`}
+    >
       <span className="font-extrabold">Atlas</span>{' '}
       <span className="font-light">de cinesiterapia</span>
     </span>
@@ -31,7 +33,7 @@ export function AppLayout({ children, actions }: AppLayoutProps) {
           className="text-tinta no-underline hover:text-acento"
           aria-label="Atlas de cinesiterapia, inicio"
         >
-          <Wordmark className="text-xl" />
+          <Wordmark className="text-lg sm:text-xl" />
         </Link>
         <div className="flex items-center gap-4">{actions}</div>
       </header>

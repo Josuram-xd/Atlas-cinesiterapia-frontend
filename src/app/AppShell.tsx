@@ -20,7 +20,11 @@ export function AppShell() {
         <>
           {usuario?.rol === 'ADMIN' ? <Link to="/admin">Administración</Link> : null}
           <span className="text-tinta-2 max-sm:hidden">{usuario?.correo}</span>
-          <Button variante="secundario" onClick={salir} className="min-h-10 px-4 py-1.5">
+          <Button
+            variante="secundario"
+            onClick={salir}
+            className="min-h-10 px-4 py-1.5 whitespace-nowrap"
+          >
             Cerrar sesión
           </Button>
         </>
