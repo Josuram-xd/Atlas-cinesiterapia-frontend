@@ -1,1 +1,110 @@
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
 @import 'tailwindcss';
+
+/*
+ * Tokens de diseño. Una paleta corta y plana: fondo, tinta y acento, más dos tonos
+ * de fondo para superficies y estados. Sin gradientes ni sombras en reposo.
+ * Contrastes medidos (WCAG): tinta/fondo 14.1:1, acento/fondo 5.7:1, fondo/acento 5.7:1.
+ */
+@theme {
+  --color-fondo: #e8ece6;
+  --color-fondo-2: #d9dfd5;
+  --color-fondo-3: #c4cdc0;
+  --color-tinta: #10201c;
+  --color-tinta-2: #3b4c47;
+  --color-acento: #00675a;
+  --color-acento-claro: #a9d1c8;
+  --color-error: #9b1c1c;
+
+  /* Un solo tipo de letra: Bricolage Grotesque, con eje óptico automático. */
+  --font-sans: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+
+  --text-cuerpo: 1.0625rem;
+  --text-cuerpo--line-height: 1.55;
+  --text-titulo: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+  --text-titulo--line-height: 1.04;
+  --text-gigante: clamp(2.75rem, 1.6rem + 6vw, 6.5rem);
+  --text-gigante--line-height: 0.94;
+
+  --radius-campo: 0.25rem;
+  --spacing-gutter: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+
+  --ease-atlas: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    background-color: var(--color-fondo);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-fondo);
+    font-size: var(--text-cuerpo);
+    line-height: var(--text-cuerpo--line-height);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  a {
+    color: var(--color-acento);
+    text-decoration-line: underline;
+    text-decoration-thickness: 0.09em;
+    text-underline-offset: 0.2em;
+  }
+
+  a:hover {
+    color: var(--color-tinta);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-acento);
+    color: var(--color-fondo);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Superficies oscuras: el foco usa el color de fondo para mantener el contraste. */
+.superficie-oscura {
+  background-color: var(--color-tinta);
+  color: var(--color-fondo);
+}
+
+.superficie-oscura :focus-visible {
+  outline-color: var(--color-fondo);
+}
+
+.superficie-oscura a {
+  color: var(--color-acento-claro);
+}
+
+.superficie-oscura a:hover {
+  color: var(--color-fondo);
+}
