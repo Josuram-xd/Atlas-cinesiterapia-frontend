@@ -1,4 +1,9 @@
-import type { Categoria, Region } from '@/lib/api';
+import type { Categoria, EjercicioResumen, Region } from '@/lib/api';
+
+export interface FiltroEjercicios {
+  regionId: number;
+  categoriaId: number;
+}
 
 /**
  * Lo que la pantalla del atlas necesita del backend. Hay dos implementaciones
@@ -9,4 +14,9 @@ export interface AtlasApi {
   listarRegiones(signal?: AbortSignal): Promise<Region[]>;
   /** Categorías terapéuticas disponibles para una región. */
   listarCategorias(regionId: number, signal?: AbortSignal): Promise<Categoria[]>;
+  /** Ejercicios publicados de una región y categoría (HU-01). */
+  listarEjercicios(
+    filtro: FiltroEjercicios,
+    signal?: AbortSignal,
+  ): Promise<EjercicioResumen[]>;
 }

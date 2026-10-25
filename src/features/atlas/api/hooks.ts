@@ -22,3 +22,14 @@ export function useCategorias(regionId: number | null) {
     ...CATALOGO,
   });
 }
+
+export function useEjercicios(regionId: number | null, categoriaId: number | null) {
+  const api = useAtlasApi();
+  return useQuery({
+    queryKey: ['atlas', 'ejercicios', regionId, categoriaId],
+    queryFn: ({ signal }) =>
+      api.listarEjercicios({ regionId: regionId!, categoriaId: categoriaId! }, signal),
+    enabled: regionId !== null && categoriaId !== null,
+    staleTime: 60_000,
+  });
+}

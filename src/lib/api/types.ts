@@ -94,6 +94,14 @@ export interface Categoria {
   nombre: string;
 }
 
+/** Ejercicio publicado tal como aparece en el listado de una región y categoría. */
+export interface EjercicioResumen {
+  id: number;
+  nombre: string;
+  /** Frase corta con el objetivo terapéutico. */
+  resumen: string;
+}
+
 // --- Errores ---------------------------------------------------------------------
 
 /** Un campo inválido dentro de `fieldErrors`. */

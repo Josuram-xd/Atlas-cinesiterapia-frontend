@@ -37,3 +37,33 @@ describe('mockAtlasApi', () => {
     await expect(promesa).rejects.toMatchObject({ name: 'AbortError' });
   });
 });
+
+describe('mockAtlasApi: ejercicios', () => {
+  it('lista los ejercicios de una región y categoría con ficha', async () => {
+    const api = crearMockAtlasApi();
+    const regiones = await api.listarRegiones();
+    const rodilla = regiones.find((r) => r.svgId === 'anterior-rodilla')!;
+    const lista = await api.listarEjercicios({ regionId: rodilla.id, categoriaId: 4 });
+    expect(lista.length).toBeGreaterThanOrEqual(2);
+    expect(lista[0]).toEqual(
+      expect.objectContaining({ id: expect.any(Number), nombre: expect.any(String) }),
+    );
+  });
+
+  it('devuelve una lista vacía si no hay fichas para la combinación', async () => {
+    const api = crearMockAtlasApi();
+    const regiones = await api.listarRegiones();
+    const codo = regiones.find((r) => r.svgId === 'anterior-codo')!;
+    await expect(
+      api.listarEjercicios({ regionId: codo.id, categoriaId: 2 }),
+    ).resolves.toEqual([]);
+  });
+
+  it('los ids de los ejercicios no se repiten', async () => {
+    const { EJERCICIOS_MOCK } = await import('../data/ejercicios');
+    const ids = Object.values(EJERCICIOS_MOCK).flatMap((porCat) =>
+      Object.values(porCat).flatMap((l) => l.map((e) => e.id)),
+    );
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+});

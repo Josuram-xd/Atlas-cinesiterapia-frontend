@@ -1,5 +1,6 @@
-import type { Categoria, Region } from '@/lib/api';
+import type { Categoria, EjercicioResumen, Region } from '@/lib/api';
 import { CATEGORIAS_MOCK, REGIONES_MOCK } from '../data/regiones';
+import { EJERCICIOS_MOCK } from '../data/ejercicios';
 import type { AtlasApi } from './atlasApi';
 
 export interface OpcionesMock {
@@ -42,5 +43,10 @@ export function crearMockAtlasApi({
     listarRegiones: (signal) => responder<Region[]>(REGIONES_MOCK, signal),
     listarCategorias: (_regionId, signal) =>
       responder<Categoria[]>(CATEGORIAS_MOCK, signal),
+    listarEjercicios: ({ regionId, categoriaId }, signal) => {
+      const region = REGIONES_MOCK.find((r) => r.id === regionId);
+      const lista = region ? (EJERCICIOS_MOCK[region.svgId]?.[categoriaId] ?? []) : [];
+      return responder<EjercicioResumen[]>(lista, signal);
+    },
   };
 }

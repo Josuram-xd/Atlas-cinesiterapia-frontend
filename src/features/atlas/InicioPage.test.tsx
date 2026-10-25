@@ -100,3 +100,59 @@ describe('InicioPage', () => {
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 });
+
+describe('InicioPage: listado de ejercicios', () => {
+  it('al elegir región y categoría muestra los ejercicios de esa combinación', async () => {
+    const user = userEvent.setup();
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
+    await user.click(screen.getByRole('button', { name: 'Rodilla' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Ejercicio activo resistido' }),
+    );
+    expect(
+      await screen.findByRole('heading', { name: 'Ejercicio activo resistido' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Extensión de rodilla con banda elástica'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('3 ejercicios')).toBeInTheDocument();
+  });
+
+  it('cambiar de categoría cambia el listado y cerrar lo oculta', async () => {
+    const user = userEvent.setup();
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
+    await user.click(screen.getByRole('button', { name: 'Rodilla' }));
+    await user.click(await screen.findByRole('button', { name: 'Movilización pasiva' }));
+    expect(
+      await screen.findByText('Flexoextensión pasiva de rodilla'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Fortalecimiento isométrico' }));
+    expect(
+      await screen.findByText('Isométrico de cuádriceps con toalla'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('Flexoextensión pasiva de rodilla'),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Cerrar listado' }));
+    expect(
+      screen.queryByRole('heading', { name: 'Fortalecimiento isométrico' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('al cambiar de región se cierra el listado', async () => {
+    const user = userEvent.setup();
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
+    await user.click(screen.getByRole('button', { name: 'Rodilla' }));
+    await user.click(await screen.findByRole('button', { name: 'Movilización pasiva' }));
+    await screen.findByText('Flexoextensión pasiva de rodilla');
+    await user.click(screen.getByRole('button', { name: 'Cuerpo completo' }));
+    expect(
+      screen.queryByText('Flexoextensión pasiva de rodilla'),
+    ).not.toBeInTheDocument();
+  });
+});
