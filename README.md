@@ -66,6 +66,17 @@ HTTP renueva el access token ante un 401. Al cerrar la pestaña (`pagehide`) se 
 `navigator.sendBeacon` a `/auth/cierre-pendiente`; el backend espera 60 s y cancela el cierre
 si llega un refresh.
 
+## Despliegue en Vercel
+
+1. Importa el repositorio en Vercel. Vite se detecta solo: build `npm run build`, salida `dist`.
+2. En _Settings > Environment Variables_ define `VITE_API_URL` con la URL pública del backend, sin barra final (p. ej. `https://<servicio>.onrender.com`). Vite incrusta la variable en el bundle durante el build, así que tras cambiarla hay que volver a desplegar.
+3. Añade el origen de Vercel (p. ej. `https://<app>.vercel.app`) a `CORS_ORIGINS` y `FRONTEND_URL` en el backend; si no, el navegador bloqueará las llamadas a la API.
+
+El archivo [`vercel.json`](./vercel.json) hace dos cosas:
+
+- **Reescritura SPA:** cualquier ruta que no sea un archivo existente (p. ej. `/registro` o `/admin`) sirve `/index.html` para que React Router resuelva la vista.
+- **Cabeceras de seguridad** en todas las respuestas: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` y `X-Frame-Options: DENY`.
+
 ## Diseño
 
 Un solo tipo de letra (Bricolage Grotesque), colores planos definidos como variables CSS en
