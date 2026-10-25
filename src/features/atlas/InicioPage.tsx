@@ -6,6 +6,8 @@ import { useCategorias, useEjercicios, useRegiones } from './api/hooks';
 import { BodyAtlas } from './body/BodyAtlas';
 import type { VistaId } from './body/geometry';
 import { VistaToggle } from './body/VistaToggle';
+import { EstadoError } from './EstadoError';
+import { mensajeDeErrorAtlas } from './mensajes';
 import { CategoriaMenu } from './menu/CategoriaMenu';
 import { EjerciciosPanel } from './panel/EjerciciosPanel';
 
@@ -25,14 +27,14 @@ export function InicioPage() {
   const nombre = (apuntada ?? elegida)?.nombre ?? 'Ninguna todavía';
 
   // En móvil el listado queda debajo del cuerpo: al elegir una categoría se lleva a la vista.
-  const hayListado = Boolean(categoria && ejercicios.data);
+  const categoriaId = categoria?.id;
   useEffect(() => {
-    if (!hayListado || esPantallaAncha()) return;
+    if (categoriaId === undefined || esPantallaAncha()) return;
     panel.current?.scrollIntoView?.({
       behavior: prefersReducedMotion() ? 'auto' : 'smooth',
       block: 'start',
     });
-  }, [hayListado, categoria?.id]);
+  }, [categoriaId]);
 
   function elegirRegion(region: Region | null) {
     setElegida(region);
@@ -57,6 +59,17 @@ export function InicioPage() {
           <span className="text-tinta-2 font-light">Región: </span>
           {nombre}
         </p>
+        {regiones.isPending ? (
+          <p role="status" className="text-tinta-2">
+            Cargando regiones…
+          </p>
+        ) : null}
+        {regiones.isError ? (
+          <EstadoError
+            mensaje={mensajeDeErrorAtlas(regiones.error)}
+            onReintentar={() => void regiones.refetch()}
+          />
+        ) : null}
       </div>
       <div className="relative min-h-[28rem] flex-1 md:col-start-2 md:row-span-2 md:row-start-1 md:min-h-0">
         <BodyAtlas
@@ -67,12 +80,17 @@ export function InicioPage() {
           onClear={() => elegirRegion(null)}
           onHover={setApuntada}
           ventana={ventana}
-          className="absolute inset-0 h-full w-full"
+          className={`absolute inset-0 h-full w-full transition-opacity duration-300 ${
+            regiones.isPending ? 'opacity-40' : ''
+          }`}
         />
         {elegida ? (
           <CategoriaMenu
             region={elegida.nombre}
             categorias={categorias.data ?? []}
+            estado={
+              categorias.isError ? 'error' : categorias.isPending ? 'cargando' : 'listo'
+            }
             activaId={categoria?.id ?? null}
             onElegir={setCategoria}
             onVolver={() => elegirRegion(null)}
@@ -80,14 +98,29 @@ export function InicioPage() {
           />
         ) : null}
       </div>
-      {categoria && ejercicios.data && elegida ? (
+      {elegida && categorias.isError ? (
+        <div className="pb-6 md:col-start-1 md:row-start-2">
+          <EstadoError
+            mensaje={`No pudimos cargar las categorías. ${mensajeDeErrorAtlas(categorias.error)}`}
+            onReintentar={() => void categorias.refetch()}
+          />
+        </div>
+      ) : null}
+      {elegida && categoria ? (
         <div className="pb-6 md:col-start-1 md:row-start-2 md:overflow-y-auto md:pr-2">
           <EjerciciosPanel
             ref={panel}
             region={elegida.nombre}
             categoria={categoria.nombre}
+            estado={
+              ejercicios.isError ? 'error' : ejercicios.isPending ? 'cargando' : 'listo'
+            }
             ejercicios={ejercicios.data}
+            mensajeError={
+              ejercicios.isError ? mensajeDeErrorAtlas(ejercicios.error) : undefined
+            }
             onCerrar={() => setCategoria(null)}
+            onReintentar={() => void ejercicios.refetch()}
           />
         </div>
       ) : null}

@@ -1,6 +1,8 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { ApiError, NetworkError } from '@/lib/api';
+import { crearMockAtlasApi } from './api/mockAtlasApi';
 import { renderAtlas } from '@/test/renderAtlas';
 import { InicioPage } from './InicioPage';
 
@@ -154,5 +156,88 @@ describe('InicioPage: listado de ejercicios', () => {
     expect(
       screen.queryByText('Flexoextensión pasiva de rodilla'),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe('InicioPage: estados de carga, vacío y error', () => {
+  const regionesMock = crearMockAtlasApi();
+
+  it('muestra "Cargando regiones" mientras llega el catálogo', async () => {
+    renderAtlas(<InicioPage />, crearMockAtlasApi({ latenciaMs: 50 }));
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando regiones');
+    await cuerpoListo();
+    expect(screen.queryByText('Cargando regiones…')).not.toBeInTheDocument();
+  });
+
+  it('si fallan las regiones avisa y reintenta hasta cargarlas', async () => {
+    const user = userEvent.setup();
+    const listarRegiones = vi
+      .fn()
+      .mockRejectedValueOnce(new NetworkError())
+      .mockImplementation(() => regionesMock.listarRegiones());
+    renderAtlas(<InicioPage />, { ...regionesMock, listarRegiones });
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/conectar/i);
+    await user.click(screen.getByRole('button', { name: 'Reintentar' }));
+    await cuerpoListo();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(listarRegiones).toHaveBeenCalledTimes(2);
+  });
+
+  it('muestra los huecos de las categorías mientras cargan', async () => {
+    const user = userEvent.setup();
+    const listarCategorias = vi.fn(() => new Promise<never>(() => {}));
+    renderAtlas(<InicioPage />, { ...regionesMock, listarCategorias });
+    await cuerpoListo();
+    await user.click(screen.getByRole('button', { name: 'Rodilla' }));
+    expect(await screen.findByText('Cargando categorías…')).toBeInTheDocument();
+    // Solo queda el botón de volver; las categorías aún no son botones.
+    const menu = screen.getByRole('navigation');
+    expect(within(menu).getAllByRole('button')).toHaveLength(1);
+  });
+
+  it('si fallan las categorías ofrece reintentar', async () => {
+    const user = userEvent.setup();
+    const listarCategorias = vi
+      .fn()
+      .mockRejectedValueOnce(new ApiError(503, { code: 'INTERNAL_ERROR' }))
+      .mockImplementation(() => regionesMock.listarCategorias(1));
+    renderAtlas(<InicioPage />, { ...regionesMock, listarCategorias });
+    await cuerpoListo();
+    await user.click(screen.getByRole('button', { name: 'Rodilla' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/categorías.*servidor/is);
+    await user.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(
+      await screen.findByRole('button', { name: 'Movilización pasiva' }),
+    ).toBeInTheDocument();
+  });
+
+  it('una combinación sin fichas muestra el estado vacío', async () => {
+    const user = userEvent.setup();
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
+    await user.click(screen.getByRole('button', { name: 'Codo' }));
+    await user.click(await screen.findByRole('button', { name: 'Movilización pasiva' }));
+    expect(
+      await screen.findByText(/Todavía no hay ejercicios publicados/),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  });
+
+  it('los ejercicios muestran carga y luego error con reintento', async () => {
+    const user = userEvent.setup();
+    const listarEjercicios = vi
+      .fn()
+      .mockRejectedValueOnce(new NetworkError())
+      .mockImplementation((f) => regionesMock.listarEjercicios(f));
+    renderAtlas(<InicioPage />, { ...regionesMock, listarEjercicios });
+    await cuerpoListo();
+    await user.click(screen.getByRole('button', { name: 'Rodilla' }));
+    await user.click(await screen.findByRole('button', { name: 'Movilización pasiva' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/conectar/i);
+    await user.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(
+      await screen.findByText('Flexoextensión pasiva de rodilla'),
+    ).toBeInTheDocument();
   });
 });
