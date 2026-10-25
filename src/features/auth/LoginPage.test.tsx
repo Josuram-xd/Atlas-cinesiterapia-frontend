@@ -4,13 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { routes } from '@/app/routes';
 import { tokenStorage } from '@/lib/api';
 import { renderWithRouter } from '@/test/renderWithRouter';
-
-const usuario = {
-  id: '1',
-  correo: 'ana@correo.com',
-  rolPerfil: 'ESTUDIANTE',
-  rol: 'USUARIO',
-};
+import { authDemo } from '@/test/fixtures';
 
 function respuesta(status: number, body?: unknown) {
   return new Response(body === undefined ? null : JSON.stringify(body), { status });
@@ -25,9 +19,7 @@ describe('LoginPage', () => {
   });
 
   it('inicia sesión con credenciales correctas y entra al atlas', async () => {
-    fetchMock.mockResolvedValueOnce(
-      respuesta(200, { accessToken: 'a', refreshToken: 'r', usuario }),
-    );
+    fetchMock.mockResolvedValueOnce(respuesta(200, authDemo()));
     const user = userEvent.setup();
     renderWithRouter(routes, ['/login']);
 

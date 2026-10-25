@@ -18,7 +18,9 @@ export function AppShell() {
     <AppLayout
       actions={
         <>
-          {usuario?.rol === 'ADMIN' ? <Link to="/admin">Administración</Link> : null}
+          {usuario?.rolSistema === 'ADMIN' ? (
+            <Link to="/admin">Administración</Link>
+          ) : null}
           <span className="text-tinta-2 max-sm:hidden">{usuario?.correo}</span>
           <Button
             variante="secundario"

@@ -46,7 +46,7 @@ export function PublicOnly() {
 /** Restringe por rol de sistema (usuario / admin). Se usa dentro de RequireAuth. */
 export function RequireRole({ rol }: { rol: RolSistema }) {
   const usuario = useSession((s) => s.usuario);
-  if (usuario?.rol !== rol) {
+  if (usuario?.rolSistema !== rol) {
     return (
       <section className="max-w-xl py-10">
         <h1 className="font-display text-titulo">Sin permiso</h1>

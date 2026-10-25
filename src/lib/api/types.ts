@@ -1,20 +1,19 @@
 /**
- * Contrato de la API en un solo lugar.
- * El backend aún no está desplegado: estos tipos reflejan el contrato descrito en
- * Atlas-cinesiterapia-backend/TASKS.md y deben ajustarse cuando exista el OpenAPI real.
+ * Contrato de la API en un solo lugar. Fuente de verdad: el backend
+ * (Atlas-cinesiterapia-backend, rama task-1-autenticacion: DTOs de auth y ApiError).
  */
 
 /** Rol elegido al registrarse (HU-17). */
 export type RolPerfil = 'ESTUDIANTE' | 'PROFESIONAL' | 'PRACTICANTE' | 'VISITANTE';
 
 /** Rol de sistema que decide los permisos. */
-export type RolSistema = 'USUARIO' | 'ADMIN';
+export type RolSistema = 'USER' | 'ADMIN';
 
 export interface Usuario {
-  id: string;
+  id: number;
   correo: string;
   rolPerfil: RolPerfil;
-  rol: RolSistema;
+  rolSistema: RolSistema;
 }
 
 export interface Tokens {
@@ -24,6 +23,9 @@ export interface Tokens {
 
 /** Respuesta de /auth/login y /auth/refresh. */
 export interface AuthResponse extends Tokens {
+  tokenType: 'Bearer';
+  /** Vigencia del access token en segundos. */
+  expiresIn: number;
   usuario: Usuario;
 }
 

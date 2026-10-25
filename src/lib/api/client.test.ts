@@ -2,8 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { api, setSessionExpiredHandler } from './client';
 import { ApiError, NetworkError } from './errors';
 import { tokenStorage } from './tokenStorage';
-
-const usuario = { id: '1', correo: 'a@b.co', rolPerfil: 'ESTUDIANTE', rol: 'USUARIO' };
+import { authDemo } from '@/test/fixtures';
 
 function json(status: number, body?: unknown) {
   return new Response(body === undefined ? null : JSON.stringify(body), { status });
@@ -36,7 +35,7 @@ describe('cliente HTTP', () => {
     fetchMock
       .mockResolvedValueOnce(json(401, { message: 'expirado' }))
       .mockResolvedValueOnce(
-        json(200, { accessToken: 'nuevo', refreshToken: 'r2', usuario }),
+        json(200, authDemo({ accessToken: 'nuevo', refreshToken: 'r2' })),
       )
       .mockResolvedValueOnce(json(200, [{ id: 1 }]));
     const result = await api.get('/regiones');
@@ -48,7 +47,7 @@ describe('cliente HTTP', () => {
   it('comparte un único refresh entre peticiones simultáneas', async () => {
     fetchMock.mockImplementation(async (url: string, init: RequestInit) => {
       if (url.endsWith('/auth/refresh')) {
-        return json(200, { accessToken: 'nuevo', refreshToken: 'r2', usuario });
+        return json(200, authDemo({ accessToken: 'nuevo', refreshToken: 'r2' }));
       }
       return bearer(init) === 'Bearer viejo' ? json(401) : json(200, { ok: true });
     });
