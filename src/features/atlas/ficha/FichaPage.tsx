@@ -4,6 +4,8 @@ import type { Ejercicio } from '@/lib/api';
 import { useEjercicio } from '../api/hooks';
 import { EstadoError } from '../EstadoError';
 import { mensajeDeErrorAtlas } from '../mensajes';
+import { GaleriaImagenes } from './GaleriaImagenes';
+import { ReproductorVideo } from './ReproductorVideo';
 import { Campo, Seccion } from './Seccion';
 import { cohorteLegible, fechaLarga } from './texto';
 
@@ -67,6 +69,24 @@ function Ficha({ e }: { e: Ejercicio }) {
           {e.objetivoTerapeutico}
         </p>
       </header>
+
+      {e.video || e.imagenes.length > 0 ? (
+        <section
+          aria-label="Video e imágenes"
+          className={`grid gap-4 ${e.video && e.imagenes.length > 0 ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : ''}`}
+        >
+          {e.video ? <ReproductorVideo nombre={e.nombre} video={e.video} /> : null}
+          <GaleriaImagenes
+            nombre={e.nombre}
+            imagenes={e.imagenes}
+            className={
+              e.video
+                ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 lg:content-start'
+                : 'grid-cols-2 sm:grid-cols-3'
+            }
+          />
+        </section>
+      ) : null}
 
       <div className="lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-12">
         <nav aria-label="Secciones de la ficha" className="mb-10 lg:mb-0">
