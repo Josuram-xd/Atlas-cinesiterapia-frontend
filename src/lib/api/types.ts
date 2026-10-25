@@ -80,7 +80,11 @@ export type VistaCuerpo = 'ANTERIOR' | 'POSTERIOR';
 export interface Region {
   id: number;
   nombre: string;
-  /** Id del `<path>` dentro del SVG del cuerpo. */
+  /**
+   * Id del `<path>` dentro del SVG (columna `svg_id` del backend). Lleva el prefijo de la
+   * vista, `<vista>-<region>` (ej. `anterior-rodilla`), porque algunas regiones como
+   * cabeza-cuello existen en ambas vistas y el id debe ser único.
+   */
   svgId: string;
   vista: VistaCuerpo;
 }
