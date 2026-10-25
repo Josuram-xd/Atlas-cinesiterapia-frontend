@@ -4,6 +4,7 @@ import type {
   LoginRequest,
   LogoutRequest,
   RecuperarRequest,
+  RecuperarResponse,
   RegistroRequest,
   RegistroResponse,
   RestablecerRequest,
@@ -17,7 +18,7 @@ export const authApi = {
   logout: (datos: LogoutRequest) =>
     api.post<void>('/auth/logout', datos, { auth: false }),
   recuperar: (datos: RecuperarRequest) =>
-    api.post<void>('/auth/recuperar', datos, { auth: false }),
+    api.post<RecuperarResponse>('/auth/recuperar', datos, { auth: false }),
   restablecer: (datos: RestablecerRequest) =>
     api.post<void>('/auth/restablecer', datos, { auth: false }),
 };

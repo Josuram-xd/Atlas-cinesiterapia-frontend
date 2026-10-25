@@ -57,9 +57,15 @@ export interface RecuperarRequest {
   correo: string;
 }
 
+/** POST /auth/recuperar responde 202 con un mensaje neutro (no revela si el correo existe). */
+export interface RecuperarResponse {
+  mensaje: string;
+}
+
 export interface RestablecerRequest {
   token: string;
-  password: string;
+  /** El backend la llama nuevaPassword (no password). */
+  nuevaPassword: string;
 }
 
 /** POST /auth/cierre-pendiente: lo envía `navigator.sendBeacon` en `pagehide`. */

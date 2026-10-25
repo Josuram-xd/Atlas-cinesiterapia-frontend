@@ -39,7 +39,7 @@ export function RestablecerPage() {
     };
     setErrores(siguiente);
     if (siguiente.password || siguiente.confirmacion) return;
-    restablecer.mutate({ token, password });
+    restablecer.mutate({ token, nuevaPassword: password });
   }
 
   if (!token) {

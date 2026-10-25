@@ -78,7 +78,7 @@ describe('restablecer contraseña', () => {
       JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string),
     ).toEqual({
       token: 'abc123',
-      password: 'nuevaclave1',
+      nuevaPassword: 'nuevaclave1',
     });
   });
 
