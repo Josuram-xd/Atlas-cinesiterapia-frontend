@@ -5,6 +5,7 @@ import {
   useState,
   type MouseEvent,
   type PointerEvent,
+  type RefObject,
 } from 'react';
 import gsap from 'gsap';
 import type { Region } from '@/lib/api';
@@ -13,7 +14,14 @@ import { BodyFigure, type EventoSeleccion } from './BodyFigure';
 import type { Box } from './curves';
 import { BODY_VIEWBOX, type VistaId } from './geometry';
 import { esToque, moverGesto, type Punto } from './gestos';
-import { aTexto, encuadreCompleto, encuadreDe, focoDe, type Lado } from './zoom';
+import {
+  aTexto,
+  encuadreCompleto,
+  encuadreDe,
+  encuadreEnVentana,
+  focoDe,
+  type Lado,
+} from './zoom';
 
 interface BodyAtlasProps {
   vista: VistaId;
@@ -25,6 +33,11 @@ interface BodyAtlasProps {
   /** Se pide volver al cuerpo completo (clic en el fondo o tecla Escape). */
   onClear?: () => void;
   onHover?: (region: Region | null) => void;
+  /**
+   * Hueco libre (por ejemplo, el centro de los menús que rodean el dibujo). Si se da, la
+   * región elegida se encuadra dentro de él, no en todo el contenedor.
+   */
+  ventana?: RefObject<HTMLElement | null>;
   className?: string;
 }
 
@@ -32,6 +45,23 @@ const NOMBRE_VISTA: Record<VistaId, string> = {
   anterior: 'vista anterior',
   posterior: 'vista posterior',
 };
+
+/** Encuadre de una región: dentro de la ventana libre si existe y se puede medir. */
+function encuadreRegion(
+  destino: Box,
+  el: SVGSVGElement | null,
+  hueco: HTMLElement | null,
+  proporcion: number,
+): Box {
+  if (el && hueco) {
+    const c = el.getBoundingClientRect();
+    const v = hueco.getBoundingClientRect();
+    if (c.width > 0 && c.height > 0 && v.width > 0 && v.height > 0) {
+      return encuadreEnVentana(destino, c, v);
+    }
+  }
+  return encuadreDe(destino, proporcion);
+}
 
 const VISTA_ORIGEN = `${BODY_VIEWBOX.w / 2} ${BODY_VIEWBOX.h / 2}`;
 const VIEWBOX_REPOSO = aTexto(BODY_VIEWBOX);
@@ -49,6 +79,7 @@ export function BodyAtlas({
   onSelect,
   onClear,
   onHover,
+  ventana,
   className,
 }: BodyAtlasProps) {
   const [mostrada, setMostrada] = useState<VistaId>(vista);
@@ -100,25 +131,28 @@ export function BodyAtlas({
   useEffect(() => {
     const destino = seleccionada ? focoDe(mostrada, seleccionada, lado.current) : null;
     const objetivo = destino
-      ? encuadreDe(destino, proporcion())
+      ? encuadreRegion(destino, svg.current, ventana?.current ?? null, proporcion())
       : encuadreCompleto(proporcion());
     const tween = irA(objetivo, !destino);
     return () => {
       tween?.kill();
     };
-  }, [seleccionada, mostrada, proporcion, irA]);
+  }, [seleccionada, mostrada, proporcion, irA, ventana]);
 
   // Al cambiar el tamaño de la ventana se reencuadra al instante.
   useEffect(() => {
     function alRedimensionar() {
       const destino = seleccionada ? focoDe(mostrada, seleccionada, lado.current) : null;
       if (!destino) return;
-      Object.assign(camara.current, encuadreDe(destino, proporcion()));
+      Object.assign(
+        camara.current,
+        encuadreRegion(destino, svg.current, ventana?.current ?? null, proporcion()),
+      );
       aplicar();
     }
     window.addEventListener('resize', alRedimensionar);
     return () => window.removeEventListener('resize', alRedimensionar);
-  }, [seleccionada, mostrada, proporcion, aplicar]);
+  }, [seleccionada, mostrada, proporcion, aplicar, ventana]);
 
   // Escape vuelve al cuerpo completo.
   useEffect(() => {

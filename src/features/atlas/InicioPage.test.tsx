@@ -1,11 +1,18 @@
-import { render, screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { renderAtlas } from '@/test/renderAtlas';
 import { InicioPage } from './InicioPage';
 
+/** Espera a que el catálogo de regiones llegue de la API (mock) y los paths sean botones. */
+async function cuerpoListo() {
+  await screen.findByRole('button', { name: 'Rodilla' });
+}
+
 describe('InicioPage', () => {
-  it('empieza en la vista anterior', () => {
-    render(<InicioPage />);
+  it('empieza en la vista anterior', async () => {
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
     expect(screen.getByRole('group', { name: /vista anterior/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Anterior' })).toHaveAttribute(
       'aria-pressed',
@@ -18,7 +25,8 @@ describe('InicioPage', () => {
 
   it('alterna a la vista posterior y muestra sus regiones', async () => {
     const user = userEvent.setup();
-    render(<InicioPage />);
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
     await user.click(screen.getByRole('button', { name: 'Posterior' }));
 
     expect(
@@ -34,7 +42,8 @@ describe('InicioPage', () => {
 
   it('acerca la cámara a la región y vuelve con el botón, Escape o el fondo', async () => {
     const user = userEvent.setup();
-    render(<InicioPage />);
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
     const svg = screen.getByRole('group', { name: /vista anterior/i });
     expect(svg).toHaveAttribute('viewBox', '0 0 400 900');
 
@@ -44,7 +53,7 @@ describe('InicioPage', () => {
     expect(w).toBeLessThan(400);
     expect(h).toBeLessThan(900);
 
-    await user.click(screen.getByRole('button', { name: 'Volver al cuerpo completo' }));
+    await user.click(screen.getByRole('button', { name: 'Cuerpo completo' }));
     expect(svg).toHaveAttribute('viewBox', '0 0 400 900');
 
     await user.click(screen.getByRole('button', { name: 'Codo' }));
@@ -58,8 +67,36 @@ describe('InicioPage', () => {
 
   it('muestra el nombre de la región elegida', async () => {
     const user = userEvent.setup();
-    render(<InicioPage />);
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
     await user.click(screen.getByRole('button', { name: 'Codo' }));
     expect(screen.getByText('Codo', { selector: 'p' })).toBeInTheDocument();
+  });
+
+  it('rodea la región ampliada con las 9 categorías, pedidas a la API', async () => {
+    const user = userEvent.setup();
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Rodilla' }));
+    const menu = await screen.findByRole('navigation', { name: /categorías.*rodilla/i });
+    expect(await within(menu).findAllByRole('button', { name: /./ })).toHaveLength(10);
+    expect(
+      within(menu).getByRole('button', { name: 'Ejercicio activo resistido' }),
+    ).toBeInTheDocument();
+  });
+
+  it('al elegir una categoría la marca; al cambiar de región se desmarca', async () => {
+    const user = userEvent.setup();
+    renderAtlas(<InicioPage />);
+    await cuerpoListo();
+    await user.click(screen.getByRole('button', { name: 'Rodilla' }));
+    const boton = await screen.findByRole('button', { name: 'Movilización pasiva' });
+    await user.click(boton);
+    expect(boton).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(screen.getByRole('button', { name: 'Cuerpo completo' }));
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 });

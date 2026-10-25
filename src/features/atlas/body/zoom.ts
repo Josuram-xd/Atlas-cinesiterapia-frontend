@@ -39,3 +39,34 @@ export const aTexto = (b: Box): string =>
   `${round(b.x)} ${round(b.y)} ${round(b.w)} ${round(b.h)}`;
 
 const round = (n: number) => Math.round(n * 100) / 100;
+
+/** Posición y tamaño en pantalla (px). */
+export interface RectPx {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Encuadre que deja la caja centrada y ajustada dentro de una `ventana` (por ejemplo, el
+ * hueco que dejan los menús alrededor del dibujo), pero con un viewBox que cubre todo el
+ * `contenedor` del SVG: el dibujo sigue siendo visible bajo y alrededor de los menús.
+ * Ambos rectángulos están en coordenadas de pantalla.
+ */
+export function encuadreEnVentana(caja: Box, contenedor: RectPx, ventana: RectPx): Box {
+  const ajustado = encuadreDe(caja, ventana.width / ventana.height);
+  const escala = ventana.width / ajustado.w; // px por unidad
+  const centroVentana = {
+    x: ventana.left + ventana.width / 2 - contenedor.left,
+    y: ventana.top + ventana.height / 2 - contenedor.top,
+  };
+  const w = contenedor.width / escala;
+  const h = contenedor.height / escala;
+  return {
+    x: ajustado.x + ajustado.w / 2 - centroVentana.x / escala,
+    y: ajustado.y + ajustado.h / 2 - centroVentana.y / escala,
+    w,
+    h,
+  };
+}
