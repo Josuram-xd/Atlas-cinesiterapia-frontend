@@ -12,6 +12,14 @@ async function cuerpoListo() {
 }
 
 describe('InicioPage', () => {
+  it('registra una visita al atlas al abrir la página', async () => {
+    const api = crearMockAtlasApi();
+    const espia = vi.spyOn(api, 'registrarVisitaAtlas');
+    renderAtlas(<InicioPage />, api);
+    await cuerpoListo();
+    expect(espia).toHaveBeenCalledTimes(1);
+  });
+
   it('empieza en la vista anterior', async () => {
     renderAtlas(<InicioPage />);
     await cuerpoListo();

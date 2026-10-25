@@ -287,6 +287,20 @@ export interface SubidaPrefirmada {
   expiraEn: string;
 }
 
+// --- Métricas --------------------------------------------------------------------
+
+/** Cuerpo de POST /metricas/visitas (docs/API.md, sección 9). */
+export type VisitaRequest = { tipo: 'FICHA'; ejercicioId: number } | { tipo: 'ATLAS' };
+
+/** Respuesta de POST /metricas/sesion/ping. */
+export interface Sesion {
+  sesionId: number;
+  nuevaSesion: boolean;
+  inicio: string;
+  ultimoPing: string;
+  duracionSegundos: number;
+}
+
 // --- Errores ---------------------------------------------------------------------
 
 /** Un campo inválido dentro de `fieldErrors`. */
