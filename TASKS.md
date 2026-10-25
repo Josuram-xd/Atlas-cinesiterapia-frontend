@@ -33,7 +33,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 
 ## Fase 1 — Autenticación (HU-16 a HU-20)
 - [x] 1.1 Pantalla de login (HU-16)
-- [ ] 1.2 Pantalla de registro con selección de rol (HU-17)
+- [x] 1.2 Pantalla de registro con selección de rol (HU-17)
 - [ ] 1.3 Recuperar contraseña: solicitud y restablecimiento (HU-18)
 - [ ] 1.4 Store de sesión, rutas protegidas y guard por rol (usuario / admin)
 - [ ] 1.5 Cierre de sesión al cerrar la pestaña con periodo de gracia (HU-19)
