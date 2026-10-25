@@ -44,12 +44,14 @@ export const REGIONES_MOCK: Region[] = [
     nombre,
     svgId: `anterior-${slug}`,
     vista: 'ANTERIOR',
+    orden: i + 1,
   })),
   ...posterior.map(([slug, nombre], i): Region => ({
     id: 100 + i + 1,
     nombre,
     svgId: `posterior-${slug}`,
     vista: 'POSTERIOR',
+    orden: i + 1,
   })),
 ];
 
@@ -63,4 +65,4 @@ export const CATEGORIAS_MOCK: Categoria[] = [
   'Propiocepción y equilibrio',
   'Control motor y estabilización',
   'Facilitación neuromuscular propioceptiva (FNP)',
-].map((nombre, i) => ({ id: i + 1, nombre }));
+].map((nombre, i) => ({ id: i + 1, nombre, orden: i + 1 }));

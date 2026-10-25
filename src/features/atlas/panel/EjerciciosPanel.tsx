@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { Link } from 'react-router-dom';
 import type { EjercicioResumen } from '@/lib/api';
 import { EstadoError } from '../EstadoError';
 
@@ -82,11 +83,18 @@ export const EjerciciosPanel = forwardRef<HTMLElement, EjerciciosPanelProps>(
         {estado === 'listo' && !vacio ? (
           <ul className="flex flex-col gap-2">
             {ejercicios.map((e) => (
-              <li key={e.id} className="bg-fondo-2 flex flex-col gap-1 px-4 py-3">
-                <span className="font-display text-lg leading-snug font-semibold">
-                  {e.nombre}
-                </span>
-                <span className="text-tinta-2">{e.resumen}</span>
+              <li key={e.id}>
+                <Link
+                  to={`/ejercicios/${e.id}`}
+                  className="bg-fondo-2 hover:bg-fondo-3 text-tinta flex items-baseline justify-between gap-4 px-4 py-4 no-underline transition-colors duration-150"
+                >
+                  <span className="font-display text-lg leading-snug font-semibold">
+                    {e.nombre}
+                  </span>
+                  <span className="text-acento shrink-0 font-semibold underline underline-offset-4">
+                    Ver ficha
+                  </span>
+                </Link>
               </li>
             ))}
           </ul>

@@ -1,5 +1,6 @@
 import type { RouteObject } from 'react-router-dom';
 import { AdminPage } from '@/features/admin/AdminPage';
+import { FichaPage } from '@/features/atlas/ficha/FichaPage';
 import { InicioPage } from '@/features/atlas/InicioPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RecuperarPage } from '@/features/auth/RecuperarPage';
@@ -25,6 +26,7 @@ export const routes: RouteObject[] = [
         element: <AppShell />,
         children: [
           { path: '/', element: <InicioPage /> },
+          { path: '/ejercicios/:id', element: <FichaPage /> },
           {
             element: <RequireRole rol="ADMIN" />,
             children: [{ path: '/admin', element: <AdminPage /> }],

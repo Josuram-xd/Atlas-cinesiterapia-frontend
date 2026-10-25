@@ -33,3 +33,13 @@ export function useEjercicios(regionId: number | null, categoriaId: number | nul
     staleTime: 60_000,
   });
 }
+
+export function useEjercicio(id: number | null) {
+  const api = useAtlasApi();
+  return useQuery({
+    queryKey: ['atlas', 'ejercicio', id],
+    queryFn: ({ signal }) => api.obtenerEjercicio(id!, signal),
+    enabled: id !== null,
+    staleTime: 60_000,
+  });
+}
