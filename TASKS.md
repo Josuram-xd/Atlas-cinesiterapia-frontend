@@ -28,7 +28,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 0.1 Scaffold Vite + React + TS, Tailwind, ESLint, Prettier, Vitest
 - [x] 0.2 Estructura de carpetas (`features/`, `components/`, `lib/api`), cliente HTTP con interceptor de refresh
 - [x] 0.3 Tokens de diseño (color, tipografía, espaciado) y layout base
-- [ ] 0.4 CI en GitHub Actions: lint + test + build
+- [x] 0.4 CI en GitHub Actions: lint + test + build
 - [ ] 0.5 README con cómo correr y variables de entorno
 
 ## Fase 1 — Autenticación (HU-16 a HU-20)
