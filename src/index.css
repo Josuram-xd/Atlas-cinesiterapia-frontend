@@ -138,3 +138,8 @@
 .superficie-oscura a:hover {
   color: var(--color-fondo);
 }
+
+/* Con la cámara acercada, el resto del cuerpo cede protagonismo (sigue siendo operable). */
+svg[data-zoom='si'] .region:not([aria-pressed='true']):not(:hover):not(:focus-visible) {
+  fill: var(--color-fondo);
+}

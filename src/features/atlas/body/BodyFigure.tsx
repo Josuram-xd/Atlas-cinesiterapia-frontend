@@ -1,9 +1,8 @@
-import type { KeyboardEvent, PointerEvent } from 'react';
+import type { KeyboardEvent, MouseEvent } from 'react';
 import type { Region } from '@/lib/api';
 import { GEOMETRIA, ORDEN_REGIONES, type VistaId } from './geometry';
 
-export type EventoSeleccion =
-  PointerEvent<SVGPathElement> | KeyboardEvent<SVGPathElement>;
+export type EventoSeleccion = MouseEvent<SVGPathElement> | KeyboardEvent<SVGPathElement>;
 
 interface BodyFigureProps {
   vista: VistaId;
@@ -40,7 +39,7 @@ export function BodyFigure({
                 tabIndex: 0,
                 'aria-label': region.nombre,
                 'aria-pressed': seleccionada === svgId,
-                onClick: (e: PointerEvent<SVGPathElement>) => onSelect(region, e),
+                onClick: (e: MouseEvent<SVGPathElement>) => onSelect(region, e),
                 onKeyDown: (e: KeyboardEvent<SVGPathElement>) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();

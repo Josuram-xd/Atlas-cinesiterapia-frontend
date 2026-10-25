@@ -43,7 +43,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 2.1 Dibujar el SVG del cuerpo: vista anterior y posterior con todas las regiones como paths separados
 - [x] 2.2 Componente `BodyAtlas`: regiones clicables, hover, foco con teclado, etiqueta accesible
 - [x] 2.3 Alternar vista anterior/posterior con animación
-- [ ] 2.4 Zoom animado a la región y botón/gesto para volver al cuerpo completo
+- [x] 2.4 Zoom animado a la región y botón/gesto para volver al cuerpo completo
 - [ ] 2.5 Gestos táctiles: tocar región, pellizco y arrastre en móvil
 - [ ] 2.6 Menú de las 9 categorías alrededor de la región ampliada
 - [ ] 2.7 Panel con el listado de ejercicios de la categoría

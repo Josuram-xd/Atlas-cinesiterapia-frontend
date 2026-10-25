@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from '@/components/Button';
 import type { Region } from '@/lib/api';
 import { BodyAtlas } from './body/BodyAtlas';
 import type { VistaId } from './body/geometry';
@@ -28,14 +29,20 @@ export function InicioPage() {
           <span className="text-tinta-2 font-light">Región: </span>
           {nombre}
         </p>
+        <div className={elegida ? undefined : 'invisible'}>
+          <Button variante="secundario" onClick={() => setElegida(null)}>
+            Volver al cuerpo completo
+          </Button>
+        </div>
       </div>
       <BodyAtlas
         vista={vista}
         regiones={REGIONES_MOCK}
         seleccionada={elegida?.svgId}
         onSelect={setElegida}
+        onClear={() => setElegida(null)}
         onHover={setApuntada}
-        className="mx-auto max-h-[78dvh] w-full"
+        className="mx-auto h-[68dvh] w-full md:h-[78dvh]"
       />
     </div>
   );
