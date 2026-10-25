@@ -42,6 +42,24 @@ describe('cierre de sesión al cerrar la pestaña', () => {
     expect(JSON.parse(await blob.text())).toEqual({ refreshToken: 'r1' });
   });
 
+  it('si el navegador rechaza el beacon, lo reenvía con fetch keepalive', async () => {
+    beacon.mockReturnValueOnce(false);
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    useSession.getState().iniciar(authDemo({ refreshToken: 'r1' }));
+
+    expect(enviarCierrePendiente()).toBe(true);
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toMatch(/\/auth\/cierre-pendiente$/);
+    expect(init.keepalive).toBe(true);
+    expect(init.method).toBe('POST');
+    expect((init.headers as Record<string, string>)['Content-Type']).toBe(
+      'application/json',
+    );
+    expect(JSON.parse(init.body as string)).toEqual({ refreshToken: 'r1' });
+  });
+
   it('no envía nada si no hay sesión', () => {
     render(<Montador />);
     window.dispatchEvent(new Event('pagehide'));

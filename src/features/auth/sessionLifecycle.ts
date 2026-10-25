@@ -5,14 +5,36 @@ import { useSession } from './sessionStore';
 /**
  * Avisa al backend de que la pestaña se está cerrando (RF_029). El backend espera 60 s
  * antes de invalidar la sesión (RF_030); un refresh exitoso dentro de ese margen cancela
- * el cierre. `sendBeacon` sobrevive al cierre de la página, a diferencia de `fetch`.
+ * el cierre.
+ *
+ * El endpoint es público y toma el refresh token del cuerpo JSON, así que no necesita
+ * Authorization. Como el cuerpo es `application/json`, entre orígenes distintos el navegador
+ * hace una petición previa CORS: el backend la admite (Content-Type permitido, maxAge 3600)
+ * siempre que el origen del frontend esté en su variable CORS_ORIGINS.
+ * `sendBeacon` sobrevive al cierre de la página; si el navegador lo rechaza (devuelve
+ * false) se reintenta con `fetch` y `keepalive`, que también sobrevive.
  */
 export function enviarCierrePendiente(): boolean {
   const tokens = tokenStorage.get();
-  if (!tokens || typeof navigator.sendBeacon !== 'function') return false;
+  if (!tokens) return false;
   const cuerpo: CierrePendienteRequest = { refreshToken: tokens.refreshToken };
-  const blob = new Blob([JSON.stringify(cuerpo)], { type: 'application/json' });
-  return navigator.sendBeacon(`${API_URL}/auth/cierre-pendiente`, blob);
+  const json = JSON.stringify(cuerpo);
+  const url = `${API_URL}/auth/cierre-pendiente`;
+
+  if (typeof navigator.sendBeacon === 'function') {
+    const blob = new Blob([json], { type: 'application/json' });
+    if (navigator.sendBeacon(url, blob)) return true;
+  }
+  if (typeof fetch !== 'function') return false;
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: json,
+    keepalive: true,
+  }).catch(() => {
+    /* si falla, el refresh token expirará por su cuenta */
+  });
+  return true;
 }
 
 /**
