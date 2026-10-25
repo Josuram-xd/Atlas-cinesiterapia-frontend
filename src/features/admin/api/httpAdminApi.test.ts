@@ -151,6 +151,15 @@ describe('putConProgreso', () => {
     vi.unstubAllGlobals();
   });
 
+  it('no envía el archivo a esquemas que no sean http(s)', async () => {
+    await expect(
+      putConProgreso('javascript:alert(1)', {}, new Blob(['a']), vi.fn()),
+    ).rejects.toBeInstanceOf(SubidaRechazadaError);
+    await expect(
+      putConProgreso('file:///c:/x', {}, new Blob(['a']), vi.fn()),
+    ).rejects.toBeInstanceOf(SubidaRechazadaError);
+  });
+
   it('se cancela con la señal', async () => {
     vi.stubGlobal('XMLHttpRequest', XhrFalso);
     const control = new AbortController();

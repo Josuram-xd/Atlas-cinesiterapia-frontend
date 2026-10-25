@@ -34,6 +34,8 @@ export function putConProgreso(
   signal?: AbortSignal,
 ): Promise<void> {
   return new Promise((resolver, rechazar) => {
+    // La URL la entrega el backend: solo se acepta http(s), nunca otros esquemas.
+    if (!/^https?:\/\//i.test(url)) return rechazar(new SubidaRechazadaError(0));
     if (signal?.aborted) return rechazar(new DOMException('Cancelado', 'AbortError'));
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', url);
