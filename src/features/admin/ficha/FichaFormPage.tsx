@@ -20,6 +20,7 @@ import { describirError } from '../erroresAdmin';
 import { PasoMultimedia } from '../media/PasoMultimedia';
 import { EtiquetaEstado } from '../lista/EtiquetaEstado';
 import {
+  etiquetaCampo,
   fichaAForm,
   formARequest,
   formVacio,
@@ -37,6 +38,15 @@ import {
   PasoMetadatos,
   PasoProtocolo,
 } from './PasosFicha';
+
+/** Agrupa los campos faltantes por el paso del formulario donde se completan. */
+function agruparPorPaso(campos: string[]) {
+  return PASOS.map((p) => ({
+    paso: p.id,
+    titulo: p.titulo,
+    campos: campos.filter((c) => pasoDeCampo(c) === p.id),
+  })).filter((g) => g.campos.length > 0);
+}
 
 function VolverALista() {
   return (
@@ -70,6 +80,7 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
   );
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [aviso, setAviso] = useState<Aviso | null>(null);
+  const [faltantes, setFaltantes] = useState<string[]>(inicial?.camposFaltantes ?? []);
   const [irA, setIrA] = useState<string | null>(null);
 
   const sinGuardar = hayCambios(base, form);
@@ -104,6 +115,7 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
         ? await acciones.actualizar.mutateAsync({ id: ficha.id, datos })
         : await acciones.crear.mutateAsync(datos);
       setFicha(guardada);
+      setFaltantes(guardada.camposFaltantes);
       setBase(form);
       setErrores({});
       setAviso({ tipo: 'ok', texto: 'Borrador guardado.' });
@@ -115,9 +127,32 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
     } catch (error) {
       const d = describirError(error);
       setErrores(d.campos);
+      if (d.faltantes.length > 0) setFaltantes(d.faltantes);
       setAviso({ tipo: 'error', texto: d.mensaje });
       irAlPrimerError(Object.keys(d.campos));
       return null;
+    }
+  }
+
+  /** Guarda lo pendiente y publica. Si el backend responde 422 muestra qué falta, por paso. */
+  async function publicar() {
+    const guardada = sinGuardar || !ficha ? await guardarBorrador() : ficha;
+    if (!guardada) return;
+    try {
+      const publicada = await acciones.publicar.mutateAsync(guardada.id);
+      setFicha(publicada);
+      setFaltantes([]);
+      setErrores({});
+      setAviso({
+        tipo: 'ok',
+        texto: 'Ficha publicada. Ya la ven todas las personas usuarias.',
+      });
+    } catch (error) {
+      const d = describirError(error);
+      setErrores(d.campos);
+      setFaltantes(d.faltantes);
+      setAviso({ tipo: 'error', texto: d.mensaje });
+      irAlPrimerError(d.faltantes.length > 0 ? d.faltantes : Object.keys(d.campos));
     }
   }
 
@@ -126,11 +161,14 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
     if (!ficha) return;
     const actual = await adminApi.obtenerFicha(ficha.id);
     setFicha(actual);
+    setFaltantes(actual.camposFaltantes);
     cliente.setQueryData([...CLAVE_FICHAS, 'detalle', actual.id], actual);
     void cliente.invalidateQueries({ queryKey: [...CLAVE_FICHAS, 'lista'] });
   }
 
   const guardando = acciones.crear.isPending || acciones.actualizar.isPending;
+  const publicando = acciones.publicar.isPending;
+  const porPaso = agruparPorPaso(faltantes);
   const indice = PASOS.findIndex((p) => p.id === paso);
   const props = { form, errores, onCambio: cambiar };
 
@@ -145,9 +183,27 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
               {ficha ? ficha.nombre : 'Nueva ficha'}
             </h1>
           </div>
-          <Button onClick={() => void guardarBorrador()} cargando={guardando}>
-            Guardar borrador
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variante={
+                ficha?.estado === 'BORRADOR' || !ficha ? 'secundario' : 'primario'
+              }
+              onClick={() => void guardarBorrador()}
+              cargando={guardando}
+              disabled={publicando}
+            >
+              Guardar borrador
+            </Button>
+            {ficha?.estado === 'BORRADOR' ? (
+              <Button
+                onClick={() => void publicar()}
+                cargando={publicando}
+                disabled={guardando}
+              >
+                Publicar
+              </Button>
+            ) : null}
+          </div>
         </div>
         <div aria-live="polite">
           {aviso ? (
@@ -155,6 +211,38 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
           ) : null}
         </div>
       </header>
+
+      {faltantes.length > 0 && ficha?.estado !== 'ARCHIVADO' ? (
+        <section
+          aria-labelledby="faltantes-titulo"
+          className="bg-fondo-2 border-error flex flex-col gap-3 border-l-4 px-5 py-4"
+        >
+          <h2 id="faltantes-titulo" className="font-display text-xl">
+            {ficha?.estado === 'PUBLICADO'
+              ? `Faltan ${faltantes.length} datos obligatorios para guardar los cambios`
+              : `Faltan ${faltantes.length} datos obligatorios para publicar`}
+          </h2>
+          <ul className="flex flex-col gap-1">
+            {porPaso.map(({ paso: id, titulo, campos }) => (
+              <li key={id}>
+                <button
+                  type="button"
+                  onClick={() => setPaso(id)}
+                  className="text-acento min-h-11 cursor-pointer text-left font-semibold underline underline-offset-4"
+                >
+                  {titulo}
+                </button>
+                <span className="text-tinta-2">
+                  : {campos.map(etiquetaCampo).join(', ')}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-tinta-2">
+            Según lo último que se guardó o que respondió el servidor.
+          </p>
+        </section>
+      ) : null}
 
       <nav aria-label="Pasos de la ficha">
         <ol className="flex flex-wrap gap-2">
@@ -171,6 +259,9 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
                 }`}
               >
                 {p.titulo}
+                {porPaso.find((g) => g.paso === p.id) ? (
+                  <span className="font-light"> · pendiente</span>
+                ) : null}
               </button>
             </li>
           ))}
@@ -202,6 +293,7 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
         {paso === 'multimedia' ? (
           <PasoMultimedia
             ficha={ficha}
+            error={errores.media}
             onGuardarBorrador={guardarBorrador}
             onCambio={recargarFicha}
           />

@@ -5,6 +5,7 @@ import { crearMockAtlasApi } from '../../atlas/api/mockAtlasApi';
 import { renderWithRouter } from '@/test/renderWithRouter';
 import type { AdminApi } from '../api/adminApi';
 import { crearMockAdminApi } from '../api/mockAdminApi';
+import { ApiError } from '@/lib/api';
 import { FichaFormPage } from './FichaFormPage';
 
 const rutas = [
@@ -197,5 +198,123 @@ describe('FichaFormPage: editar', () => {
     expect(
       await screen.findByRole('heading', { name: 'Esta ficha no existe' }),
     ).toBeInTheDocument();
+  });
+});
+
+/** Deja el borrador 3 completo (todos los campos y una imagen) para poder publicarlo. */
+async function completar(api: AdminApi) {
+  const f = await api.obtenerFicha(3);
+  await api.actualizarFicha(3, {
+    nombre: f.nombre,
+    regionId: f.region.id,
+    categoriaId: f.categoria.id,
+    objetivoTerapeutico: 'o',
+    estructurasIntervenidas: 'e',
+    indicaciones: 'i',
+    precaucionesContraindicaciones: 'p',
+    posicionPaciente: 'pp',
+    posicionFisioterapeuta: 'pf',
+    ejecucion: 'x',
+    comandosVerbales: 'c',
+    dosificacion: {
+      series: '3',
+      repeticiones: '10',
+      intensidad: 'l',
+      tiempo: '2 s',
+      descanso: '60 s',
+      frecuencia: 'd',
+    },
+    progresion: null,
+    erroresComunes: null,
+    estudiantesCreadores: ['Ana'],
+    cohorte: '2025-1',
+    profesoraRevisora: 'Dra. R',
+  });
+  const s = await api.solicitarSubida(3, {
+    tipo: 'IMAGEN',
+    rol: 'OTRO',
+    nombreArchivo: 'a.png',
+    contentType: 'image/png',
+    tamanoBytes: 10,
+  });
+  await api.confirmarMedia(3, s.mediaId);
+}
+
+describe('FichaFormPage: publicar', () => {
+  it('lista por paso lo que falta para publicar', async () => {
+    montar('/admin/fichas/3');
+    const panel = await screen.findByRole('region', {
+      name: /datos obligatorios para publicar/,
+    });
+    expect(
+      within(panel).getByRole('button', { name: 'Protocolo clínico' }),
+    ).toBeInTheDocument();
+    expect(within(panel).getByText(/Indicaciones/)).toBeInTheDocument();
+    expect(within(panel).getByRole('button', { name: 'Multimedia' })).toBeInTheDocument();
+  });
+
+  it('al publicar con campos faltantes muestra los del 422 y lleva al primer paso afectado', async () => {
+    const { user, api } = montar('/admin/fichas/3');
+    const publicar = vi.spyOn(api, 'publicarFicha');
+    await user.click(await screen.findByRole('button', { name: 'Publicar' }));
+    expect(
+      await screen.findByText('Faltan datos obligatorios para publicar la ficha.'),
+    ).toBeInTheDocument();
+    expect(publicar).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Protocolo clínico' }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByLabelText('Indicaciones').closest('div')!).getByText(
+        'Campo obligatorio',
+      ),
+    ).toBeInTheDocument();
+    const panel = screen.getByRole('region', {
+      name: /datos obligatorios para publicar/,
+    });
+    expect(within(panel).getByText(/Repeticiones/)).toBeInTheDocument();
+  });
+
+  it('publica una ficha completa y cambia su estado', async () => {
+    const api = crearMockAdminApi();
+    await completar(api);
+    const { user } = montar('/admin/fichas/3', api);
+    await user.click(await screen.findByRole('button', { name: 'Publicar' }));
+    expect(await screen.findByText(/Ficha publicada/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Publicar' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: /datos obligatorios/ }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Publicada')).toBeInTheDocument();
+  });
+
+  it('guarda los cambios pendientes antes de publicar', async () => {
+    const api = crearMockAdminApi();
+    await completar(api);
+    const { user } = montar('/admin/fichas/3', api);
+    const orden: string[] = [];
+    const guardar = api.actualizarFicha.bind(api);
+    const publicar = api.publicarFicha.bind(api);
+    api.actualizarFicha = (...a) => (orden.push('guardar'), guardar(...a));
+    api.publicarFicha = (...a) => (orden.push('publicar'), publicar(...a));
+    await user.type(await screen.findByLabelText('Estructuras intervenidas'), ' y más');
+    await user.click(screen.getByRole('button', { name: 'Publicar' }));
+    await screen.findByText(/Ficha publicada/);
+    expect(orden).toEqual(['guardar', 'publicar']);
+  });
+
+  it('un nuevo borrador no se puede publicar hasta guardarlo', async () => {
+    montar('/admin/fichas/nueva');
+    expect(screen.queryByRole('button', { name: 'Publicar' })).not.toBeInTheDocument();
+  });
+
+  it('muestra el error si el servidor rechaza la publicación por estado', async () => {
+    const api = crearMockAdminApi();
+    await completar(api);
+    api.publicarFicha = () =>
+      Promise.reject(new ApiError(409, { code: 'ESTADO_INVALIDO', message: 'x' }));
+    const { user } = montar('/admin/fichas/3', api);
+    await user.click(await screen.findByRole('button', { name: 'Publicar' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/cambió de estado/);
   });
 });

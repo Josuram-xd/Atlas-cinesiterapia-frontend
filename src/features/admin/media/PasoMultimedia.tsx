@@ -17,6 +17,8 @@ interface PasoMultimediaProps {
   ficha: EjercicioAdmin | null;
   /** Guarda el borrador para obtener el id; devuelve la ficha o `null` si falló. */
   onGuardarBorrador: () => Promise<unknown>;
+  /** Mensaje del servidor sobre los archivos (por ejemplo, que falta al menos uno). */
+  error?: string;
   /** Avisa que los archivos de la ficha cambiaron, para volver a leerla. */
   onCambio: () => Promise<void> | void;
 }
@@ -37,6 +39,7 @@ interface Subida {
 /** Paso de multimedia: sube video e imágenes con URL prefirmada y progreso, y los elimina. */
 export function PasoMultimedia({
   ficha,
+  error,
   onGuardarBorrador,
   onCambio,
 }: PasoMultimediaProps) {
@@ -132,6 +135,7 @@ export function PasoMultimedia({
 
   return (
     <div className="flex max-w-3xl flex-col gap-10">
+      {error && !aviso ? <Notice tipo="error">{error}</Notice> : null}
       {aviso ? (
         <Notice tipo={aviso.tipo === 'ok' ? 'info' : 'error'}>{aviso.texto}</Notice>
       ) : null}
