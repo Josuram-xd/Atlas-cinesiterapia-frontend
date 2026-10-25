@@ -69,11 +69,37 @@ describe('cliente HTTP', () => {
     expect(expired).toHaveBeenCalledOnce();
   });
 
+  it('conserva la sesión si el refresh falla por un error transitorio (503 o 429)', async () => {
+    const expired = vi.fn();
+    setSessionExpiredHandler(expired);
+    fetchMock
+      .mockResolvedValueOnce(json(401))
+      .mockResolvedValueOnce(json(503, { code: 'INTERNAL_ERROR' }));
+    await expect(api.get('/regiones')).rejects.toBeInstanceOf(ApiError);
+    expect(tokenStorage.get()).not.toBeNull();
+    expect(expired).not.toHaveBeenCalled();
+  });
+
+  it('cierra la sesión si el backend responde SESION_EXPIRADA al refrescar', async () => {
+    const expired = vi.fn();
+    setSessionExpiredHandler(expired);
+    fetchMock
+      .mockResolvedValueOnce(json(401))
+      .mockResolvedValueOnce(json(401, { code: 'SESION_EXPIRADA' }));
+    await expect(api.get('/regiones')).rejects.toBeInstanceOf(ApiError);
+    expect(expired).toHaveBeenCalledOnce();
+  });
+
   it('no reintenta en endpoints públicos (auth: false)', async () => {
-    fetchMock.mockResolvedValueOnce(json(401, { message: 'credenciales inválidas' }));
+    fetchMock.mockResolvedValueOnce(
+      json(401, {
+        code: 'CREDENCIALES_INVALIDAS',
+        message: 'Correo o contrasena incorrectos',
+      }),
+    );
     await expect(api.post('/auth/login', {}, { auth: false })).rejects.toMatchObject({
       status: 401,
-      message: 'credenciales inválidas',
+      code: 'CREDENCIALES_INVALIDAS',
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });

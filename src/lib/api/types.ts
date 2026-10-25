@@ -92,10 +92,22 @@ export interface Categoria {
 
 // --- Errores ---------------------------------------------------------------------
 
-/** Formato uniforme de error del backend (ControllerAdvice). */
+/** Un campo inválido dentro de `fieldErrors`. */
+export interface FieldViolation {
+  field: string;
+  message: string;
+}
+
+/**
+ * Formato uniforme de error del backend (ApiError). `code` es estable; `message` va en
+ * español sin tildes y no se muestra tal cual. `fieldErrors` se omite si está vacío.
+ */
 export interface ApiErrorBody {
-  message?: string;
+  timestamp?: string;
+  status?: number;
+  error?: string;
   code?: string;
-  /** Errores por campo, cuando aplica. */
-  errors?: Record<string, string>;
+  message?: string;
+  path?: string;
+  fieldErrors?: FieldViolation[];
 }

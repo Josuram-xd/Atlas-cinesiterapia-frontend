@@ -5,9 +5,12 @@ import { AuthLayout } from '@/components/AuthLayout';
 import { Button } from '@/components/Button';
 import { Notice } from '@/components/Notice';
 import { TextField } from '@/components/TextField';
+import { ApiError } from '@/lib/api';
 import { authApi } from './api';
 import { mensajeDeError } from './messages';
-import { PASSWORD_MIN, validarPasswordNueva } from './validation';
+import { PASSWORD_MAX, PASSWORD_MIN, validarPasswordNueva } from './validation';
+
+const ENLACE_VENCIDO = 'El enlace venció o ya se usó. Pide uno nuevo.';
 
 export function RestablecerPage() {
   const navigate = useNavigate();
@@ -28,6 +31,12 @@ export function RestablecerPage() {
       });
     },
   });
+
+  const enlaceInvalido =
+    restablecer.error instanceof ApiError &&
+    (restablecer.error.code === 'TOKEN_INVALIDO' ||
+      restablecer.error.status === 404 ||
+      restablecer.error.status === 410);
 
   function enviar(evento: FormEvent) {
     evento.preventDefault();
@@ -68,12 +77,21 @@ export function RestablecerPage() {
       <form onSubmit={enviar} noValidate className="flex flex-col gap-5">
         {restablecer.isError ? (
           <Notice tipo="error">
-            {mensajeDeError(restablecer.error, {
-              400: 'El enlace venció o ya se usó. Pide uno nuevo.',
-              404: 'El enlace venció o ya se usó. Pide uno nuevo.',
-              410: 'El enlace venció o ya se usó. Pide uno nuevo.',
-            })}{' '}
-            <Link to="/recuperar">Pedir un enlace nuevo</Link>
+            {mensajeDeError(
+              restablecer.error,
+              {
+                404: ENLACE_VENCIDO,
+                410: ENLACE_VENCIDO,
+                400: 'Revisa la contraseña: debe tener entre 8 y 72 caracteres.',
+              },
+              { TOKEN_INVALIDO: ENLACE_VENCIDO },
+            )}
+            {enlaceInvalido ? (
+              <>
+                {' '}
+                <Link to="/recuperar">Pedir un enlace nuevo</Link>
+              </>
+            ) : null}
           </Notice>
         ) : null}
         <TextField
@@ -83,7 +101,7 @@ export function RestablecerPage() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          ayuda={`Mínimo ${PASSWORD_MIN} caracteres.`}
+          ayuda={`Entre ${PASSWORD_MIN} y ${PASSWORD_MAX} caracteres.`}
           error={errores.password}
         />
         <TextField

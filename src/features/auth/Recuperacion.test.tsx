@@ -95,7 +95,12 @@ describe('restablecer contraseña', () => {
   });
 
   it('ofrece pedir otro enlace cuando el token venció', async () => {
-    fetchMock.mockResolvedValueOnce(respuesta(400, { message: 'Token vencido' }));
+    fetchMock.mockResolvedValueOnce(
+      respuesta(400, {
+        code: 'TOKEN_INVALIDO',
+        message: 'El enlace no es valido o ya expiro',
+      }),
+    );
     const user = userEvent.setup();
     renderWithRouter(routes, ['/restablecer?token=viejo']);
 
@@ -108,6 +113,25 @@ describe('restablecer contraseña', () => {
       'href',
       '/recuperar',
     );
+  });
+
+  it('un error de validación no se confunde con un enlace vencido', async () => {
+    fetchMock.mockResolvedValueOnce(
+      respuesta(400, {
+        code: 'VALIDATION_ERROR',
+        message: 'Datos de entrada invalidos',
+        fieldErrors: [{ field: 'nuevaPassword', message: 'entre 8 y 72' }],
+      }),
+    );
+    const user = userEvent.setup();
+    renderWithRouter(routes, ['/restablecer?token=abc123']);
+
+    await user.type(screen.getByLabelText('Contraseña nueva'), 'nuevaclave1');
+    await user.type(screen.getByLabelText('Confirma la contraseña'), 'nuevaclave1');
+    await user.click(screen.getByRole('button', { name: 'Guardar contraseña' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('entre 8 y 72');
+    expect(screen.queryByRole('link', { name: 'Pedir un enlace nuevo' })).toBeNull();
   });
 
   it('avisa cuando el enlace no trae token', () => {
