@@ -19,31 +19,39 @@ export function InicioPage() {
   }
 
   return (
-    <div className="grid flex-1 items-center gap-8 md:grid-cols-[1fr_minmax(0,30rem)]">
-      <div className="flex flex-col gap-8">
-        <h1 className="font-display text-gigante max-w-[12ch]">
+    <div className="flex flex-1 flex-col gap-4 md:grid md:grid-cols-[1fr_minmax(0,30rem)] md:items-center md:gap-8">
+      <div className="flex flex-col gap-3 md:gap-8">
+        <h1 className="font-display text-titulo md:text-gigante md:max-w-[12ch]">
           Elige una región del cuerpo
         </h1>
         <VistaToggle vista={vista} onChange={cambiarVista} />
-        <p className="font-display text-titulo" aria-live="polite">
-          <span className="text-tinta-2 font-light">Región: </span>
-          {nombre}
-        </p>
-        <div className={elegida ? undefined : 'invisible'}>
-          <Button variante="secundario" onClick={() => setElegida(null)}>
-            Volver al cuerpo completo
-          </Button>
+        <div className="flex min-h-12 items-center justify-between gap-3 md:min-h-0 md:flex-col md:items-start md:gap-8">
+          <p className="font-display text-xl md:text-titulo" aria-live="polite">
+            <span className="text-tinta-2 font-light">Región: </span>
+            {nombre}
+          </p>
+          {elegida ? (
+            <Button
+              variante="secundario"
+              onClick={() => setElegida(null)}
+              className="min-h-10 px-4 py-1.5 md:min-h-12 md:px-6 md:py-2.5"
+            >
+              Volver al cuerpo completo
+            </Button>
+          ) : null}
         </div>
       </div>
-      <BodyAtlas
-        vista={vista}
-        regiones={REGIONES_MOCK}
-        seleccionada={elegida?.svgId}
-        onSelect={setElegida}
-        onClear={() => setElegida(null)}
-        onHover={setApuntada}
-        className="mx-auto h-[68dvh] w-full md:h-[78dvh]"
-      />
+      <div className="relative min-h-[26rem] flex-1 md:h-[calc(100dvh-8rem)] md:flex-none">
+        <BodyAtlas
+          vista={vista}
+          regiones={REGIONES_MOCK}
+          seleccionada={elegida?.svgId}
+          onSelect={setElegida}
+          onClear={() => setElegida(null)}
+          onHover={setApuntada}
+          className="absolute inset-0 h-full w-full"
+        />
+      </div>
     </div>
   );
 }
