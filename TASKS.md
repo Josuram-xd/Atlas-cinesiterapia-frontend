@@ -60,7 +60,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 4.2 Formulario de ficha por pasos: información general, protocolo, ejecución, dosificación, multimedia, metadatos académicos
 - [x] 4.3 Subida de video e imágenes con barra de progreso y validación de tamaño/tipo
 - [x] 4.4 Guardar borrador y publicar mostrando los campos faltantes
-- [ ] 4.5 Editar ficha publicada
+- [x] 4.5 Editar ficha publicada
 - [ ] 4.6 Archivar, restaurar y eliminar con confirmación
 
 ## Fase 5 — Comentarios y moderación (HU-21 a HU-29)

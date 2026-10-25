@@ -118,7 +118,11 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
       setFaltantes(guardada.camposFaltantes);
       setBase(form);
       setErrores({});
-      setAviso({ tipo: 'ok', texto: 'Borrador guardado.' });
+      setAviso({
+        tipo: 'ok',
+        texto:
+          guardada.estado === 'BORRADOR' ? 'Borrador guardado.' : 'Cambios guardados.',
+      });
       if (!ficha) {
         cliente.setQueryData([...CLAVE_FICHAS, 'detalle', guardada.id], guardada);
         setIrA(`/admin/fichas/${guardada.id}?paso=${paso}`);
@@ -192,7 +196,9 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
               cargando={guardando}
               disabled={publicando}
             >
-              Guardar borrador
+              {ficha && ficha.estado !== 'BORRADOR'
+                ? 'Guardar cambios'
+                : 'Guardar borrador'}
             </Button>
             {ficha?.estado === 'BORRADOR' ? (
               <Button
@@ -211,6 +217,19 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
           ) : null}
         </div>
       </header>
+
+      {ficha?.estado === 'PUBLICADO' ? (
+        <p className="bg-fondo-2 max-w-3xl px-5 py-4">
+          Esta ficha está publicada: los cambios se ven en cuanto los guardas y todos los
+          campos obligatorios deben seguir completos.
+        </p>
+      ) : null}
+      {ficha?.estado === 'ARCHIVADO' ? (
+        <p className="bg-fondo-2 max-w-3xl px-5 py-4">
+          Esta ficha está archivada y no se ve en el atlas. Puedes editarla; para que
+          vuelva a verse hay que restaurarla.
+        </p>
+      ) : null}
 
       {faltantes.length > 0 && ficha?.estado !== 'ARCHIVADO' ? (
         <section

@@ -318,3 +318,58 @@ describe('FichaFormPage: publicar', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(/cambió de estado/);
   });
 });
+
+describe('FichaFormPage: editar una ficha publicada', () => {
+  it('avisa que está publicada y ofrece guardar cambios, sin botón de publicar', async () => {
+    montar('/admin/fichas/1');
+    expect(await screen.findByText(/Esta ficha está publicada/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Guardar cambios' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Publicar' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Guardar borrador' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Publicada')).toBeInTheDocument();
+  });
+
+  it('guarda los cambios con PUT y confirma', async () => {
+    const { user, api } = montar('/admin/fichas/1');
+    const actualizar = vi.spyOn(api, 'actualizarFicha');
+    const nombre = await screen.findByLabelText('Nombre del ejercicio');
+    await user.clear(nombre);
+    await user.type(nombre, 'Flexoextensión de rodilla');
+    await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+    expect(await screen.findByText('Cambios guardados.')).toBeInTheDocument();
+    expect(actualizar).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({ nombre: 'Flexoextensión de rodilla' }),
+    );
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Flexoextensión de rodilla' }),
+    ).toBeInTheDocument();
+  });
+
+  it('si el cambio deja la ficha incompleta, el servidor no guarda y se muestra qué falta', async () => {
+    const { user, api } = montar('/admin/fichas/1');
+    const objetivo = await screen.findByLabelText('Objetivo terapéutico');
+    await user.clear(objetivo);
+    await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+    expect(
+      await screen.findByText('Faltan datos obligatorios para publicar la ficha.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: /para guardar los cambios/ }),
+    ).toHaveTextContent('Objetivo terapéutico');
+    const guardada = await api.obtenerFicha(1);
+    expect(guardada.objetivoTerapeutico).toBe('Recuperar el rango articular.');
+    // sigue habiendo cambios sin guardar: salir pide confirmación
+    await user.click(screen.getByRole('link', { name: /Volver a las fichas/ }));
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument();
+  });
+
+  it('una ficha archivada se puede editar y explica cómo volver a verla', async () => {
+    montar('/admin/fichas/4');
+    expect(await screen.findByText(/está archivada/)).toBeInTheDocument();
+    expect(screen.getByText('Archivada')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Guardar cambios' })).toBeInTheDocument();
+  });
+});
