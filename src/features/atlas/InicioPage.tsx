@@ -48,12 +48,12 @@ export function InicioPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 md:grid md:h-[calc(100dvh-8rem)] md:flex-none md:grid-cols-[minmax(0,26rem)_1fr] md:grid-rows-[auto_minmax(0,1fr)] md:gap-x-8 md:gap-y-6">
-      <div className="flex flex-col gap-3 md:gap-6">
+    <div className="flex flex-1 flex-col gap-4 lg:grid lg:h-[calc(100dvh-8rem)] lg:flex-none lg:grid-cols-[minmax(0,26rem)_1fr] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-x-8 lg:gap-y-6">
+      <div className="flex flex-col gap-3 lg:gap-6">
         <h1 className="font-display text-titulo">Elige una región del cuerpo</h1>
         <VistaToggle vista={vista} onChange={cambiarVista} />
         <p
-          className="font-display min-h-12 text-xl md:min-h-0 md:text-titulo"
+          className="font-display min-h-12 text-xl lg:min-h-0 lg:text-titulo"
           aria-live="polite"
         >
           <span className="text-tinta-2 font-light">Región: </span>
@@ -71,7 +71,7 @@ export function InicioPage() {
           />
         ) : null}
       </div>
-      <div className="relative min-h-[28rem] flex-1 md:col-start-2 md:row-span-2 md:row-start-1 md:min-h-0">
+      <div className="relative min-h-[28rem] flex-1 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:min-h-0">
         <BodyAtlas
           vista={vista}
           regiones={regiones.data ?? SIN_REGIONES}
@@ -99,7 +99,7 @@ export function InicioPage() {
         ) : null}
       </div>
       {elegida && categorias.isError ? (
-        <div className="pb-6 md:col-start-1 md:row-start-2">
+        <div className="pb-6 lg:col-start-1 lg:row-start-2">
           <EstadoError
             mensaje={`No pudimos cargar las categorías. ${mensajeDeErrorAtlas(categorias.error)}`}
             onReintentar={() => void categorias.refetch()}
@@ -107,7 +107,7 @@ export function InicioPage() {
         </div>
       ) : null}
       {elegida && categoria ? (
-        <div className="pb-6 md:col-start-1 md:row-start-2 md:overflow-y-auto md:pr-2">
+        <div className="pb-6 lg:col-start-1 lg:row-start-2 lg:overflow-y-auto lg:pr-2">
           <EjerciciosPanel
             ref={panel}
             region={elegida.nombre}

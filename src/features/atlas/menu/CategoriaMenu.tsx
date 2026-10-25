@@ -79,7 +79,7 @@ export function CategoriaMenu({
     <div
       key={`hueco-${i}`}
       aria-hidden
-      className={`bg-fondo-2 rounded-campo min-h-12 animate-pulse ${posicion}`}
+      className={`bg-fondo-2 rounded-campo min-h-12 ${posicion}`}
     />
   );
   const fila = (c: Categoria | undefined, i: number, posicion = '') =>

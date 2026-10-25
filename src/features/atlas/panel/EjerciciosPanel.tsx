@@ -56,7 +56,7 @@ export const EjerciciosPanel = forwardRef<HTMLElement, EjerciciosPanelProps>(
           <div role="status" className="flex flex-col gap-2">
             <p className="text-tinta-2">Cargando ejercicios…</p>
             {[0, 1, 2].map((i) => (
-              <div key={i} aria-hidden className="bg-fondo-2 h-20 animate-pulse" />
+              <div key={i} aria-hidden className="bg-fondo-2 h-20" />
             ))}
           </div>
         ) : null}
