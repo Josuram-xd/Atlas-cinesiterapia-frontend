@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { routes } from './app/routes';
+import { useSession } from './features/auth/sessionStore';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -9,6 +10,9 @@ const queryClient = new QueryClient({
 
 export function App() {
   const [router] = useState(() => createBrowserRouter(routes));
+  useEffect(() => {
+    void useSession.getState().recuperar();
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />

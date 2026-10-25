@@ -1,13 +1,13 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { AuthLayout } from '@/components/AuthLayout';
 import { Button } from '@/components/Button';
 import { Notice } from '@/components/Notice';
 import { TextField } from '@/components/TextField';
-import { tokenStorage } from '@/lib/api';
 import { authApi } from './api';
 import { mensajeDeError } from './messages';
+import { useSession } from './sessionStore';
 import { validarCorreo } from './validation';
 
 interface LoginState {
@@ -18,7 +18,6 @@ interface LoginState {
 }
 
 export function LoginPage() {
-  const navigate = useNavigate();
   const state = (useLocation().state ?? {}) as LoginState;
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
@@ -26,13 +25,8 @@ export function LoginPage() {
 
   const login = useMutation({
     mutationFn: authApi.login,
-    onSuccess: (auth) => {
-      tokenStorage.set({
-        accessToken: auth.accessToken,
-        refreshToken: auth.refreshToken,
-      });
-      navigate(state.from ?? '/', { replace: true });
-    },
+    // PublicOnly detecta la sesión y lleva a `from` o al inicio.
+    onSuccess: (auth) => useSession.getState().iniciar(auth),
   });
 
   function enviar(evento: FormEvent) {

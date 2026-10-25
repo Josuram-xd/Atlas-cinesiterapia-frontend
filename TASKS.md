@@ -35,7 +35,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 1.1 Pantalla de login (HU-16)
 - [x] 1.2 Pantalla de registro con selección de rol (HU-17)
 - [x] 1.3 Recuperar contraseña: solicitud y restablecimiento (HU-18)
-- [ ] 1.4 Store de sesión, rutas protegidas y guard por rol (usuario / admin)
+- [x] 1.4 Store de sesión, rutas protegidas y guard por rol (usuario / admin)
 - [ ] 1.5 Cierre de sesión al cerrar la pestaña con periodo de gracia (HU-19)
 - [ ] 1.6 Hook `useUnsavedChanges` con aviso `beforeunload` y de navegación interna (HU-20)
 
