@@ -35,10 +35,10 @@ describe('geometría del cuerpo', () => {
     const { container } = render(
       <>
         <svg>
-          <BodyFigure vista="anterior" />
+          <BodyFigure vista="anterior" regiones={REGIONES_MOCK} />
         </svg>
         <svg>
-          <BodyFigure vista="posterior" />
+          <BodyFigure vista="posterior" regiones={REGIONES_MOCK} />
         </svg>
       </>,
     );

@@ -91,6 +91,36 @@
   }
 }
 
+/* Regiones del cuerpo: color plano que cambia de tono con el cursor y el foco. */
+.region {
+  fill: var(--color-fondo-2);
+  stroke: var(--color-tinta);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  outline: none;
+  transition: fill 150ms var(--ease-atlas);
+}
+
+.region:hover {
+  fill: var(--color-acento-claro);
+}
+
+.region:focus-visible {
+  fill: var(--color-acento);
+  stroke-width: 3;
+}
+
+.region[aria-pressed='true'] {
+  fill: var(--color-acento-claro);
+  stroke-width: 3;
+}
+
+.region[aria-pressed='true']:focus-visible {
+  fill: var(--color-acento);
+}
+
 /* Superficies oscuras: el foco usa el color de fondo para mantener el contraste. */
 .superficie-oscura {
   background-color: var(--color-tinta);
