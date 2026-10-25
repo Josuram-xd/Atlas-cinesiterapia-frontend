@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { SelectField } from '@/components/Campos';
+import { Notice } from '@/components/Notice';
 import { TextField } from '@/components/TextField';
 import { useDebounce } from '@/hooks/useDebounce';
 import type { EstadoFicha, FiltroFichas } from '@/lib/api';
@@ -10,9 +11,15 @@ import { mensajeDeErrorAtlas } from '../../atlas/mensajes';
 import { useCategoriasAdmin, useFichasAdmin } from '../api/hooks';
 import { fechaCorta } from '../fechas';
 import { ETIQUETA_ESTADO } from '../estados';
+import { AccionesFicha } from './AccionesFicha';
 import { EtiquetaEstado } from './EtiquetaEstado';
 
 const TAMANO_PAGINA = 20;
+const TEXTO_RESULTADO = {
+  archivar: (n: string) => `Ficha «${n}» archivada.`,
+  restaurar: (n: string) => `Ficha «${n}» restaurada.`,
+  eliminar: (n: string) => `Ficha «${n}» eliminada.`,
+};
 const ESTADOS: EstadoFicha[] = ['BORRADOR', 'PUBLICADO', 'ARCHIVADO'];
 
 function numeroDe(valor: string | null): number | undefined {
@@ -26,6 +33,7 @@ function numeroDe(valor: string | null): number | undefined {
 export function ListaFichasPage() {
   const [params, setParams] = useSearchParams();
   const [texto, setTexto] = useState(params.get('q') ?? '');
+  const [resultado, setResultado] = useState<string | null>(null);
   const q = useDebounce(texto.trim(), 300);
 
   const estadoParam = params.get('estado');
@@ -132,6 +140,8 @@ export function ListaFichasPage() {
         </SelectField>
       </form>
 
+      {resultado ? <Notice tipo="info">{resultado}</Notice> : null}
+
       {fichas.isPending ? (
         <div role="status" className="flex flex-col gap-2">
           <p className="text-tinta-2">Cargando fichas…</p>
@@ -173,10 +183,10 @@ export function ListaFichasPage() {
           </p>
           <ul className="flex flex-col gap-2">
             {pagina.content.map((f) => (
-              <li key={f.id}>
+              <li key={f.id} className="bg-fondo-2">
                 <Link
                   to={`/admin/fichas/${f.id}`}
-                  className="bg-fondo-2 hover:bg-fondo-3 text-tinta grid gap-x-6 gap-y-1 px-4 py-4 no-underline transition-colors duration-150 sm:grid-cols-[minmax(0,1fr)_auto]"
+                  className="hover:bg-fondo-3 text-tinta grid gap-x-6 gap-y-1 px-4 pt-4 pb-2 no-underline transition-colors duration-150 sm:grid-cols-[minmax(0,1fr)_auto]"
                 >
                   <span className="font-display text-xl leading-snug font-semibold">
                     {f.nombre}
@@ -189,6 +199,13 @@ export function ListaFichasPage() {
                     actualizada el {fechaCorta(f.actualizadoEn)}
                   </span>
                 </Link>
+                <div className="flex flex-wrap gap-x-4 px-3 pb-2">
+                  <AccionesFicha
+                    ficha={f}
+                    compacto
+                    onHecho={(accion) => setResultado(TEXTO_RESULTADO[accion](f.nombre))}
+                  />
+                </div>
               </li>
             ))}
           </ul>

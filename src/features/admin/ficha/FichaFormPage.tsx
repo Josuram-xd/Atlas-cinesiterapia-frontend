@@ -18,6 +18,7 @@ import {
 import { useAdminApi } from '../api/contexto';
 import { describirError } from '../erroresAdmin';
 import { PasoMultimedia } from '../media/PasoMultimedia';
+import { AccionesFicha } from '../lista/AccionesFicha';
 import { EtiquetaEstado } from '../lista/EtiquetaEstado';
 import {
   etiquetaCampo,
@@ -208,6 +209,26 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
               >
                 Publicar
               </Button>
+            ) : null}
+            {ficha ? (
+              <AccionesFicha
+                ficha={ficha}
+                onHecho={(accion, actualizada) => {
+                  if (!actualizada) {
+                    // Eliminada: ya no hay nada que guardar, se vuelve a la lista sin aviso.
+                    setBase(form);
+                    setIrA('/admin');
+                    return;
+                  }
+                  setFicha(actualizada);
+                  setFaltantes(actualizada.camposFaltantes);
+                  setAviso({
+                    tipo: 'ok',
+                    texto:
+                      accion === 'archivar' ? 'Ficha archivada.' : 'Ficha restaurada.',
+                  });
+                }}
+              />
             ) : null}
           </div>
         </div>

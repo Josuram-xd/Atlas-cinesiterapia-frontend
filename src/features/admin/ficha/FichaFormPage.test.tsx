@@ -373,3 +373,38 @@ describe('FichaFormPage: editar una ficha publicada', () => {
     expect(screen.getByRole('button', { name: 'Guardar cambios' })).toBeInTheDocument();
   });
 });
+
+describe('FichaFormPage: archivar, restaurar y eliminar', () => {
+  it('archiva desde el formulario y luego ofrece restaurar', async () => {
+    const { user } = montar('/admin/fichas/1');
+    await user.click(await screen.findByRole('button', { name: 'Archivar' }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Archivar ficha',
+      }),
+    );
+    expect(await screen.findByText('Ficha archivada.')).toBeInTheDocument();
+    expect(screen.getByText('Archivada')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Restaurar' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Archivar' })).not.toBeInTheDocument();
+  });
+
+  it('elimina y vuelve a la lista sin pedir confirmar cambios sin guardar', async () => {
+    const { user, api } = montar('/admin/fichas/3');
+    const eliminar = vi.spyOn(api, 'eliminarFicha');
+    await user.type(await screen.findByLabelText('Nombre del ejercicio'), ' editado');
+    await user.click(screen.getByRole('button', { name: 'Eliminar' }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Eliminar ficha',
+      }),
+    );
+    expect(await screen.findByText('Lista de fichas')).toBeInTheDocument();
+    expect(eliminar).toHaveBeenCalledWith(3);
+  });
+
+  it('una ficha nueva todavía no ofrece acciones de estado', async () => {
+    montar('/admin/fichas/nueva');
+    expect(screen.queryByRole('button', { name: 'Eliminar' })).not.toBeInTheDocument();
+  });
+});

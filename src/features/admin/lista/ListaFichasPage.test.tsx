@@ -141,3 +141,139 @@ describe('ListaFichasPage', () => {
     expect(screen.getByRole('button', { name: 'Reintentar' })).toBeInTheDocument();
   });
 });
+
+describe('ListaFichasPage: archivar, restaurar y eliminar', () => {
+  it('ofrece solo las acciones que corresponden al estado', async () => {
+    montar();
+    await filas();
+    expect(
+      screen.getByRole('button', { name: /^Archivar Flexoextensión/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^Restaurar Flexoextensión/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^Restaurar Rodillas al pecho/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^Archivar Rodillas al pecho/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^Archivar Elevación/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^Eliminar Elevación/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('pide confirmación antes de archivar y no hace nada si se cancela', async () => {
+    const user = userEvent.setup();
+    const { api } = montar();
+    const archivar = vi.spyOn(api, 'archivarFicha');
+    await filas();
+    await user.click(screen.getByRole('button', { name: /^Archivar Flexoextensión/ }));
+    const dialogo = await screen.findByRole('alertdialog');
+    expect(dialogo).toHaveTextContent('¿Archivar «Flexoextensión pasiva de rodilla»?');
+    expect(dialogo).toHaveTextContent('Podrás restaurarla');
+    expect(within(dialogo).getByRole('button', { name: 'Cancelar' })).toHaveFocus();
+    await user.click(within(dialogo).getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(archivar).not.toHaveBeenCalled();
+  });
+
+  it('archiva tras confirmar y actualiza la lista', async () => {
+    const user = userEvent.setup();
+    const { api } = montar();
+    const archivar = vi.spyOn(api, 'archivarFicha');
+    await filas();
+    await user.click(screen.getByRole('button', { name: /^Archivar Flexoextensión/ }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Archivar ficha',
+      }),
+    );
+    expect(
+      await screen.findByText('Ficha «Flexoextensión pasiva de rodilla» archivada.'),
+    ).toBeInTheDocument();
+    expect(archivar).toHaveBeenCalledWith(1);
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole('link', { name: /Flexoextensión pasiva/ })).getByText(
+          'Archivada',
+        ),
+      ).toBeInTheDocument(),
+    );
+  });
+
+  it('restaura una ficha archivada', async () => {
+    const user = userEvent.setup();
+    montar();
+    await filas();
+    await user.click(
+      screen.getByRole('button', { name: /^Restaurar Rodillas al pecho/ }),
+    );
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Restaurar ficha',
+      }),
+    );
+    expect(
+      await screen.findByText('Ficha «Rodillas al pecho» restaurada.'),
+    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole('link', { name: /Rodillas al pecho/ })).getByText(
+          'Publicada',
+        ),
+      ).toBeInTheDocument(),
+    );
+  });
+
+  it('elimina tras confirmar y la ficha desaparece de la lista', async () => {
+    const user = userEvent.setup();
+    const { api } = montar();
+    const eliminar = vi.spyOn(api, 'eliminarFicha');
+    await filas();
+    await user.click(screen.getByRole('button', { name: /^Eliminar Elevación/ }));
+    const dialogo = await screen.findByRole('alertdialog');
+    expect(dialogo).toHaveTextContent('No se puede deshacer');
+    await user.click(within(dialogo).getByRole('button', { name: 'Eliminar ficha' }));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('link', { name: /Elevación activa/ }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(eliminar).toHaveBeenCalledWith(3);
+    expect(
+      screen.getByText('Ficha «Elevación activa en el plano escapular» eliminada.'),
+    ).toBeInTheDocument();
+  });
+
+  it('si el servidor falla deja el diálogo abierto con el error', async () => {
+    const user = userEvent.setup();
+    const api = crearMockAdminApi();
+    api.eliminarFicha = () => Promise.reject(new Error('caído'));
+    montar('/admin', api);
+    await filas();
+    await user.click(screen.getByRole('button', { name: /^Eliminar Elevación/ }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Eliminar ficha',
+      }),
+    );
+    expect(
+      await within(screen.getByRole('alertdialog')).findByRole('alert'),
+    ).toHaveTextContent(/No se pudo completar/);
+    expect(screen.getByRole('link', { name: /Elevación activa/ })).toBeInTheDocument();
+  });
+
+  it('Escape cierra el diálogo de confirmación', async () => {
+    const user = userEvent.setup();
+    montar();
+    await filas();
+    await user.click(screen.getByRole('button', { name: /^Eliminar Elevación/ }));
+    await screen.findByRole('alertdialog');
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+});
