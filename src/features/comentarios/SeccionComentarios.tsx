@@ -5,6 +5,7 @@ import { Seccion } from '../atlas/ficha/Seccion';
 import { mensajeDeErrorAtlas } from '../atlas/mensajes';
 import { useAccionesComentario, useComentarios } from './api/hooks';
 import { ComentarioItem } from './ComentarioItem';
+import { avisoDeResultado } from './avisos';
 import { FormularioComentario } from './FormularioComentario';
 
 /** Comentarios de una ficha: formulario, hilos de un nivel y "Ver más". */
@@ -14,8 +15,8 @@ export function SeccionComentarios({ ejercicioId }: { ejercicioId: number }) {
   const [aviso, setAviso] = useState<string>();
 
   async function comentar(texto: string) {
-    await acciones.crear.mutateAsync(texto);
-    setAviso('Comentario publicado.');
+    const creado = await acciones.crear.mutateAsync(texto);
+    setAviso(avisoDeResultado(creado, 'Comentario publicado.'));
   }
 
   const paginas = comentarios.data?.pages ?? [];

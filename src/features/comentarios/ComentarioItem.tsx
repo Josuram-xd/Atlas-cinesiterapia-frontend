@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { ConfirmarAccion } from '@/components/ConfirmarAccion';
+import { IconoAdvertencia } from '@/components/IconoAdvertencia';
 import type { Comentario } from '@/lib/api';
 import { ROLES_PERFIL } from '../auth/roles';
 import { fechaLarga } from '../atlas/ficha/texto';
 import { useAccionesComentario } from './api/hooks';
 import { mensajeErrorComentario } from './errores';
 import { FormularioComentario } from './FormularioComentario';
+import { avisoDeResultado } from './avisos';
 
 const NOMBRE_ROL = Object.fromEntries(ROLES_PERFIL.map((r) => [r.valor, r.nombre]));
 
@@ -30,15 +32,15 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
   const puedeResponder = !c.eliminado && !c.enRevision;
 
   async function responder(texto: string) {
-    await acciones.responder.mutateAsync({ id: c.id, texto });
+    const creada = await acciones.responder.mutateAsync({ id: c.id, texto });
     setRespondiendo(false);
-    setAviso('Respuesta publicada.');
+    setAviso(avisoDeResultado(creada, 'Respuesta publicada.'));
   }
 
   async function editar(texto: string) {
-    await acciones.editar.mutateAsync({ id: c.id, texto });
+    const editado = await acciones.editar.mutateAsync({ id: c.id, texto });
     setEditando(false);
-    setAviso('Comentario actualizado.');
+    setAviso(avisoDeResultado(editado, 'Comentario actualizado.'));
   }
 
   async function eliminar() {
@@ -57,22 +59,30 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
       aria-label={
         c.eliminado
           ? 'Comentario eliminado'
-          : `${esRespuesta ? 'Respuesta' : 'Comentario'} de ${c.autor?.nombre ?? ''}`
+          : `${esRespuesta ? 'Respuesta' : 'Comentario'} de ${c.autor?.nombre ?? ''}${c.enRevision ? ', esperando revisión' : ''}`
       }
-      className="flex flex-col gap-2"
+      className={`flex flex-col gap-2 ${c.enRevision ? 'bg-fondo-3 text-tinta-2 px-4 py-3' : ''}`}
     >
       {c.eliminado || !c.autor ? (
         <p className="text-tinta-2 italic">Comentario eliminado</p>
       ) : (
         <>
-          <p className="flex flex-wrap items-baseline gap-x-2">
-            <span className="font-display text-lg font-semibold">{c.autor.nombre}</span>
-            <span className="text-tinta-2">
-              {NOMBRE_ROL[c.autor.rolPerfil] ?? c.autor.rolPerfil} ·{' '}
-              {fechaLarga(c.createdAt)}
-              {c.editadoAt ? ' · editado' : ''}
-            </span>
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <p className="flex flex-wrap items-baseline gap-x-2">
+              <span className="font-display text-lg font-semibold">{c.autor.nombre}</span>
+              <span className="text-tinta-2">
+                {NOMBRE_ROL[c.autor.rolPerfil] ?? c.autor.rolPerfil} ·{' '}
+                {fechaLarga(c.createdAt)}
+                {c.editadoAt ? ' · editado' : ''}
+              </span>
+            </p>
+            {c.enRevision ? (
+              <p className="flex shrink-0 items-center gap-2 font-semibold">
+                <span>Esperando revisión</span>
+                <IconoAdvertencia />
+              </p>
+            ) : null}
+          </div>
           {editando ? (
             <div className="max-w-[68ch]">
               <FormularioComentario

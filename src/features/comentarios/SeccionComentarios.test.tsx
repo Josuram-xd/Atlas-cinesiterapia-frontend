@@ -283,3 +283,83 @@ describe('SeccionComentarios: editar y eliminar el propio', () => {
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 });
+
+describe('SeccionComentarios: esperando revisión (RF_045)', () => {
+  async function comentarOfensivo(texto: string, api = crearMockComentariosApi()) {
+    const user = userEvent.setup();
+    montar(api);
+    await screen.findByText(/post-operatorio/);
+    await user.type(screen.getByLabelText('Escribe un comentario'), texto);
+    await user.click(screen.getByRole('button', { name: 'Publicar comentario' }));
+    return user;
+  }
+
+  it('el comentario retenido se muestra atenuado con el mensaje y el ícono de advertencia', async () => {
+    await comentarOfensivo('Qué ejercicio tan idiota');
+    const articulo = (await screen.findByText('Qué ejercicio tan idiota')).closest(
+      'article',
+    )!;
+    expect(articulo).toHaveAccessibleName(/esperando revisión/);
+    expect(articulo).toHaveClass('bg-fondo-3', 'text-tinta-2');
+    const mensaje = within(articulo).getByText('Esperando revisión');
+    expect(mensaje.closest('p')!.querySelector('svg[aria-hidden="true"]')).not.toBeNull();
+    // El ícono va a la derecha: después del mensaje.
+    expect(mensaje.nextElementSibling?.tagName.toLowerCase()).toBe('svg');
+  });
+
+  it('explica al autor por qué nadie más lo ve', async () => {
+    await comentarOfensivo('Qué ejercicio tan idiota');
+    expect(await screen.findByText(/por ahora solo tú lo ves/)).toBeInTheDocument();
+  });
+
+  it('un comentario normal no lleva el estado de revisión', async () => {
+    await comentarOfensivo('Muy buen ejercicio');
+    const articulo = (await screen.findByText('Muy buen ejercicio')).closest('article')!;
+    expect(within(articulo).queryByText('Esperando revisión')).not.toBeInTheDocument();
+    expect(articulo).not.toHaveClass('bg-fondo-3');
+  });
+
+  it('no se puede responder a un comentario propio en revisión', async () => {
+    await comentarOfensivo('Qué ejercicio tan idiota');
+    const articulo = (await screen.findByText('Qué ejercicio tan idiota')).closest(
+      'article',
+    )!;
+    expect(
+      within(articulo).queryByRole('button', { name: /Responder/ }),
+    ).not.toBeInTheDocument();
+    // Sigue pudiendo editarlo o borrarlo.
+    expect(within(articulo).getByRole('button', { name: /Editar/ })).toBeInTheDocument();
+  });
+
+  it('una edición limpia lo devuelve a la lista normal', async () => {
+    const user = await comentarOfensivo('Qué ejercicio tan idiota');
+    const articulo = (await screen.findByText('Qué ejercicio tan idiota')).closest(
+      'article',
+    )!;
+    await user.click(within(articulo).getByRole('button', { name: /Editar/ }));
+    const campo = screen.getByLabelText('Editar tu comentario');
+    await user.clear(campo);
+    await user.type(campo, 'Qué ejercicio tan útil');
+    await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+    const editado = (await screen.findByText('Qué ejercicio tan útil')).closest(
+      'article',
+    )!;
+    await vi.waitFor(() =>
+      expect(within(editado).queryByText('Esperando revisión')).not.toBeInTheDocument(),
+    );
+  });
+
+  it('el filtro ignora tildes y sustituciones de números', async () => {
+    await comentarOfensivo('qué 1d10t4 es esto');
+    const articulo = (await screen.findByText('qué 1d10t4 es esto')).closest('article')!;
+    expect(within(articulo).getByText('Esperando revisión')).toBeInTheDocument();
+  });
+
+  it('busca palabra completa: «idiotez» no es «idiota»', async () => {
+    await comentarOfensivo('qué idiotez de tiempo');
+    const articulo = (await screen.findByText('qué idiotez de tiempo')).closest(
+      'article',
+    )!;
+    expect(within(articulo).queryByText('Esperando revisión')).not.toBeInTheDocument();
+  });
+});

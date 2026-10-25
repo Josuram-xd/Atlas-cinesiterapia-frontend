@@ -7,6 +7,28 @@ export interface OpcionesMockComentarios {
   latenciaMs?: number;
   /** Quien "está autenticado" en el mock. */
   yo?: Autor;
+  /** Palabras que el filtro automático manda a revisión (en el backend viven en la base). */
+  palabras?: string[];
+}
+
+const SUSTITUCIONES: Record<string, string> = {
+  '4': 'a',
+  '3': 'e',
+  '0': 'o',
+  '1': 'i',
+  '5': 's',
+  '7': 't',
+  '@': 'a',
+  $: 's',
+};
+
+/** Minúsculas, sin tildes y con las sustituciones habituales (4→a, 3→e...), como el filtro del backend. */
+function normalizarOfensa(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[430157@$]/g, (c) => SUSTITUCIONES[c] ?? c);
 }
 
 interface Registro {
@@ -103,6 +125,7 @@ function esperar(ms: number, signal?: AbortSignal): Promise<void> {
 export function crearMockComentariosApi({
   latenciaMs = 0,
   yo = YO_MOCK,
+  palabras = ['idiota', 'imbecil'],
 }: OpcionesMockComentarios = {}): ComentariosApi {
   const registros = semilla(yo);
   let siguienteId = 1000;
@@ -156,14 +179,24 @@ export function crearMockComentariosApi({
     return structuredClone(valor());
   }
 
+  /** `EN_REVISION` si el texto contiene alguna palabra ofensiva (palabra completa). */
+  function estadoPara(texto: string): EstadoComentario {
+    const normal = normalizarOfensa(texto);
+    const ofensivo = palabras.some((p) =>
+      new RegExp(`(^|[^a-z])${normalizarOfensa(p)}($|[^a-z])`).test(normal),
+    );
+    return ofensivo ? 'EN_REVISION' : 'PUBLICADO';
+  }
+
   function nuevo(ejercicioId: number, padreId: number | null, texto: string): Registro {
+    const limpio = validarTexto(texto);
     const registro: Registro = {
       id: siguienteId++,
       ejercicioId,
       padreId,
       autor: yo,
-      texto: validarTexto(texto),
-      estado: 'PUBLICADO',
+      texto: limpio,
+      estado: estadoPara(limpio),
       createdAt: new Date().toISOString(),
       editadoAt: null,
     };
@@ -216,6 +249,7 @@ export function crearMockComentariosApi({
         if (!r || r.estado === 'ELIMINADO' || !visible(r)) throw noEncontrado();
         if (r.autor.id !== yo.id) throw new ApiError(403, { code: 'NO_ES_AUTOR' });
         r.texto = validarTexto(texto);
+        r.estado = estadoPara(r.texto);
         r.editadoAt = new Date().toISOString();
         return aDto(r);
       }),
