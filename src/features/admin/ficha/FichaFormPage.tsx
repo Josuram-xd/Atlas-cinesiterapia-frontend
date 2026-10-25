@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/Button';
 import { ConfirmarSalida } from '@/components/ConfirmarSalida';
@@ -15,7 +15,9 @@ import {
   useCategoriasAdmin,
   useFichaAdmin,
 } from '../api/hooks';
+import { useAdminApi } from '../api/contexto';
 import { describirError } from '../erroresAdmin';
+import { PasoMultimedia } from '../media/PasoMultimedia';
 import { EtiquetaEstado } from '../lista/EtiquetaEstado';
 import {
   fichaAForm,
@@ -52,6 +54,8 @@ interface Aviso {
 function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
   const navigate = useNavigate();
   const cliente = useQueryClient();
+  const adminApi = useAdminApi();
+  const [params] = useSearchParams();
   const acciones = useAccionesFicha();
   const regiones = useRegiones();
   const categorias = useCategoriasAdmin();
@@ -61,7 +65,9 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
     inicial ? fichaAForm(inicial) : formVacio(),
   );
   const [base, setBase] = useState(form);
-  const [paso, setPaso] = useState<PasoId>('general');
+  const [paso, setPaso] = useState<PasoId>(
+    () => PASOS.find((p) => p.id === params.get('paso'))?.id ?? 'general',
+  );
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [aviso, setAviso] = useState<Aviso | null>(null);
   const [irA, setIrA] = useState<string | null>(null);
@@ -103,7 +109,7 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
       setAviso({ tipo: 'ok', texto: 'Borrador guardado.' });
       if (!ficha) {
         cliente.setQueryData([...CLAVE_FICHAS, 'detalle', guardada.id], guardada);
-        setIrA(`/admin/fichas/${guardada.id}`);
+        setIrA(`/admin/fichas/${guardada.id}?paso=${paso}`);
       }
       return guardada;
     } catch (error) {
@@ -113,6 +119,15 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
       irAlPrimerError(Object.keys(d.campos));
       return null;
     }
+  }
+
+  /** Vuelve a leer la ficha tras subir o quitar archivos (lista de medios y campos faltantes). */
+  async function recargarFicha() {
+    if (!ficha) return;
+    const actual = await adminApi.obtenerFicha(ficha.id);
+    setFicha(actual);
+    cliente.setQueryData([...CLAVE_FICHAS, 'detalle', actual.id], actual);
+    void cliente.invalidateQueries({ queryKey: [...CLAVE_FICHAS, 'lista'] });
   }
 
   const guardando = acciones.crear.isPending || acciones.actualizar.isPending;
@@ -185,11 +200,11 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
         {paso === 'ejecucion' ? <PasoEjecucion {...props} /> : null}
         {paso === 'dosificacion' ? <PasoDosificacion {...props} /> : null}
         {paso === 'multimedia' ? (
-          <p className="max-w-prose">
-            {ficha
-              ? `Archivos de la ficha: ${ficha.media.length}.`
-              : 'Guarda el borrador para poder agregar archivos.'}
-          </p>
+          <PasoMultimedia
+            ficha={ficha}
+            onGuardarBorrador={guardarBorrador}
+            onCambio={recargarFicha}
+          />
         ) : null}
         {paso === 'metadatos' ? <PasoMetadatos {...props} /> : null}
 
