@@ -54,7 +54,8 @@ export function crearMockAtlasApi({
   const resumenes = (filtro: (e: EjercicioMock) => boolean = () => true) =>
     [...todos()]
       .filter(({ e }) => filtro(e))
-      .map(({ e, region, categoria }) => resumenMock(e, region, categoria));
+      .map(({ e, region, categoria }) => resumenMock(e, region, categoria))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
 
   return {
     listarRegiones: (signal) => responder<Region[]>(REGIONES_MOCK, signal),

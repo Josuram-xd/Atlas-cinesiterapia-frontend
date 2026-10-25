@@ -43,3 +43,14 @@ export function useEjercicio(id: number | null) {
     staleTime: 60_000,
   });
 }
+
+/** Búsqueda por nombre; con `texto` nulo no consulta. */
+export function useBuscarEjercicios(texto: string | null) {
+  const api = useAtlasApi();
+  return useQuery({
+    queryKey: ['atlas', 'buscar', texto],
+    queryFn: ({ signal }) => api.buscarEjercicios(texto!, signal),
+    enabled: texto !== null,
+    staleTime: 60_000,
+  });
+}

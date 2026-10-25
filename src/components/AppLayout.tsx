@@ -5,6 +5,8 @@ interface AppLayoutProps {
   children: ReactNode;
   /** Zona derecha de la cabecera (sesión, acciones). */
   actions?: ReactNode;
+  /** Zona central de la cabecera (búsqueda). En pantallas angostas pasa a su propia fila. */
+  centro?: ReactNode;
 }
 
 export function Wordmark({ className = '' }: { className?: string }) {
@@ -18,7 +20,7 @@ export function Wordmark({ className = '' }: { className?: string }) {
   );
 }
 
-export function AppLayout({ children, actions }: AppLayoutProps) {
+export function AppLayout({ children, actions, centro }: AppLayoutProps) {
   return (
     <div className="flex min-h-dvh flex-col">
       <a
@@ -27,7 +29,7 @@ export function AppLayout({ children, actions }: AppLayoutProps) {
       >
         Saltar al contenido
       </a>
-      <header className="px-gutter flex items-center justify-between gap-4 py-4">
+      <header className="px-gutter flex flex-wrap items-center justify-between gap-x-4 gap-y-3 py-4">
         <Link
           to="/"
           className="text-tinta no-underline hover:text-acento"
@@ -35,6 +37,11 @@ export function AppLayout({ children, actions }: AppLayoutProps) {
         >
           <Wordmark className="text-lg sm:text-xl" />
         </Link>
+        {centro ? (
+          <div className="order-last w-full md:order-none md:max-w-md md:flex-1">
+            {centro}
+          </div>
+        ) : null}
         <div className="flex items-center gap-4">{actions}</div>
       </header>
       <main

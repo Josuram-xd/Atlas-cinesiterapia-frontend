@@ -1,6 +1,7 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
 import { Button } from '@/components/Button';
+import { BuscadorEjercicios } from '@/features/atlas/busqueda/BuscadorEjercicios';
 import { useSession } from '@/features/auth/sessionStore';
 
 /** Marco de las pantallas con sesión: cabecera con el usuario y el cierre de sesión. */
@@ -16,6 +17,7 @@ export function AppShell() {
 
   return (
     <AppLayout
+      centro={<BuscadorEjercicios />}
       actions={
         <>
           {usuario?.rolSistema === 'ADMIN' ? (
