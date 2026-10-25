@@ -1,10 +1,11 @@
-import type { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, Ref } from 'react';
 
 type Variante = 'primario' | 'secundario';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variante?: Variante;
   cargando?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 const estilos: Record<Variante, string> = {
