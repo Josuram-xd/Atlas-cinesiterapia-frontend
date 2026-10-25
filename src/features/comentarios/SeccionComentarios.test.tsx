@@ -186,3 +186,100 @@ describe('SeccionComentarios: escribir y responder', () => {
     expect(within(eliminado).queryByRole('button')).not.toBeInTheDocument();
   });
 });
+
+describe('SeccionComentarios: editar y eliminar el propio', () => {
+  async function propio() {
+    const texto = await screen.findByText(/Faltaría una foto/);
+    return texto.closest('article')!;
+  }
+
+  it('solo ofrece Editar y Eliminar en los comentarios propios', async () => {
+    montar();
+    const mio = await propio();
+    expect(within(mio).getByRole('button', { name: /Editar/ })).toBeInTheDocument();
+    expect(within(mio).getByRole('button', { name: /Eliminar/ })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /Editar/ })).toHaveLength(1);
+    expect(screen.getAllByRole('button', { name: /Eliminar/ })).toHaveLength(1);
+  });
+
+  it('edita el comentario propio y lo marca como editado', async () => {
+    const user = userEvent.setup();
+    montar();
+    const mio = await propio();
+    await user.click(within(mio).getByRole('button', { name: /Editar/ }));
+    const campo = screen.getByLabelText('Editar tu comentario');
+    expect(campo).toHaveValue('Faltaría una foto de la posición del terapeuta.');
+    await user.clear(campo);
+    await user.type(campo, 'Ahora sí hay foto, gracias');
+    await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+    expect(await screen.findByText('Ahora sí hay foto, gracias')).toBeInTheDocument();
+    expect(screen.getByText('Comentario actualizado.')).toBeInTheDocument();
+    expect(screen.getByText(/· editado/)).toBeInTheDocument();
+  });
+
+  it('cancelar la edición conserva el texto original', async () => {
+    const user = userEvent.setup();
+    montar();
+    const mio = await propio();
+    await user.click(within(mio).getByRole('button', { name: /Editar/ }));
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(screen.getByText(/Faltaría una foto/)).toBeInTheDocument();
+    expect(screen.queryByLabelText('Editar tu comentario')).not.toBeInTheDocument();
+  });
+
+  it('muestra el error si la edición lleva HTML', async () => {
+    const user = userEvent.setup();
+    montar();
+    const mio = await propio();
+    await user.click(within(mio).getByRole('button', { name: /Editar/ }));
+    const campo = screen.getByLabelText('Editar tu comentario');
+    await user.clear(campo);
+    await user.type(campo, '<b>hola</b>');
+    await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+    expect(await screen.findByText(/no puede llevar etiquetas HTML/)).toBeInTheDocument();
+  });
+
+  it('pide confirmación antes de eliminar y luego lo quita de la lista', async () => {
+    const api = crearMockComentariosApi();
+    const eliminar = vi.spyOn(api, 'eliminar');
+    const user = userEvent.setup();
+    montar(api);
+    const mio = await propio();
+    await user.click(within(mio).getByRole('button', { name: /Eliminar/ }));
+    expect(eliminar).not.toHaveBeenCalled();
+    const dialogo = screen.getByRole('alertdialog');
+    await user.click(
+      within(dialogo).getByRole('button', { name: 'Eliminar comentario' }),
+    );
+    expect(eliminar).toHaveBeenCalledWith(105);
+    await vi.waitFor(() =>
+      expect(screen.queryByText(/Faltaría una foto/)).not.toBeInTheDocument(),
+    );
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('cancelar la confirmación no elimina nada', async () => {
+    const api = crearMockComentariosApi();
+    const eliminar = vi.spyOn(api, 'eliminar');
+    const user = userEvent.setup();
+    montar(api);
+    const mio = await propio();
+    await user.click(within(mio).getByRole('button', { name: /Eliminar/ }));
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(eliminar).not.toHaveBeenCalled();
+    expect(screen.getByText(/Faltaría una foto/)).toBeInTheDocument();
+  });
+
+  it('si eliminar falla, el diálogo sigue abierto con el motivo', async () => {
+    const api = crearMockComentariosApi();
+    api.eliminar = () =>
+      Promise.reject(new ApiError(404, { code: 'COMENTARIO_NO_ENCONTRADO' }));
+    const user = userEvent.setup();
+    montar(api);
+    const mio = await propio();
+    await user.click(within(mio).getByRole('button', { name: /Eliminar/ }));
+    await user.click(screen.getByRole('button', { name: 'Eliminar comentario' }));
+    expect(await screen.findByText(/ya no existe/)).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+  });
+});

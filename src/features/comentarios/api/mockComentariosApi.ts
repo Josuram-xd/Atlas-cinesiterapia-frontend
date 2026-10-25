@@ -209,5 +209,24 @@ export function crearMockComentariosApi({
         }
         return aDto(nuevo(raiz.ejercicioId, raiz.id, texto));
       }),
+
+    editar: (id, texto) =>
+      respuesta(() => {
+        const r = registros.find((x) => x.id === id);
+        if (!r || r.estado === 'ELIMINADO' || !visible(r)) throw noEncontrado();
+        if (r.autor.id !== yo.id) throw new ApiError(403, { code: 'NO_ES_AUTOR' });
+        r.texto = validarTexto(texto);
+        r.editadoAt = new Date().toISOString();
+        return aDto(r);
+      }),
+
+    eliminar: (id) =>
+      respuesta(() => {
+        const r = registros.find((x) => x.id === id);
+        if (!r || r.estado === 'ELIMINADO' || !visible(r)) throw noEncontrado();
+        if (r.autor.id !== yo.id) throw new ApiError(403, { code: 'NO_ES_AUTOR' });
+        r.estado = 'ELIMINADO';
+        r.texto = '';
+      }),
   };
 }

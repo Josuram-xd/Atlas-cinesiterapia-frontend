@@ -65,7 +65,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 
 ## Fase 5 — Comentarios y moderación (HU-21 a HU-29)
 - [x] 5.1 Lista de comentarios con hilos y formulario de nuevo comentario
-- [ ] 5.2 Editar y eliminar comentario propio
+- [x] 5.2 Editar y eliminar comentario propio
 - [ ] 5.3 Estado "esperando revisión": atenuado en gris, ícono de advertencia a la derecha y mensaje (RF_045)
 - [ ] 5.4 Reportar comentario
 - [ ] 5.5 Página de moderación: ocultados y reportados, aceptar y eliminar

@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { ConfirmarAccion } from '@/components/ConfirmarAccion';
 import type { Comentario } from '@/lib/api';
 import { ROLES_PERFIL } from '../auth/roles';
 import { fechaLarga } from '../atlas/ficha/texto';
 import { useAccionesComentario } from './api/hooks';
+import { mensajeErrorComentario } from './errores';
 import { FormularioComentario } from './FormularioComentario';
 
 const NOMBRE_ROL = Object.fromEntries(ROLES_PERFIL.map((r) => [r.valor, r.nombre]));
@@ -19,6 +21,9 @@ interface ComentarioItemProps {
 export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemProps) {
   const acciones = useAccionesComentario(ejercicioId);
   const [respondiendo, setRespondiendo] = useState(false);
+  const [editando, setEditando] = useState(false);
+  const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
+  const [errorBorrado, setErrorBorrado] = useState<string>();
   const [aviso, setAviso] = useState<string>();
 
   const esRespuesta = c.padreId !== null;
@@ -28,6 +33,22 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
     await acciones.responder.mutateAsync({ id: c.id, texto });
     setRespondiendo(false);
     setAviso('Respuesta publicada.');
+  }
+
+  async function editar(texto: string) {
+    await acciones.editar.mutateAsync({ id: c.id, texto });
+    setEditando(false);
+    setAviso('Comentario actualizado.');
+  }
+
+  async function eliminar() {
+    setErrorBorrado(undefined);
+    try {
+      await acciones.eliminar.mutateAsync(c.id);
+      setConfirmandoBorrado(false);
+    } catch (fallo) {
+      setErrorBorrado(mensajeErrorComentario(fallo));
+    }
   }
 
   return (
@@ -52,16 +73,58 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
               {c.editadoAt ? ' · editado' : ''}
             </span>
           </p>
-          <p className="max-w-[68ch] break-words whitespace-pre-wrap">{c.texto}</p>
+          {editando ? (
+            <div className="max-w-[68ch]">
+              <FormularioComentario
+                etiqueta="Editar tu comentario"
+                textoBoton="Guardar cambios"
+                inicial={c.texto ?? ''}
+                autoFocus
+                onEnviar={editar}
+                onCancelar={() => setEditando(false)}
+              />
+            </div>
+          ) : (
+            <p className="max-w-[68ch] break-words whitespace-pre-wrap">{c.texto}</p>
+          )}
         </>
       )}
 
-      {puedeResponder ? (
+      {!editando && (puedeResponder || c.propio) ? (
         <div className="flex flex-wrap gap-x-4">
-          <button type="button" className={ACCION} onClick={() => setRespondiendo(true)}>
-            Responder
-            <span className="sr-only"> a {c.autor?.nombre}</span>
-          </button>
+          {puedeResponder ? (
+            <button
+              type="button"
+              className={ACCION}
+              onClick={() => setRespondiendo(true)}
+            >
+              Responder
+              <span className="sr-only"> a {c.autor?.nombre}</span>
+            </button>
+          ) : null}
+          {c.propio ? (
+            <>
+              <button
+                type="button"
+                className={ACCION}
+                onClick={() => {
+                  setAviso(undefined);
+                  setEditando(true);
+                }}
+              >
+                Editar
+                <span className="sr-only"> tu comentario</span>
+              </button>
+              <button
+                type="button"
+                className={ACCION}
+                onClick={() => setConfirmandoBorrado(true)}
+              >
+                Eliminar
+                <span className="sr-only"> tu comentario</span>
+              </button>
+            </>
+          ) : null}
         </div>
       ) : null}
 
@@ -82,6 +145,22 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
             onCancelar={() => setRespondiendo(false)}
           />
         </div>
+      ) : null}
+
+      {confirmandoBorrado ? (
+        <ConfirmarAccion
+          titulo="¿Eliminar tu comentario?"
+          confirmar="Eliminar comentario"
+          error={errorBorrado}
+          cargando={acciones.eliminar.isPending}
+          onConfirmar={() => void eliminar()}
+          onCancelar={() => setConfirmandoBorrado(false)}
+        >
+          <p>
+            El texto se borrará para todas las personas. Si tiene respuestas, se mostrará
+            como «Comentario eliminado». No se puede deshacer.
+          </p>
+        </ConfirmarAccion>
       ) : null}
     </article>
   );

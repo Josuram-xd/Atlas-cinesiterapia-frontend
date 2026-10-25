@@ -35,5 +35,13 @@ export function useAccionesComentario(ejercicioId: number) {
         api.responder(id, texto),
       ...opciones,
     }),
+    editar: useMutation({
+      mutationFn: ({ id, texto }: { id: number; texto: string }) => api.editar(id, texto),
+      ...opciones,
+    }),
+    eliminar: useMutation({
+      mutationFn: (id: number) => api.eliminar(id),
+      ...opciones,
+    }),
   };
 }
