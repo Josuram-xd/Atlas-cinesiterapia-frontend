@@ -22,7 +22,7 @@ export interface Tokens {
   refreshToken: string;
 }
 
-/** Respuesta de /auth/login, /auth/registro y /auth/refresh. */
+/** Respuesta de /auth/login y /auth/refresh. */
 export interface AuthResponse extends Tokens {
   usuario: Usuario;
 }
@@ -39,6 +39,9 @@ export interface RegistroRequest {
   password: string;
   rolPerfil: RolPerfil;
 }
+
+/** Respuesta de /auth/registro: la cuenta queda creada y la persona inicia sesión aparte. */
+export type RegistroResponse = Usuario;
 
 export interface RefreshRequest {
   refreshToken: string;
