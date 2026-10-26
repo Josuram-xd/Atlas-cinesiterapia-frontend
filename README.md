@@ -22,9 +22,10 @@ npm run dev            # http://localhost:5173
 
 ## Variables de entorno
 
-| Variable       | Descripción                                                       | Ejemplo                 |
-| -------------- | ----------------------------------------------------------------- | ----------------------- |
-| `VITE_API_URL` | URL base del backend, sin barra final. Obligatoria en producción. | `http://localhost:8080` |
+| Variable         | Descripción                                                                                                                      | Ejemplo                 |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `VITE_API_URL`   | URL base del backend, sin barra final. Obligatoria en producción.                                                                | `http://localhost:8080` |
+| `VITE_ATLAS_API` | Origen de los datos del atlas: `mock` (por defecto) o `http`. En desarrollo, `?mock=error` o `?mock=lento` fuerzan esos estados. | `mock`                  |
 
 `.env` no se versiona. Las variables `VITE_*` quedan dentro del bundle: nunca pongas secretos.
 

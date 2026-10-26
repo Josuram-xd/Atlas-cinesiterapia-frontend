@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { REGIONES_MOCK } from '../data/regiones';
@@ -73,5 +73,48 @@ describe('BodyAtlas', () => {
     );
     await user.unhover(screen.getByRole('button', { name: 'Abdomen' }));
     expect(onHover).toHaveBeenLastCalledWith(null);
+  });
+});
+
+describe('BodyAtlas con gestos táctiles', () => {
+  function dedo(tipo: string, id: number, x: number, y: number) {
+    return { pointerType: 'touch', pointerId: id, clientX: x, clientY: y, type: tipo };
+  }
+
+  it('un toque corto elige la región', () => {
+    const onSelect = vi.fn();
+    render(<BodyAtlas vista="anterior" regiones={anteriores} onSelect={onSelect} />);
+    const rodilla = screen.getByRole('button', { name: 'Rodilla' });
+    fireEvent.pointerDown(rodilla, dedo('pointerdown', 1, 100, 100));
+    fireEvent.pointerUp(rodilla, dedo('pointerup', 1, 102, 101));
+    fireEvent.click(rodilla);
+    expect(onSelect).toHaveBeenCalledOnce();
+  });
+
+  it('un arrastre no elige la región bajo el dedo', () => {
+    const onSelect = vi.fn();
+    render(<BodyAtlas vista="anterior" regiones={anteriores} onSelect={onSelect} />);
+    const rodilla = screen.getByRole('button', { name: 'Rodilla' });
+    fireEvent.pointerDown(rodilla, dedo('pointerdown', 1, 100, 100));
+    fireEvent.pointerMove(rodilla, dedo('pointermove', 1, 100, 180));
+    fireEvent.pointerUp(rodilla, dedo('pointerup', 1, 100, 180));
+    fireEvent.click(rodilla);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('el ratón no activa los gestos: un clic siempre elige', () => {
+    const onSelect = vi.fn();
+    render(<BodyAtlas vista="anterior" regiones={anteriores} onSelect={onSelect} />);
+    const rodilla = screen.getByRole('button', { name: 'Rodilla' });
+    fireEvent.pointerDown(rodilla, {
+      ...dedo('pointerdown', 1, 0, 0),
+      pointerType: 'mouse',
+    });
+    fireEvent.pointerMove(rodilla, {
+      ...dedo('pointermove', 1, 0, 200),
+      pointerType: 'mouse',
+    });
+    fireEvent.click(rodilla);
+    expect(onSelect).toHaveBeenCalledOnce();
   });
 });
