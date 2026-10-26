@@ -56,12 +56,12 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 3.4 Registro de visita al abrir una ficha
 
 ## Fase 4 — Panel de administración (HU-04 a HU-15)
-- [ ] 4.1 Lista de fichas con filtros por estado, región y categoría (todas las de todos los admin)
-- [ ] 4.2 Formulario de ficha por pasos: información general, protocolo, ejecución, dosificación, multimedia, metadatos académicos
-- [ ] 4.3 Subida de video e imágenes con barra de progreso y validación de tamaño/tipo
-- [ ] 4.4 Guardar borrador y publicar mostrando los campos faltantes
-- [ ] 4.5 Editar ficha publicada
-- [ ] 4.6 Archivar, restaurar y eliminar con confirmación
+- [x] 4.1 Lista de fichas con filtros por estado, región y categoría (todas las de todos los admin)
+- [x] 4.2 Formulario de ficha por pasos: información general, protocolo, ejecución, dosificación, multimedia, metadatos académicos
+- [x] 4.3 Subida de video e imágenes con barra de progreso y validación de tamaño/tipo
+- [x] 4.4 Guardar borrador y publicar mostrando los campos faltantes
+- [x] 4.5 Editar ficha publicada
+- [x] 4.6 Archivar, restaurar y eliminar con confirmación
 
 ## Fase 5 — Comentarios y moderación (HU-21 a HU-29)
 - [ ] 5.1 Lista de comentarios con hilos y formulario de nuevo comentario

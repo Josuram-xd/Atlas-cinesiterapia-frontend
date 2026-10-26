@@ -174,6 +174,119 @@ export interface Ejercicio {
   actualizadoEn: string;
 }
 
+// --- Administración de fichas ----------------------------------------------------
+
+export type EstadoFicha = 'BORRADOR' | 'PUBLICADO' | 'ARCHIVADO';
+
+/** Respuesta paginada de los listados de administración. */
+export interface Pagina<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface UsuarioRef {
+  id: number;
+  correo: string;
+}
+
+/** Cuerpo de POST y PUT /admin/ejercicios. Los textos vacíos viajan como `null`. */
+export interface EjercicioRequest {
+  nombre: string;
+  regionId: number;
+  categoriaId: number;
+  objetivoTerapeutico: string | null;
+  estructurasIntervenidas: string | null;
+  indicaciones: string | null;
+  precaucionesContraindicaciones: string | null;
+  posicionPaciente: string | null;
+  posicionFisioterapeuta: string | null;
+  ejecucion: string | null;
+  comandosVerbales: string | null;
+  dosificacion: Partial<Record<keyof Dosificacion, string | null>> | null;
+  progresion: string | null;
+  erroresComunes: string | null;
+  estudiantesCreadores: string[] | null;
+  cohorte: string | null;
+  profesoraRevisora: string | null;
+}
+
+export interface MediaAdmin extends Media {
+  estado: 'CONFIRMADO' | 'PENDIENTE';
+}
+
+/** Ficha en cualquier estado, con los campos que falten como `null` (EjercicioAdminResponse). */
+export interface EjercicioAdmin {
+  id: number;
+  estado: EstadoFicha;
+  nombre: string;
+  region: RegionRef;
+  categoria: CategoriaRef;
+  objetivoTerapeutico: string | null;
+  estructurasIntervenidas: string | null;
+  indicaciones: string | null;
+  precaucionesContraindicaciones: string | null;
+  posicionPaciente: string | null;
+  posicionFisioterapeuta: string | null;
+  ejecucion: string | null;
+  comandosVerbales: string | null;
+  dosificacion: Partial<Record<keyof Dosificacion, string | null>> | null;
+  progresion: string | null;
+  erroresComunes: string | null;
+  estudiantesCreadores: string[] | null;
+  cohorte: string | null;
+  profesoraRevisora: string | null;
+  media: MediaAdmin[];
+  creadoPor: UsuarioRef;
+  actualizadoPor: UsuarioRef | null;
+  creadoEn: string;
+  actualizadoEn: string;
+  publicadoEn: string | null;
+  archivadoEn: string | null;
+  /** Lo que falta para publicar (`[]` = lista). Usa los nombres de campo de `fieldErrors`. */
+  camposFaltantes: string[];
+  version: number;
+}
+
+export interface EjercicioAdminResumen {
+  id: number;
+  nombre: string;
+  estado: EstadoFicha;
+  region: RegionRef;
+  categoria: CategoriaRef;
+  creadoPor: UsuarioRef;
+  actualizadoEn: string;
+}
+
+export interface FiltroFichas {
+  estado?: EstadoFicha;
+  regionId?: number;
+  categoriaId?: number;
+  q?: string;
+  page?: number;
+  size?: number;
+}
+
+/** Paso 1 de la subida con URL prefirmada: POST /admin/ejercicios/{id}/media/subida. */
+export interface SolicitudSubida {
+  tipo: MediaTipo;
+  /** Obligatorio en imágenes; se ignora en video. */
+  rol?: MediaRol;
+  nombreArchivo: string;
+  contentType: string;
+  tamanoBytes: number;
+}
+
+export interface SubidaPrefirmada {
+  mediaId: number;
+  urlSubida: string;
+  metodo: 'PUT';
+  cabeceras: Record<string, string>;
+  expiraEn: string;
+}
+
 // --- Errores ---------------------------------------------------------------------
 
 /** Un campo inválido dentro de `fieldErrors`. */

@@ -7,6 +7,8 @@ import { tokenStorage } from '@/lib/api';
 import { renderWithRouter } from '@/test/renderWithRouter';
 import { routes } from './routes';
 import { adminDemo, authDemo, usuarioDemo } from '@/test/fixtures';
+import { crearMockAdminApi } from '@/features/admin/api/mockAdminApi';
+import { crearMockAtlasApi } from '@/features/atlas/api/mockAtlasApi';
 
 const usuario = usuarioDemo;
 const admin: Usuario = adminDemo;
@@ -50,7 +52,7 @@ describe('guardas de rutas', () => {
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
     expect(
-      await screen.findByRole('heading', { name: 'Panel de administración' }),
+      await screen.findByRole('heading', { name: 'Fichas de ejercicios' }),
     ).toBeInTheDocument();
   });
 
@@ -77,7 +79,7 @@ describe('guardas de rutas', () => {
     conSesion(admin);
     renderWithRouter(routes, ['/admin']);
     expect(
-      await screen.findByRole('heading', { name: 'Panel de administración' }),
+      await screen.findByRole('heading', { name: 'Fichas de ejercicios' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Administración' })).toBeInTheDocument();
   });
@@ -100,5 +102,29 @@ describe('guardas de rutas', () => {
     ).toEqual({
       refreshToken: 'r',
     });
+  });
+});
+
+describe('rutas de administración de fichas', () => {
+  it.each(['/admin/fichas/nueva', '/admin/fichas/3'])(
+    'un usuario común no entra a %s ni dispara llamadas de administración',
+    async (ruta) => {
+      conSesion(usuario);
+      const adminApi = crearMockAdminApi();
+      const espia = vi.spyOn(adminApi, 'obtenerFicha');
+      renderWithRouter(routes, [ruta], crearMockAtlasApi(), adminApi);
+      expect(
+        await screen.findByRole('heading', { name: 'Sin permiso' }),
+      ).toBeInTheDocument();
+      expect(espia).not.toHaveBeenCalled();
+    },
+  );
+
+  it('un administrador entra a la edición de una ficha', async () => {
+    conSesion(admin);
+    renderWithRouter(routes, ['/admin/fichas/nueva']);
+    expect(
+      await screen.findByRole('heading', { name: 'Nueva ficha' }),
+    ).toBeInTheDocument();
   });
 });

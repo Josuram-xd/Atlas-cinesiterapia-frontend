@@ -67,6 +67,20 @@ Con `VITE_ATLAS_API=http` el atlas usa el backend real; con `mock` usa datos de 
 llama a `POST /ejercicios/{id}/visitas`, endpoint que llegará con la Fase 5 del backend: hasta
 entonces responde 404 y el frontend lo ignora sin avisar a la persona.
 
+## Panel de administración
+
+Rutas `/admin` (lista de fichas con filtros y paginación), `/admin/fichas/nueva` y
+`/admin/fichas/:id` (formulario por pasos). Solo entra quien tiene `rolSistema` `ADMIN`
+(`RequireRole`); el backend lo vuelve a exigir en `/admin/**`. Con `VITE_ATLAS_API=mock` el panel
+trabaja con datos en memoria; con `http` usa el backend real.
+
+La multimedia se sube sin pasar por el backend: 1) `POST /admin/ejercicios/{id}/media/subida`
+devuelve una URL prefirmada, 2) el archivo se envía con `PUT` a esa URL (con barra de progreso), 3) `POST .../media/{mediaId}/confirmar`. Antes del paso 1 se valida el tipo y el tamaño (video
+MP4/WebM/GIF hasta 25 MB, imágenes JPG/PNG/WebP hasta 5 MB). En desarrollo el backend usa
+almacenamiento `fake`: su URL es de un dominio `.invalid` y el frontend omite el paso 2. En
+producción el bucket de R2 necesita CORS que permita `PUT` con la cabecera `Content-Type` desde
+el origen del frontend.
+
 Sesión: los tokens se guardan en `sessionStorage` (se borran al cerrar la pestaña). El cliente
 HTTP renueva el access token ante un 401. Al cerrar la pestaña (`pagehide`) se avisa con
 `navigator.sendBeacon` a `/auth/cierre-pendiente`; el backend espera 60 s y cancela el cierre

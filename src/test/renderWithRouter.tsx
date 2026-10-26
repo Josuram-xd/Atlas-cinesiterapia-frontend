@@ -3,6 +3,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AtlasApiProvider } from '@/features/atlas/api/AtlasApiProvider';
 import type { AtlasApi } from '@/features/atlas/api/atlasApi';
 import { crearMockAtlasApi } from '@/features/atlas/api/mockAtlasApi';
+import { AdminApiProvider } from '@/features/admin/api/AdminApiProvider';
+import type { AdminApi } from '@/features/admin/api/adminApi';
+import { crearMockAdminApi } from '@/features/admin/api/mockAdminApi';
 import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
 
 /** Renderiza rutas reales con un router en memoria y un QueryClient limpio. */
@@ -10,6 +13,7 @@ export function renderWithRouter(
   routes: RouteObject[],
   initialEntries: Array<string | { pathname: string; state?: unknown }> = ['/'],
   atlasApi: AtlasApi = crearMockAtlasApi(),
+  adminApi: AdminApi = crearMockAdminApi(),
 ) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -20,7 +24,9 @@ export function renderWithRouter(
   const utils = render(
     <QueryClientProvider client={client}>
       <AtlasApiProvider api={atlasApi}>
-        <RouterProvider router={router} />
+        <AdminApiProvider api={adminApi}>
+          <RouterProvider router={router} />
+        </AdminApiProvider>
       </AtlasApiProvider>
     </QueryClientProvider>,
   );
