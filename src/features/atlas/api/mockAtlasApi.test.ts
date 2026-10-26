@@ -67,3 +67,53 @@ describe('mockAtlasApi: ejercicios', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 });
+
+describe('mockAtlasApi: ficha, búsqueda y visitas', () => {
+  it('los resúmenes traen región y categoría como el backend', async () => {
+    const api = crearMockAtlasApi();
+    const regiones = await api.listarRegiones();
+    const rodilla = regiones.find((r) => r.svgId === 'anterior-rodilla')!;
+    const [primero] = await api.listarEjercicios({
+      regionId: rodilla.id,
+      categoriaId: 4,
+    });
+    expect(primero.region).toMatchObject({ id: rodilla.id, svgId: 'anterior-rodilla' });
+    expect(primero.categoria).toMatchObject({ id: 4 });
+  });
+
+  it('cuenta los ejercicios por categoría de la región', async () => {
+    const api = crearMockAtlasApi();
+    const regiones = await api.listarRegiones();
+    const rodilla = regiones.find((r) => r.svgId === 'anterior-rodilla')!;
+    const categorias = await api.listarCategorias(rodilla.id);
+    expect(categorias.find((c) => c.id === 4)?.totalEjercicios).toBe(3);
+    expect(categorias.find((c) => c.id === 2)?.totalEjercicios).toBe(0);
+  });
+
+  it('entrega la ficha completa de un ejercicio', async () => {
+    const api = crearMockAtlasApi();
+    const ficha = await api.obtenerEjercicio(1);
+    expect(ficha.nombre).toBe('Flexoextensión pasiva de rodilla');
+    expect(ficha.dosificacion.series).toBeTruthy();
+    expect(ficha.estudiantesCreadores.length).toBeGreaterThan(0);
+    expect(ficha.cohorte).toMatch(/^\d{4}-\d{1,2}$/);
+  });
+
+  it('responde 404 como el backend si la ficha no existe', async () => {
+    await expect(crearMockAtlasApi().obtenerEjercicio(99999)).rejects.toMatchObject({
+      status: 404,
+      code: 'EJERCICIO_NO_ENCONTRADO',
+    });
+  });
+
+  it('busca sin distinguir mayúsculas ni tildes', async () => {
+    const api = crearMockAtlasApi();
+    const lista = await api.buscarEjercicios('flexoextension');
+    expect(lista.map((e) => e.nombre)).toContain('Flexoextensión pasiva de rodilla');
+    await expect(api.buscarEjercicios('zzzz')).resolves.toEqual([]);
+  });
+
+  it('registrar una visita no falla', async () => {
+    await expect(crearMockAtlasApi().registrarVisita(1)).resolves.toBeUndefined();
+  });
+});

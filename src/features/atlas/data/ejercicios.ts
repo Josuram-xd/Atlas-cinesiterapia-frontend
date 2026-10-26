@@ -1,18 +1,24 @@
-import type { EjercicioResumen } from '@/lib/api';
+/** Ejercicio de ejemplo: lo mínimo del que el mock deriva el resumen y la ficha completa. */
+export interface EjercicioMock {
+  id: number;
+  nombre: string;
+  /** Objetivo terapéutico (una frase). */
+  objetivo: string;
+}
 
 /**
- * Ejercicios de ejemplo mientras no exista `GET /ejercicios`. Se indexan por `svgId` de la
+ * Ejercicios de ejemplo para el modo `mock`. Se indexan por `svgId` de la
  * región y por id de categoría (1 a 9, en el orden de CATEGORIAS_MOCK). Lo que no está aquí
  * devuelve una lista vacía, como haría el backend con una combinación sin fichas publicadas.
  */
 let siguienteId = 1;
-const ej = (nombre: string, resumen: string): EjercicioResumen => ({
+const ej = (nombre: string, objetivo: string): EjercicioMock => ({
   id: siguienteId++,
   nombre,
-  resumen,
+  objetivo,
 });
 
-export const EJERCICIOS_MOCK: Record<string, Record<number, EjercicioResumen[]>> = {
+export const EJERCICIOS_MOCK: Record<string, Record<number, EjercicioMock[]>> = {
   'anterior-rodilla': {
     1: [
       ej(

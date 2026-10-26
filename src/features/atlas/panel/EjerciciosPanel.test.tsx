@@ -2,26 +2,33 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { EjerciciosPanel } from './EjerciciosPanel';
 
+const base = {
+  region: { id: 9, nombre: 'Columna lumbar', svgId: 'posterior-lumbar' },
+  categoria: { id: 6, nombre: 'Fortalecimiento isométrico' },
+};
 const ejercicios = [
-  { id: 1, nombre: 'Puente isométrico', resumen: 'Activar glúteos en estático.' },
-  { id: 2, nombre: 'Plancha', resumen: 'Controlar la posición neutra.' },
+  { id: 1, nombre: 'Puente isométrico', ...base },
+  { id: 2, nombre: 'Plancha', ...base },
 ];
 
 function montar(props: Partial<ComponentProps<typeof EjerciciosPanel>> = {}) {
   const onCerrar = vi.fn();
   const onReintentar = vi.fn();
   const utils = render(
-    <EjerciciosPanel
-      region="Columna lumbar"
-      categoria="Fortalecimiento isométrico"
-      estado="listo"
-      ejercicios={ejercicios}
-      onCerrar={onCerrar}
-      onReintentar={onReintentar}
-      {...props}
-    />,
+    <MemoryRouter>
+      <EjerciciosPanel
+        region="Columna lumbar"
+        categoria="Fortalecimiento isométrico"
+        estado="listo"
+        ejercicios={ejercicios}
+        onCerrar={onCerrar}
+        onReintentar={onReintentar}
+        {...props}
+      />
+    </MemoryRouter>,
   );
   return { onCerrar, onReintentar, ...utils };
 }
@@ -35,21 +42,26 @@ describe('EjerciciosPanel con datos', () => {
     expect(screen.getByText('Columna lumbar', { selector: 'p' })).toBeInTheDocument();
     expect(screen.getByRole('list').querySelectorAll('li')).toHaveLength(2);
     expect(screen.getByText('Puente isométrico')).toBeInTheDocument();
-    expect(screen.getByText('Controlar la posición neutra.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Puente isométrico/ })).toHaveAttribute(
+      'href',
+      '/ejercicios/1',
+    );
   });
 
   it('anuncia la cantidad en singular y en plural', () => {
     const { rerender } = montar();
     expect(screen.getByText('2 ejercicios')).toBeInTheDocument();
     rerender(
-      <EjerciciosPanel
-        region="Rodilla"
-        categoria="Pasiva"
-        estado="listo"
-        ejercicios={ejercicios.slice(0, 1)}
-        onCerrar={() => {}}
-        onReintentar={() => {}}
-      />,
+      <MemoryRouter>
+        <EjerciciosPanel
+          region="Rodilla"
+          categoria="Pasiva"
+          estado="listo"
+          ejercicios={ejercicios.slice(0, 1)}
+          onCerrar={() => {}}
+          onReintentar={() => {}}
+        />
+      </MemoryRouter>,
     );
     expect(screen.getByText('1 ejercicio')).toBeInTheDocument();
   });

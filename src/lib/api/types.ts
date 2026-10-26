@@ -87,19 +87,91 @@ export interface Region {
    */
   svgId: string;
   vista: VistaCuerpo;
+  orden: number;
 }
 
 export interface Categoria {
   id: number;
   nombre: string;
+  orden: number;
 }
 
-/** Ejercicio publicado tal como aparece en el listado de una región y categoría. */
+/** GET /regiones/{id}/categorias: las 9 categorías con las fichas publicadas de esa región. */
+export interface CategoriaConConteo extends Categoria {
+  totalEjercicios: number;
+}
+
+export interface RegionRef {
+  id: number;
+  nombre: string;
+  svgId: string;
+  vista?: VistaCuerpo;
+}
+
+export interface CategoriaRef {
+  id: number;
+  nombre: string;
+}
+
+/** Ejercicio publicado tal como aparece en listados y búsqueda (EjercicioResumenResponse). */
 export interface EjercicioResumen {
   id: number;
   nombre: string;
-  /** Frase corta con el objetivo terapéutico. */
-  resumen: string;
+  region: RegionRef;
+  categoria: CategoriaRef;
+}
+
+// --- Ficha de ejercicio ----------------------------------------------------------
+
+export type MediaTipo = 'VIDEO' | 'IMAGEN';
+export type MediaRol = 'POSICION_INICIAL' | 'POSICION_FINAL' | 'TOMA_TERAPEUTA' | 'OTRO';
+
+export interface Media {
+  id: number;
+  tipo: MediaTipo;
+  /** `null` en video. */
+  rol: MediaRol | null;
+  contentType: string;
+  tamanoBytes: number;
+  /** URL de lectura; puede ser temporal, se usa tal cual. */
+  url: string;
+  orden: number;
+}
+
+/** Texto libre por campo ("3x12", "hasta fatiga"). */
+export interface Dosificacion {
+  series: string;
+  repeticiones: string;
+  intensidad: string;
+  tiempo: string;
+  descanso: string;
+  frecuencia: string;
+}
+
+/** Ficha completa publicada (GET /ejercicios/{id}). */
+export interface Ejercicio {
+  id: number;
+  nombre: string;
+  region: RegionRef & { vista: VistaCuerpo };
+  categoria: CategoriaRef;
+  objetivoTerapeutico: string;
+  estructurasIntervenidas: string;
+  indicaciones: string;
+  precaucionesContraindicaciones: string;
+  posicionPaciente: string;
+  posicionFisioterapeuta: string;
+  ejecucion: string;
+  comandosVerbales: string;
+  dosificacion: Dosificacion;
+  progresion: string | null;
+  erroresComunes: string | null;
+  estudiantesCreadores: string[];
+  /** "AAAA-N", p. ej. "2025-1". */
+  cohorte: string;
+  profesoraRevisora: string;
+  video: Media | null;
+  imagenes: Media[];
+  actualizadoEn: string;
 }
 
 // --- Errores ---------------------------------------------------------------------

@@ -1,11 +1,13 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
 import { Button } from '@/components/Button';
+import { BuscadorEjercicios } from '@/features/atlas/busqueda/BuscadorEjercicios';
 import { useSession } from '@/features/auth/sessionStore';
 
 /** Marco de las pantallas con sesión: cabecera con el usuario y el cierre de sesión. */
 export function AppShell() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const usuario = useSession((s) => s.usuario);
   const cerrarSesion = useSession((s) => s.cerrarSesion);
 
@@ -16,6 +18,8 @@ export function AppShell() {
 
   return (
     <AppLayout
+      // La clave reinicia la búsqueda (texto y lista) al cambiar de pantalla.
+      centro={<BuscadorEjercicios key={pathname} />}
       actions={
         <>
           {usuario?.rolSistema === 'ADMIN' ? (
