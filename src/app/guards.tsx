@@ -2,6 +2,7 @@ import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Notice } from '@/components/Notice';
 import { useSession } from '@/features/auth/sessionStore';
 import type { RolSistema } from '@/lib/api';
+import { rutaLocal } from './rutaLocal';
 
 function Cargando() {
   return (
@@ -37,7 +38,7 @@ export function PublicOnly() {
   if (estado === 'iniciando') return <Cargando />;
   if (estado === 'autenticado') {
     const from = (location.state as { from?: string } | null)?.from;
-    return <Navigate to={from ?? '/'} replace />;
+    return <Navigate to={rutaLocal(from)} replace />;
   }
   return <Outlet />;
 }

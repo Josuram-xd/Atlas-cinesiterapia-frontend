@@ -37,7 +37,7 @@ describe('LoginPage', () => {
 
     await waitFor(() =>
       expect(
-        screen.getByRole('heading', { name: /atlas de cinesiterapia/i }),
+        screen.getByRole('heading', { name: /elige una región/i }),
       ).toBeInTheDocument(),
     );
     expect(tokenStorage.get()).toEqual({ accessToken: 'a', refreshToken: 'r' });
