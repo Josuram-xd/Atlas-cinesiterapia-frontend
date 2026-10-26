@@ -60,7 +60,6 @@ export function LoginPage() {
         {login.isError ? (
           <Notice tipo="error">
             {mensajeDeError(login.error, {
-              400: 'Correo o contraseña incorrectos.',
               401: 'Correo o contraseña incorrectos.',
             })}
           </Notice>

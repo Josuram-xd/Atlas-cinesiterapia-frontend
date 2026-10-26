@@ -1,20 +1,19 @@
 /**
- * Contrato de la API en un solo lugar.
- * El backend aún no está desplegado: estos tipos reflejan el contrato descrito en
- * Atlas-cinesiterapia-backend/TASKS.md y deben ajustarse cuando exista el OpenAPI real.
+ * Contrato de la API en un solo lugar. Fuente de verdad: el backend
+ * (Atlas-cinesiterapia-backend, rama task-1-autenticacion: DTOs de auth y ApiError).
  */
 
 /** Rol elegido al registrarse (HU-17). */
 export type RolPerfil = 'ESTUDIANTE' | 'PROFESIONAL' | 'PRACTICANTE' | 'VISITANTE';
 
 /** Rol de sistema que decide los permisos. */
-export type RolSistema = 'USUARIO' | 'ADMIN';
+export type RolSistema = 'USER' | 'ADMIN';
 
 export interface Usuario {
-  id: string;
+  id: number;
   correo: string;
   rolPerfil: RolPerfil;
-  rol: RolSistema;
+  rolSistema: RolSistema;
 }
 
 export interface Tokens {
@@ -24,6 +23,9 @@ export interface Tokens {
 
 /** Respuesta de /auth/login y /auth/refresh. */
 export interface AuthResponse extends Tokens {
+  tokenType: 'Bearer';
+  /** Vigencia del access token en segundos. */
+  expiresIn: number;
   usuario: Usuario;
 }
 
@@ -55,9 +57,15 @@ export interface RecuperarRequest {
   correo: string;
 }
 
+/** POST /auth/recuperar responde 202 con un mensaje neutro (no revela si el correo existe). */
+export interface RecuperarResponse {
+  mensaje: string;
+}
+
 export interface RestablecerRequest {
   token: string;
-  password: string;
+  /** El backend la llama nuevaPassword (no password). */
+  nuevaPassword: string;
 }
 
 /** POST /auth/cierre-pendiente: lo envía `navigator.sendBeacon` en `pagehide`. */
@@ -72,7 +80,11 @@ export type VistaCuerpo = 'ANTERIOR' | 'POSTERIOR';
 export interface Region {
   id: number;
   nombre: string;
-  /** Id del `<path>` dentro del SVG del cuerpo. */
+  /**
+   * Id del `<path>` dentro del SVG (columna `svg_id` del backend). Lleva el prefijo de la
+   * vista, `<vista>-<region>` (ej. `anterior-rodilla`), porque algunas regiones como
+   * cabeza-cuello existen en ambas vistas y el id debe ser único.
+   */
   svgId: string;
   vista: VistaCuerpo;
 }
@@ -84,10 +96,22 @@ export interface Categoria {
 
 // --- Errores ---------------------------------------------------------------------
 
-/** Formato uniforme de error del backend (ControllerAdvice). */
+/** Un campo inválido dentro de `fieldErrors`. */
+export interface FieldViolation {
+  field: string;
+  message: string;
+}
+
+/**
+ * Formato uniforme de error del backend (ApiError). `code` es estable; `message` va en
+ * español sin tildes y no se muestra tal cual. `fieldErrors` se omite si está vacío.
+ */
 export interface ApiErrorBody {
-  message?: string;
+  timestamp?: string;
+  status?: number;
+  error?: string;
   code?: string;
-  /** Errores por campo, cuando aplica. */
-  errors?: Record<string, string>;
+  message?: string;
+  path?: string;
+  fieldErrors?: FieldViolation[];
 }

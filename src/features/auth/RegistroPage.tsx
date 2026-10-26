@@ -9,7 +9,12 @@ import { ApiError, type RolPerfil } from '@/lib/api';
 import { authApi } from './api';
 import { mensajeDeError } from './messages';
 import { RolSelector } from './RolSelector';
-import { PASSWORD_MIN, validarCorreo, validarPasswordNueva } from './validation';
+import {
+  PASSWORD_MAX,
+  PASSWORD_MIN,
+  validarCorreo,
+  validarPasswordNueva,
+} from './validation';
 
 interface Errores {
   correo?: string;
@@ -35,7 +40,9 @@ export function RegistroPage() {
   });
 
   // 409: el correo ya existe. Se muestra en el campo, no como aviso general.
-  const correoEnUso = registro.error instanceof ApiError && registro.error.status === 409;
+  const correoEnUso =
+    registro.error instanceof ApiError &&
+    (registro.error.code === 'CORREO_EN_USO' || registro.error.status === 409);
 
   function enviar(evento: FormEvent) {
     evento.preventDefault();
@@ -83,7 +90,7 @@ export function RegistroPage() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          ayuda={`Mínimo ${PASSWORD_MIN} caracteres.`}
+          ayuda={`Entre ${PASSWORD_MIN} y ${PASSWORD_MAX} caracteres.`}
           error={errores.password}
         />
         <RolSelector

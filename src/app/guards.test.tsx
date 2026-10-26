@@ -6,17 +6,13 @@ import type { Usuario } from '@/lib/api';
 import { tokenStorage } from '@/lib/api';
 import { renderWithRouter } from '@/test/renderWithRouter';
 import { routes } from './routes';
+import { adminDemo, authDemo, usuarioDemo } from '@/test/fixtures';
 
-const usuario: Usuario = {
-  id: '1',
-  correo: 'ana@correo.com',
-  rolPerfil: 'ESTUDIANTE',
-  rol: 'USUARIO',
-};
-const admin: Usuario = { ...usuario, id: '2', correo: 'admin@correo.com', rol: 'ADMIN' };
+const usuario = usuarioDemo;
+const admin: Usuario = adminDemo;
 
 function conSesion(u: Usuario) {
-  useSession.getState().iniciar({ accessToken: 'a', refreshToken: 'r', usuario: u });
+  useSession.getState().iniciar(authDemo({ usuario: u }));
 }
 
 describe('guardas de rutas', () => {

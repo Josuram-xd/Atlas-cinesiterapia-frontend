@@ -25,10 +25,10 @@ describe('RegistroPage', () => {
   it('crea la cuenta con el rol elegido y lleva al login con un aviso', async () => {
     fetchMock.mockResolvedValueOnce(
       respuesta(201, {
-        id: '9',
+        id: 9,
         correo: 'nuevo@correo.com',
         rolPerfil: 'PRACTICANTE',
-        rol: 'USUARIO',
+        rolSistema: 'USER',
       }),
     );
     const user = userEvent.setup();

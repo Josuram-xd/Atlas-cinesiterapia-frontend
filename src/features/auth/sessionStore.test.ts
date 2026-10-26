@@ -1,13 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { tokenStorage, type Usuario } from '@/lib/api';
+import { tokenStorage } from '@/lib/api';
 import { useSession } from './sessionStore';
+import { authDemo, usuarioDemo } from '@/test/fixtures';
 
-const usuario: Usuario = {
-  id: '1',
-  correo: 'ana@correo.com',
-  rolPerfil: 'ESTUDIANTE',
-  rol: 'USUARIO',
-};
+const usuario = usuarioDemo;
 
 function json(status: number, body?: unknown) {
   return new Response(body === undefined ? null : JSON.stringify(body), { status });
@@ -22,7 +18,7 @@ describe('store de sesión', () => {
   });
 
   it('iniciar guarda tokens y usuario', () => {
-    useSession.getState().iniciar({ accessToken: 'a', refreshToken: 'r', usuario });
+    useSession.getState().iniciar(authDemo({ usuario }));
     expect(useSession.getState().estado).toBe('autenticado');
     expect(useSession.getState().usuario).toEqual(usuario);
     expect(tokenStorage.get()).toEqual({ accessToken: 'a', refreshToken: 'r' });
@@ -31,7 +27,7 @@ describe('store de sesión', () => {
   it('recuperar renueva la sesión guardada con un refresh', async () => {
     tokenStorage.set({ accessToken: 'viejo', refreshToken: 'r1' });
     fetchMock.mockResolvedValueOnce(
-      json(200, { accessToken: 'nuevo', refreshToken: 'r2', usuario }),
+      json(200, authDemo({ accessToken: 'nuevo', refreshToken: 'r2', usuario })),
     );
     await useSession.getState().recuperar();
     expect(useSession.getState().estado).toBe('autenticado');
@@ -48,7 +44,7 @@ describe('store de sesión', () => {
   });
 
   it('recuperar sin red conserva la sesión con el usuario guardado', async () => {
-    useSession.getState().iniciar({ accessToken: 'a', refreshToken: 'r', usuario });
+    useSession.getState().iniciar(authDemo({ usuario }));
     useSession.setState({ estado: 'iniciando', usuario: null });
     fetchMock.mockRejectedValueOnce(new TypeError('offline'));
     await useSession.getState().recuperar();
