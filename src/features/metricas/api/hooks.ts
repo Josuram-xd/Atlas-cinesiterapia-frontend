@@ -31,3 +31,13 @@ export function useUsuariosActivos(rango: Rango | null) {
     enabled: rango !== null,
   });
 }
+
+/** Tiempo promedio por sesión del rango y del periodo anterior; con `rango` nulo no consulta. */
+export function useTiempoPromedio(rango: Rango | null) {
+  const api = useMetricasApi();
+  return useQuery({
+    queryKey: ['metricas', 'tiempo', rango],
+    queryFn: ({ signal }) => api.tiempoPromedio(rango!, signal),
+    enabled: rango !== null,
+  });
+}

@@ -73,3 +73,16 @@ describe('mockMetricasApi: usuarios activos', () => {
     expect(r.total).toBe(r.porRol.reduce((suma, x) => suma + x.usuarios, 0));
   });
 });
+
+describe('mockMetricasApi: tiempo promedio', () => {
+  it('devuelve promedio, sesiones y tendencia frente al periodo anterior', async () => {
+    const r = await crearMockMetricasApi().tiempoPromedio({
+      desde: '2026-10-01',
+      hasta: '2026-10-28',
+    });
+    expect(r.promedioSegundos).toBeGreaterThan(0);
+    expect(r.sesiones).toBeGreaterThan(0);
+    expect(r.anterior.promedioSegundos).toBeDefined();
+    expect(r.variacionPorcentaje).toBeDefined();
+  });
+});

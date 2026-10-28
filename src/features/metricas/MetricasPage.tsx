@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { PanelEjercicios } from './PanelEjercicios';
+import { PanelTiempo } from './PanelTiempo';
 import { PanelUsuarios } from './PanelUsuarios';
 import { PanelVisitas } from './PanelVisitas';
 import { SelectorRango } from './SelectorRango';
@@ -36,6 +37,7 @@ export function MetricasPage() {
       <PanelVisitas rango={rangoValido} />
       <PanelEjercicios rango={rangoValido} />
       <PanelUsuarios rango={rangoValido} />
+      <PanelTiempo rango={rangoValido} />
     </section>
   );
 }

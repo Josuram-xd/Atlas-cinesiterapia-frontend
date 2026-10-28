@@ -3,6 +3,7 @@ import type {
   Rango,
   Sesion,
   TopEjercicios,
+  TiempoPromedio,
   UsuariosActivos,
   VisitasPeriodo,
 } from '@/lib/api';
@@ -24,4 +25,6 @@ export interface MetricasApi {
   ejerciciosMasConsultados(rango: Rango, signal?: AbortSignal): Promise<TopEjercicios>;
   /** Usuarios con actividad en el rango, por rol de perfil (HU-33). */
   usuariosActivos(rango: Rango, signal?: AbortSignal): Promise<UsuariosActivos>;
+  /** Promedio de duración de las sesiones iniciadas en el rango, con el periodo anterior (HU-34). */
+  tiempoPromedio(rango: Rango, signal?: AbortSignal): Promise<TiempoPromedio>;
 }

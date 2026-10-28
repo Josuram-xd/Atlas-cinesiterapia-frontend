@@ -76,7 +76,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 6.2 Gráfico de visitas por periodo con selector de rango
 - [x] 6.3 Ranking de ejercicios más consultados
 - [x] 6.4 Usuarios activos por rol
-- [ ] 6.5 Tiempo promedio de uso por sesión
+- [x] 6.5 Tiempo promedio de uso por sesión
 - [x] 6.6 Ping de sesión para alimentar la métrica de tiempo
 
 ## Fase 7 — Offline, calidad y despliegue (RNF_003, RNF_004)

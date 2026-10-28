@@ -383,6 +383,22 @@ export interface VisitasPeriodo extends Rango {
   serie: { inicio: string; visitas: number }[];
 }
 
+/** GET /admin/metricas/tiempo-promedio. `anterior` es el periodo previo de igual longitud. */
+export interface TiempoPromedio extends Rango {
+  /** Sesiones con duración registrada en el periodo. */
+  sesiones: number;
+  /** Ausente si no hay datos. */
+  promedioSegundos?: number;
+  anterior: {
+    desde: string;
+    hasta: string;
+    sesiones: number;
+    promedioSegundos?: number;
+  };
+  /** (actual - anterior) / anterior * 100, una decimal; ausente si falta alguno de los dos. */
+  variacionPorcentaje?: number;
+}
+
 /** GET /admin/metricas/ejercicios-mas-consultados: solo fichas publicadas con visitas. */
 /** GET /admin/metricas/usuarios-activos. Cada persona cuenta una vez; siempre 4 roles, en orden. */
 export interface UsuariosActivos extends Rango {

@@ -51,3 +51,14 @@ describe('httpMetricasApi: usuarios activos', () => {
     );
   });
 });
+
+describe('httpMetricasApi: tiempo promedio', () => {
+  it('pide el tiempo promedio del rango', async () => {
+    const get = vi.spyOn(api, 'get').mockResolvedValue({});
+    await httpMetricasApi.tiempoPromedio({ desde: '2026-10-01', hasta: '2026-10-28' });
+    expect(get).toHaveBeenCalledWith(
+      '/admin/metricas/tiempo-promedio?desde=2026-10-01&hasta=2026-10-28',
+      { signal: undefined },
+    );
+  });
+});

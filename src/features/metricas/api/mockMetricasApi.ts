@@ -83,5 +83,14 @@ export function crearMockMetricasApi(): MetricasApi {
         total: ACTIVOS_MOCK.reduce((suma, x) => suma + x.usuarios, 0),
         porRol: ACTIVOS_MOCK,
       }),
+    // shortcut: cifras fijas y el periodo anterior no se recalcula, usar la API real al tenerla
+    tiempoPromedio: (rango: Rango) =>
+      Promise.resolve({
+        ...rango,
+        sesiones: 48,
+        promedioSegundos: 512,
+        anterior: { ...rango, sesiones: 40, promedioSegundos: 455 },
+        variacionPorcentaje: 12.5,
+      }),
   };
 }
