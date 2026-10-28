@@ -11,4 +11,18 @@ describe('httpMetricasApi', () => {
     expect(RUTA_PING).toBe('/metricas/sesion/ping');
     expect(post).toHaveBeenCalledWith('/metricas/sesion/ping');
   });
+
+  it('la consulta de visitas lleva el rango y la agrupación', async () => {
+    const get = vi.spyOn(api, 'get').mockResolvedValue({});
+    const signal = new AbortController().signal;
+    await httpMetricasApi.visitasPorPeriodo(
+      { desde: '2026-10-01', hasta: '2026-10-28' },
+      'SEMANA',
+      signal,
+    );
+    expect(get).toHaveBeenCalledWith(
+      '/admin/metricas/visitas?desde=2026-10-01&hasta=2026-10-28&agrupacion=SEMANA',
+      { signal },
+    );
+  });
 });

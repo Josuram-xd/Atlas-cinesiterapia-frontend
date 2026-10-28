@@ -1,4 +1,4 @@
-import type { Sesion } from '@/lib/api';
+import type { Agrupacion, Rango, Sesion, VisitasPeriodo } from '@/lib/api';
 
 /** Lo que el front necesita de `/metricas/**` y `/admin/metricas/**` (docs/API.md, sección 9). */
 export interface MetricasApi {
@@ -7,4 +7,10 @@ export interface MetricasApi {
    * pasaron más de 30 minutos desde el último. Sin cuerpo.
    */
   registrarPing(): Promise<Sesion>;
+  /** Visitas (atlas y fichas) por día, semana o mes dentro del rango (HU-31). */
+  visitasPorPeriodo(
+    rango: Rango,
+    agrupacion: Agrupacion,
+    signal?: AbortSignal,
+  ): Promise<VisitasPeriodo>;
 }

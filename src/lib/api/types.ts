@@ -368,6 +368,21 @@ export interface Sesion {
   duracionSegundos: number;
 }
 
+/** Días UTC `AAAA-MM-DD`, ambos incluidos (docs/API.md, sección 9). */
+export interface Rango {
+  desde: string;
+  hasta: string;
+}
+
+export type Agrupacion = 'DIA' | 'SEMANA' | 'MES';
+
+/** GET /admin/metricas/visitas. Los cubos vacíos vienen con `visitas: 0`. */
+export interface VisitasPeriodo extends Rango {
+  agrupacion: Agrupacion;
+  total: number;
+  serie: { inicio: string; visitas: number }[];
+}
+
 // --- Errores ---------------------------------------------------------------------
 
 /** Un campo inválido dentro de `fieldErrors`. */

@@ -73,7 +73,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 
 ## Fase 6 — Métricas (HU-30 a HU-34)
 - [x] 6.1 Página de métricas protegida para admin
-- [ ] 6.2 Gráfico de visitas por periodo con selector de rango
+- [x] 6.2 Gráfico de visitas por periodo con selector de rango
 - [ ] 6.3 Ranking de ejercicios más consultados
 - [ ] 6.4 Usuarios activos por rol
 - [ ] 6.5 Tiempo promedio de uso por sesión
