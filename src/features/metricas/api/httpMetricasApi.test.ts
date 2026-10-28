@@ -35,7 +35,7 @@ describe('httpMetricasApi: ranking de ejercicios', () => {
       hasta: '2026-10-28',
     });
     expect(get).toHaveBeenCalledWith(
-      '/admin/metricas/ejercicios-mas-consultados?desde=2026-10-01&hasta=2026-10-28&limite=10',
+      '/admin/metricas/ejercicios-mas-consultados?desde=2026-10-01&hasta=2026-10-28',
       { signal: undefined },
     );
   });

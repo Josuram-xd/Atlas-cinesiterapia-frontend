@@ -10,26 +10,19 @@ import type { MetricasApi } from './metricasApi';
 
 export const RUTA_PING = '/metricas/sesion/ping';
 
+/** GET a `/admin/metricas/{ruta}` con el rango (y lo demás) como query string. */
+const pedir = <T>(ruta: string, params: Record<string, string>, signal?: AbortSignal) =>
+  api.get<T>(`/admin/metricas/${ruta}?${new URLSearchParams(params)}`, { signal });
+
 export const httpMetricasApi: MetricasApi = {
   registrarPing: () => api.post<Sesion>(RUTA_PING),
   visitasPorPeriodo: (rango, agrupacion, signal) =>
-    api.get<VisitasPeriodo>(
-      `/admin/metricas/visitas?${new URLSearchParams({ ...rango, agrupacion })}`,
-      { signal },
-    ),
+    pedir<VisitasPeriodo>('visitas', { ...rango, agrupacion }, signal),
+  // Sin `limite`: el backend da 10 por defecto, lo que pide HU-32.
   ejerciciosMasConsultados: (rango, signal) =>
-    api.get<TopEjercicios>(
-      `/admin/metricas/ejercicios-mas-consultados?${new URLSearchParams({ ...rango, limite: '10' })}`,
-      { signal },
-    ),
+    pedir<TopEjercicios>('ejercicios-mas-consultados', { ...rango }, signal),
   usuariosActivos: (rango, signal) =>
-    api.get<UsuariosActivos>(
-      `/admin/metricas/usuarios-activos?${new URLSearchParams({ ...rango })}`,
-      { signal },
-    ),
+    pedir<UsuariosActivos>('usuarios-activos', { ...rango }, signal),
   tiempoPromedio: (rango, signal) =>
-    api.get<TiempoPromedio>(
-      `/admin/metricas/tiempo-promedio?${new URLSearchParams({ ...rango })}`,
-      { signal },
-    ),
+    pedir<TiempoPromedio>('tiempo-promedio', { ...rango }, signal),
 };

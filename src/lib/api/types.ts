@@ -399,13 +399,13 @@ export interface TiempoPromedio extends Rango {
   variacionPorcentaje?: number;
 }
 
-/** GET /admin/metricas/ejercicios-mas-consultados: solo fichas publicadas con visitas. */
 /** GET /admin/metricas/usuarios-activos. Cada persona cuenta una vez; siempre 4 roles, en orden. */
 export interface UsuariosActivos extends Rango {
   total: number;
   porRol: { rol: RolPerfil; usuarios: number }[];
 }
 
+/** GET /admin/metricas/ejercicios-mas-consultados: solo fichas publicadas con visitas. */
 export interface TopEjercicios {
   /** `null` si la consulta no pidió rango (todo el histórico). */
   desde: string | null;
