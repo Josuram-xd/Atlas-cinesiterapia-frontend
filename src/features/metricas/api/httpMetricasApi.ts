@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import type { Sesion, TopEjercicios, VisitasPeriodo } from '@/lib/api';
+import type { Sesion, TopEjercicios, UsuariosActivos, VisitasPeriodo } from '@/lib/api';
 import type { MetricasApi } from './metricasApi';
 
 export const RUTA_PING = '/metricas/sesion/ping';
@@ -14,6 +14,11 @@ export const httpMetricasApi: MetricasApi = {
   ejerciciosMasConsultados: (rango, signal) =>
     api.get<TopEjercicios>(
       `/admin/metricas/ejercicios-mas-consultados?${new URLSearchParams({ ...rango, limite: '10' })}`,
+      { signal },
+    ),
+  usuariosActivos: (rango, signal) =>
+    api.get<UsuariosActivos>(
+      `/admin/metricas/usuarios-activos?${new URLSearchParams({ ...rango })}`,
       { signal },
     ),
 };

@@ -1,4 +1,4 @@
-import type { Agrupacion, Rango } from '@/lib/api';
+import type { Agrupacion, Rango, UsuariosActivos } from '@/lib/api';
 import { CATEGORIAS_MOCK, REGIONES_MOCK } from '../../atlas/data/regiones';
 import { inicioCubo } from '../rangos';
 import type { MetricasApi } from './metricasApi';
@@ -31,6 +31,14 @@ const RANKING_MOCK = [
     categoriaId: 3,
     visitas: 9,
   },
+];
+
+/** Usuarios activos de ejemplo por rol, en el orden que devuelve el backend. */
+const ACTIVOS_MOCK: UsuariosActivos['porRol'] = [
+  { rol: 'ESTUDIANTE', usuarios: 14 },
+  { rol: 'PROFESIONAL', usuarios: 6 },
+  { rol: 'PRACTICANTE', usuarios: 3 },
+  { rol: 'VISITANTE', usuarios: 0 },
 ];
 
 /** Datos de ejemplo detrás de la misma interfaz que el backend. */
@@ -68,6 +76,12 @@ export function crearMockMetricasApi(): MetricasApi {
           categoria: CATEGORIAS_MOCK.find((c) => c.id === f.categoriaId)!,
           visitas: f.visitas,
         })),
+      }),
+    usuariosActivos: (rango: Rango) =>
+      Promise.resolve({
+        ...rango,
+        total: ACTIVOS_MOCK.reduce((suma, x) => suma + x.usuarios, 0),
+        porRol: ACTIVOS_MOCK,
       }),
   };
 }

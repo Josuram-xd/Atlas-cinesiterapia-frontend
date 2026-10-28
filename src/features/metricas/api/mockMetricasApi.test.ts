@@ -57,3 +57,19 @@ describe('mockMetricasApi: ranking de ejercicios', () => {
     expect([...visitas].sort((a, b) => b - a)).toEqual(visitas);
   });
 });
+
+describe('mockMetricasApi: usuarios activos', () => {
+  it('devuelve los cuatro roles en orden y el total es su suma', async () => {
+    const r = await crearMockMetricasApi().usuariosActivos({
+      desde: '2026-10-01',
+      hasta: '2026-10-28',
+    });
+    expect(r.porRol.map((x) => x.rol)).toEqual([
+      'ESTUDIANTE',
+      'PROFESIONAL',
+      'PRACTICANTE',
+      'VISITANTE',
+    ]);
+    expect(r.total).toBe(r.porRol.reduce((suma, x) => suma + x.usuarios, 0));
+  });
+});

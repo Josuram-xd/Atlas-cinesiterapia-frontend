@@ -40,3 +40,14 @@ describe('httpMetricasApi: ranking de ejercicios', () => {
     );
   });
 });
+
+describe('httpMetricasApi: usuarios activos', () => {
+  it('pide los usuarios activos del rango', async () => {
+    const get = vi.spyOn(api, 'get').mockResolvedValue({});
+    await httpMetricasApi.usuariosActivos({ desde: '2026-10-01', hasta: '2026-10-28' });
+    expect(get).toHaveBeenCalledWith(
+      '/admin/metricas/usuarios-activos?desde=2026-10-01&hasta=2026-10-28',
+      { signal: undefined },
+    );
+  });
+});

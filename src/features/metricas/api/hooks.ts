@@ -21,3 +21,13 @@ export function useEjerciciosMasConsultados(rango: Rango | null) {
     enabled: rango !== null,
   });
 }
+
+/** Usuarios activos por rol del rango; con `rango` nulo no consulta. */
+export function useUsuariosActivos(rango: Rango | null) {
+  const api = useMetricasApi();
+  return useQuery({
+    queryKey: ['metricas', 'usuarios', rango],
+    queryFn: ({ signal }) => api.usuariosActivos(rango!, signal),
+    enabled: rango !== null,
+  });
+}

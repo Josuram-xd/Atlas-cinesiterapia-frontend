@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { PanelEjercicios } from './PanelEjercicios';
+import { PanelUsuarios } from './PanelUsuarios';
 import { PanelVisitas } from './PanelVisitas';
 import { SelectorRango } from './SelectorRango';
 import { hoyUtc, rangoDePeriodo, validarRango, type Periodo } from './rangos';
@@ -34,6 +35,7 @@ export function MetricasPage() {
       />
       <PanelVisitas rango={rangoValido} />
       <PanelEjercicios rango={rangoValido} />
+      <PanelUsuarios rango={rangoValido} />
     </section>
   );
 }
