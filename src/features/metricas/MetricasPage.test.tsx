@@ -5,6 +5,7 @@ import { routes } from '@/app/routes';
 import { useSession } from '@/features/auth/sessionStore';
 import { adminDemo, authDemo, usuarioDemo } from '@/test/fixtures';
 import { renderWithRouter } from '@/test/renderWithRouter';
+import { MetricasApiProvider } from './api/MetricasApiProvider';
 import { MetricasPage } from './MetricasPage';
 import { crearMockMetricasApi } from './api/mockMetricasApi';
 import { hoyUtc, inicioCubo } from './rangos';
@@ -17,12 +18,17 @@ function montarPagina() {
   const api = crearMockMetricasApi();
   const espia = vi.spyOn(api, 'visitasPorPeriodo');
   renderWithRouter(
-    [{ path: '/admin/metricas', element: <MetricasPage /> }],
+    [
+      {
+        path: '/admin/metricas',
+        element: (
+          <MetricasApiProvider api={api}>
+            <MetricasPage />
+          </MetricasApiProvider>
+        ),
+      },
+    ],
     ['/admin/metricas'],
-    undefined,
-    undefined,
-    undefined,
-    api,
   );
   return espia;
 }

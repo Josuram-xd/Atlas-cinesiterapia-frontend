@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ApiError, type UsuariosActivos } from '@/lib/api';
 import { renderWithRouter } from '@/test/renderWithRouter';
+import { MetricasApiProvider } from './api/MetricasApiProvider';
 import { PanelUsuarios } from './PanelUsuarios';
 import { crearMockMetricasApi } from './api/mockMetricasApi';
 
@@ -23,12 +24,17 @@ function montar(rango: typeof RANGO | null, consulta: () => Promise<UsuariosActi
   const api = crearMockMetricasApi();
   const espia = vi.spyOn(api, 'usuariosActivos').mockImplementation(consulta);
   renderWithRouter(
-    [{ path: '/', element: <PanelUsuarios rango={rango} /> }],
+    [
+      {
+        path: '/',
+        element: (
+          <MetricasApiProvider api={api}>
+            <PanelUsuarios rango={rango} />
+          </MetricasApiProvider>
+        ),
+      },
+    ],
     ['/'],
-    undefined,
-    undefined,
-    undefined,
-    api,
   );
   return espia;
 }

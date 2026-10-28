@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ApiError, type TiempoPromedio } from '@/lib/api';
 import { renderWithRouter } from '@/test/renderWithRouter';
+import { MetricasApiProvider } from './api/MetricasApiProvider';
 import { PanelTiempo } from './PanelTiempo';
 import { crearMockMetricasApi } from './api/mockMetricasApi';
 
@@ -21,12 +22,17 @@ function montar(rango: typeof RANGO | null, consulta: () => Promise<TiempoPromed
   const api = crearMockMetricasApi();
   const espia = vi.spyOn(api, 'tiempoPromedio').mockImplementation(consulta);
   renderWithRouter(
-    [{ path: '/', element: <PanelTiempo rango={rango} /> }],
+    [
+      {
+        path: '/',
+        element: (
+          <MetricasApiProvider api={api}>
+            <PanelTiempo rango={rango} />
+          </MetricasApiProvider>
+        ),
+      },
+    ],
     ['/'],
-    undefined,
-    undefined,
-    undefined,
-    api,
   );
   return espia;
 }
