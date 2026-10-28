@@ -2,6 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ApiError, type VisitasPeriodo } from '@/lib/api';
+import { fechaCorta } from '@/features/admin/fechas';
 import { renderWithRouter } from '@/test/renderWithRouter';
 import { MetricasApiProvider } from './api/MetricasApiProvider';
 import { PanelVisitas } from './PanelVisitas';
@@ -44,6 +45,28 @@ describe('PanelVisitas', () => {
     montar(RANGO, () => Promise.resolve(datos));
     const grafico = await screen.findByRole('img', { name: /12 en total/ });
     expect(grafico.querySelectorAll('rect')).toHaveLength(3);
+  });
+
+  it('muestra la escala y las fechas de los extremos sin depender del ratón', async () => {
+    montar(RANGO, () => Promise.resolve(datos));
+    const grafico = await screen.findByRole('img', { name: /máximo 7 por día/ });
+    const marco = grafico.parentElement!;
+    expect(marco).toHaveTextContent(/^70/);
+    expect(within(marco).getByText(fechaCorta('2026-10-01'))).toBeInTheDocument();
+    expect(within(marco).getByText(fechaCorta('2026-10-03'))).toBeInTheDocument();
+  });
+
+  it('con un solo periodo dibuja una barra estrecha, no una losa', async () => {
+    montar(RANGO, () =>
+      Promise.resolve({
+        ...datos,
+        total: 5,
+        serie: [{ inicio: '2026-10-01', visitas: 5 }],
+      }),
+    );
+    const barras = (await screen.findByRole('img')).querySelectorAll('rect');
+    expect(barras).toHaveLength(1);
+    expect(Number(barras[0].getAttribute('width'))).toBeLessThanOrEqual(8);
   });
 
   it('ofrece la tabla equivalente con el valor de cada periodo', async () => {
