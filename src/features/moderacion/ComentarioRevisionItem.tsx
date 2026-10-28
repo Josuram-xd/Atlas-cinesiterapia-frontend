@@ -81,12 +81,10 @@ export function ComentarioRevisionItem({
           cargando={acciones.aceptar.isPending}
           onClick={() => void aceptar()}
         >
-          Aceptar
-          <span className="sr-only"> comentario de {c.autor.correo}</span>
+          Aceptar <span className="sr-only">comentario de {c.autor.correo}</span>
         </Button>
         <BotonTexto onClick={() => setConfirmando(true)}>
-          Eliminar
-          <span className="sr-only"> comentario de {c.autor.correo}</span>
+          Eliminar <span className="sr-only">comentario de {c.autor.correo}</span>
         </BotonTexto>
       </div>
       {errorAceptar ? <Notice tipo="error">{errorAceptar}</Notice> : null}

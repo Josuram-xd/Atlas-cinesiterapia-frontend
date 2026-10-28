@@ -1,8 +1,10 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '@/lib/api';
+import { adminDemo } from '@/test/fixtures';
+import { useSession } from '../auth/sessionStore';
 import type { Comentario } from '@/lib/api';
 import type { ComentariosApi } from './api/comentariosApi';
 import { ComentariosApiProvider } from './api/ComentariosApiProvider';
@@ -251,7 +253,7 @@ describe('SeccionComentarios: editar y eliminar el propio', () => {
     await user.click(
       within(dialogo).getByRole('button', { name: 'Eliminar comentario' }),
     );
-    expect(eliminar).toHaveBeenCalledWith(105);
+    expect(eliminar).toHaveBeenCalledWith(105, false);
     await vi.waitFor(() =>
       expect(screen.queryByText(/Faltaría una foto/)).not.toBeInTheDocument(),
     );
@@ -434,5 +436,32 @@ describe('SeccionComentarios: reportar', () => {
     await user.click(within(raiz).getByRole('button', { name: /Reportar/ }));
     await user.click(screen.getByRole('button', { name: 'Reportar comentario' }));
     expect(await screen.findByText(/Ya reportaste este comentario/)).toBeInTheDocument();
+  });
+});
+
+describe('SeccionComentarios: el admin elimina cualquier comentario (HU-28)', () => {
+  afterEach(() => useSession.setState({ usuario: null }));
+
+  it('ofrece Eliminar en los ajenos y usa la ruta de moderación', async () => {
+    useSession.setState({ usuario: adminDemo });
+    const api = crearMockComentariosApi();
+    const eliminar = vi.spyOn(api, 'eliminar');
+    const user = userEvent.setup();
+    montar(api);
+    const raiz = (await screen.findByText(/post-operatorio/)).closest('article')!;
+    // Todos menos el ya eliminado: 4 ajenos + 1 propio.
+    expect(screen.getAllByRole('button', { name: /Eliminar/ })).toHaveLength(5);
+    await user.click(
+      within(raiz).getByRole('button', { name: 'Eliminar comentario de ana.martinez' }),
+    );
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', {
+        name: 'Eliminar comentario',
+      }),
+    );
+    expect(eliminar).toHaveBeenCalledWith(100, true);
+    await vi.waitFor(() =>
+      expect(screen.queryByText(/post-operatorio/)).not.toBeInTheDocument(),
+    );
   });
 });

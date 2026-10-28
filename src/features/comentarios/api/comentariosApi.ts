@@ -14,8 +14,11 @@ export interface ComentariosApi {
   responder(id: number, texto: string): Promise<Comentario>;
   /** Edita el comentario propio. Vuelve sin respuestas: se piden de nuevo con el listado. */
   editar(id: number, texto: string): Promise<Comentario>;
-  /** Borrado blando del comentario propio; si tenía respuestas queda como «eliminado». */
-  eliminar(id: number): Promise<void>;
+  /**
+   * Borrado blando; si tenía respuestas queda como «eliminado». Sin `comoAdmin` solo el
+   * autor puede (403 NO_ES_AUTOR); con `comoAdmin` usa la ruta de moderación (HU-28).
+   */
+  eliminar(id: number, comoAdmin?: boolean): Promise<void>;
   /**
    * Reporta un comentario ajeno (sin motivo). Sigue visible mientras se revisa. 403
    * REPORTE_PROPIO si es tuyo; 409 YA_REPORTADO si ya lo reportaste.

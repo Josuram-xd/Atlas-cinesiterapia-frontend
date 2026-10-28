@@ -4,6 +4,7 @@ import { ConfirmarAccion } from '@/components/ConfirmarAccion';
 import { IconoAdvertencia } from '@/components/IconoAdvertencia';
 import type { Comentario } from '@/lib/api';
 import { ROLES_PERFIL } from '../auth/roles';
+import { useSession } from '../auth/sessionStore';
 import { fechaLarga } from '../atlas/ficha/texto';
 import { useAccionesComentario } from './api/hooks';
 import { mensajeErrorComentario } from './errores';
@@ -20,6 +21,7 @@ interface ComentarioItemProps {
 /** Un comentario o una respuesta. El texto se muestra siempre como texto, nunca como HTML. */
 export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemProps) {
   const acciones = useAccionesComentario(ejercicioId);
+  const esAdmin = useSession((s) => s.usuario?.rolSistema === 'ADMIN');
   const [respondiendo, setRespondiendo] = useState(false);
   const [editando, setEditando] = useState(false);
   const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
@@ -32,6 +34,9 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
   const esRespuesta = c.padreId !== null;
   const puedeResponder = !c.eliminado && !c.enRevision;
   const puedeReportar = !c.propio && !c.eliminado && !reportado;
+  // HU-28: el admin elimina cualquier comentario; el ajeno va por la ruta de moderación.
+  const puedeEliminar = c.propio || (esAdmin && !c.eliminado);
+  const deQuien = c.propio ? 'tu comentario' : `comentario de ${c.autor?.nombre ?? ''}`;
 
   async function responder(texto: string) {
     const creada = await acciones.responder.mutateAsync({ id: c.id, texto });
@@ -48,7 +53,7 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
   async function eliminar() {
     setErrorBorrado(undefined);
     try {
-      await acciones.eliminar.mutateAsync(c.id);
+      await acciones.eliminar.mutateAsync({ id: c.id, comoAdmin: !c.propio });
       setConfirmandoBorrado(false);
     } catch (fallo) {
       setErrorBorrado(mensajeErrorComentario(fallo));
@@ -114,36 +119,32 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
         </>
       )}
 
-      {!editando && (puedeResponder || puedeReportar || c.propio) ? (
+      {!editando && (puedeResponder || puedeReportar || puedeEliminar) ? (
         <div className="flex flex-wrap gap-x-4">
           {puedeResponder ? (
             <BotonTexto onClick={() => setRespondiendo(true)}>
-              Responder
-              <span className="sr-only"> a {c.autor?.nombre}</span>
+              Responder <span className="sr-only">a {c.autor?.nombre}</span>
             </BotonTexto>
           ) : null}
           {puedeReportar ? (
             <BotonTexto onClick={() => setConfirmandoReporte(true)}>
-              Reportar
-              <span className="sr-only"> a {c.autor?.nombre}</span>
+              Reportar <span className="sr-only">a {c.autor?.nombre}</span>
             </BotonTexto>
           ) : null}
           {c.propio ? (
-            <>
-              <BotonTexto
-                onClick={() => {
-                  setAviso(undefined);
-                  setEditando(true);
-                }}
-              >
-                Editar
-                <span className="sr-only"> tu comentario</span>
-              </BotonTexto>
-              <BotonTexto onClick={() => setConfirmandoBorrado(true)}>
-                Eliminar
-                <span className="sr-only"> tu comentario</span>
-              </BotonTexto>
-            </>
+            <BotonTexto
+              onClick={() => {
+                setAviso(undefined);
+                setEditando(true);
+              }}
+            >
+              Editar <span className="sr-only">tu comentario</span>
+            </BotonTexto>
+          ) : null}
+          {puedeEliminar ? (
+            <BotonTexto onClick={() => setConfirmandoBorrado(true)}>
+              Eliminar <span className="sr-only">{deQuien}</span>
+            </BotonTexto>
           ) : null}
         </div>
       ) : null}
@@ -169,7 +170,7 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
 
       {confirmandoBorrado ? (
         <ConfirmarAccion
-          titulo="¿Eliminar tu comentario?"
+          titulo={`¿Eliminar ${c.propio ? 'tu comentario' : 'este comentario'}?`}
           confirmar="Eliminar comentario"
           error={errorBorrado}
           cargando={acciones.eliminar.isPending}

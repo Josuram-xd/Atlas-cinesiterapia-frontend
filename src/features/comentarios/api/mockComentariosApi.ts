@@ -262,11 +262,13 @@ export function crearMockComentariosApi({
         return aDto(r);
       }),
 
-    eliminar: (id) =>
+    eliminar: (id, comoAdmin) =>
       respuesta(() => {
         const r = registros.find((x) => x.id === id);
         if (!r || r.estado === 'ELIMINADO' || !visible(r)) throw noEncontrado();
-        if (r.autor.id !== yo.id) throw new ApiError(403, { code: 'NO_ES_AUTOR' });
+        if (!comoAdmin && r.autor.id !== yo.id) {
+          throw new ApiError(403, { code: 'NO_ES_AUTOR' });
+        }
         r.estado = 'ELIMINADO';
         r.texto = '';
         r.reportes.clear();

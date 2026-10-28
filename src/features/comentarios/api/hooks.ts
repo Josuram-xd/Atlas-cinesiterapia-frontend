@@ -40,7 +40,8 @@ export function useAccionesComentario(ejercicioId: number) {
       ...opciones,
     }),
     eliminar: useMutation({
-      mutationFn: (id: number) => api.eliminar(id),
+      mutationFn: ({ id, comoAdmin }: { id: number; comoAdmin: boolean }) =>
+        api.eliminar(id, comoAdmin),
       ...opciones,
     }),
     // Un reporte no cambia lo que se ve, así que no vuelve a pedir la lista.
