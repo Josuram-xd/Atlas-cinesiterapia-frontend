@@ -16,6 +16,7 @@ test.describe('PWA: service worker y caché de datos', () => {
 
     await context.setOffline(true);
     await page.reload();
+    await expect(page.getByRole('status')).toContainText('Sin conexión');
     await expect(page.getByRole('button', { name: 'Rodilla' }).first()).toBeVisible();
     await page.goto('/');
     await abrirFichaDeRodilla(page);

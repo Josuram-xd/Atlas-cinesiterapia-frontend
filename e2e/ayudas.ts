@@ -15,7 +15,9 @@ export async function iniciarSesion(page: Page, correo = 'ana@atlas.test') {
 
 /** Región → categoría → primer ejercicio, hasta ver su ficha. */
 export async function abrirFichaDeRodilla(page: Page) {
-  await page.getByRole('button', { name: 'Rodilla', exact: true }).first().click();
+  // Por teclado: el centro de la caja de un path del SVG suele caer fuera de la forma.
+  await page.getByRole('button', { name: 'Rodilla', exact: true }).first().focus();
+  await page.keyboard.press('Enter');
   await page.getByRole('button', { name: 'Movilización pasiva' }).click();
   await page.getByRole('link', { name: /Flexoextensión pasiva de rodilla/ }).click();
   await expect(
