@@ -23,7 +23,10 @@ export function AppShell() {
       actions={
         <>
           {usuario?.rolSistema === 'ADMIN' ? (
-            <Link to="/admin">Administración</Link>
+            <>
+              <Link to="/admin">Administración</Link>
+              <Link to="/admin/moderacion">Moderación</Link>
+            </>
           ) : null}
           <span className="text-tinta-2 max-sm:hidden">{usuario?.correo}</span>
           <Button

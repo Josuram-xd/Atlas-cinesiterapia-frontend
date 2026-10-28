@@ -14,6 +14,8 @@ import { AvisosSistema } from './pwa/AvisosSistema';
 import { metricasApiDesdeEntorno } from './features/metricas/api/contexto';
 import { MetricasApiProvider } from './features/metricas/api/MetricasApiProvider';
 import { PingDeSesion } from './features/metricas/PingDeSesion';
+import { moderacionApiDesdeEntorno } from './features/moderacion/api/contexto';
+import { ModeracionApiProvider } from './features/moderacion/api/ModeracionApiProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +31,7 @@ export function App() {
   const [adminApi] = useState(adminApiDesdeEntorno);
   const [comentariosApi] = useState(comentariosApiDesdeEntorno);
   const [metricasApi] = useState(metricasApiDesdeEntorno);
+  const [moderacionApi] = useState(moderacionApiDesdeEntorno);
   useSessionLifecycle();
   useEffect(() => {
     void useSession.getState().recuperar();
@@ -41,8 +44,10 @@ export function App() {
           <RouterProvider router={router} />
           <MetricasApiProvider api={metricasApi}>
             <ComentariosApiProvider api={comentariosApi}>
-              <PingDeSesion />
-              <RouterProvider router={router} />
+              <ModeracionApiProvider api={moderacionApi}>
+                <PingDeSesion />
+                <RouterProvider router={router} />
+              </ModeracionApiProvider>
             </ComentariosApiProvider>
           </MetricasApiProvider>
         </AdminApiProvider>

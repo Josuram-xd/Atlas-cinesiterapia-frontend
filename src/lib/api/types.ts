@@ -324,6 +324,25 @@ export interface ComentarioRequest {
   texto: string;
 }
 
+// --- Moderación (solo ADMIN, docs/API.md, sección 8) ----------------------------
+
+/** Comentario cola de revisión: ocultado por el filtro y/o reportado. Ve el correo completo. */
+export interface ComentarioRevision {
+  id: number;
+  padreId: number | null;
+  /** `nombre` es `null` si la ficha fue eliminada. */
+  ejercicio: { id: number; nombre: string | null };
+  autor: { id: number; correo: string; rolPerfil: RolPerfil };
+  texto: string;
+  estado: 'PUBLICADO' | 'EN_REVISION';
+  /** `true` = lo ocultó el filtro automático. */
+  ocultadoAutomaticamente: boolean;
+  /** Mayor que 0 = reportado por personas usuarias. */
+  totalReportes: number;
+  createdAt: string;
+  editadoAt: string | null;
+}
+
 // --- Métricas --------------------------------------------------------------------
 
 /** Cuerpo de POST /metricas/visitas (docs/API.md, sección 9). */

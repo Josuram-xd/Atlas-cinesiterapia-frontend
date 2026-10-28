@@ -68,7 +68,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 5.2 Editar y eliminar comentario propio
 - [x] 5.3 Estado "esperando revisión": atenuado en gris, ícono de advertencia a la derecha y mensaje (RF_045)
 - [x] 5.4 Reportar comentario
-- [ ] 5.5 Página de moderación: ocultados y reportados, aceptar y eliminar
+- [x] 5.5 Página de moderación: ocultados y reportados, aceptar y eliminar
 - [ ] 5.6 Gestión de palabras ofensivas (admin)
 
 ## Fase 6 — Métricas (HU-30 a HU-34)
