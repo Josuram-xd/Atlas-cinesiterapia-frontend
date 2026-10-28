@@ -31,12 +31,21 @@ export function rangoDePeriodo(periodo: Exclude<Periodo, 'FECHAS'>, hoy: string)
   return { desde: inicioCubo(hoy, periodo), hasta: hoy };
 }
 
+/** `AAAA-MM-DD` que existe en el calendario: `Date.parse` sola acepta 2026-02-30. */
+function esDia(dia: string): boolean {
+  const t = Date.parse(dia);
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(dia) &&
+    !Number.isNaN(t) &&
+    new Date(t).toISOString().slice(0, 10) === dia
+  );
+}
+
 /** Motivo por el que la API rechazaría el rango (RANGO_INVALIDO), o `null` si sirve. */
 export function validarRango({ desde, hasta }: Rango): string | null {
+  if (!esDia(desde) || !esDia(hasta)) return 'Indica la fecha inicial y la final.';
   const inicio = Date.parse(desde);
   const fin = Date.parse(hasta);
-  if (Number.isNaN(inicio) || Number.isNaN(fin))
-    return 'Indica la fecha inicial y la final.';
   if (inicio > fin) return 'La fecha inicial no puede ser posterior a la final.';
   if ((fin - inicio) / DIA_MS + 1 > MAX_DIAS) {
     return `El rango máximo es de ${MAX_DIAS} días.`;

@@ -78,7 +78,7 @@ describe('selector de rango de la página', () => {
       ),
     );
     expect(
-      screen.getByRole('button', { name: 'Mes', pressed: true }),
+      screen.getByRole('button', { name: 'Este mes', pressed: true }),
     ).toBeInTheDocument();
   });
 
@@ -86,7 +86,7 @@ describe('selector de rango de la página', () => {
     const user = userEvent.setup();
     const hoy = hoyUtc();
     const espia = montarPagina();
-    await user.click(screen.getByRole('button', { name: 'Semana' }));
+    await user.click(screen.getByRole('button', { name: 'Esta semana' }));
     await waitFor(() =>
       expect(espia).toHaveBeenLastCalledWith(
         { desde: inicioCubo(hoy, 'SEMANA'), hasta: hoy },

@@ -4,9 +4,10 @@ import type { Rango } from '@/lib/api';
 import type { Periodo } from './rangos';
 
 const OPCIONES: { id: Periodo; texto: string }[] = [
-  { id: 'DIA', texto: 'Día' },
-  { id: 'SEMANA', texto: 'Semana' },
-  { id: 'MES', texto: 'Mes' },
+  // Distintos de «Agrupar por: Día/Semana/Mes» del gráfico: aquí se elige el rango.
+  { id: 'DIA', texto: 'Hoy' },
+  { id: 'SEMANA', texto: 'Esta semana' },
+  { id: 'MES', texto: 'Este mes' },
   { id: 'FECHAS', texto: 'Fechas' },
 ];
 

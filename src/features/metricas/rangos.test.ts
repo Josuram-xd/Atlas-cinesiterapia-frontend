@@ -48,6 +48,12 @@ describe('rangos de métricas', () => {
     expect(validarRango({ desde: '2025-10-27', hasta: '2026-10-28' })).toMatch(/366/);
   });
 
+  it('rechaza días que no existen y años de más de 4 cifras', () => {
+    expect(validarRango({ desde: '2026-02-30', hasta: '2026-03-05' })).toMatch(/Indica/);
+    expect(validarRango({ desde: '2026-01-01', hasta: '20260-01-01' })).toMatch(/Indica/);
+    expect(validarRango({ desde: '2024-02-29', hasta: '2024-03-01' })).toBeNull();
+  });
+
   it('acepta exactamente 366 días', () => {
     expect(validarRango({ desde: '2025-10-28', hasta: '2026-10-28' })).toBeNull();
   });
