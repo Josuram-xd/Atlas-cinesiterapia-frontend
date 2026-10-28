@@ -287,6 +287,57 @@ export interface SubidaPrefirmada {
   expiraEn: string;
 }
 
+// --- Comentarios (docs/API.md, sección 8) --------------------------------------
+
+export type EstadoComentario = 'PUBLICADO' | 'EN_REVISION' | 'ELIMINADO';
+
+/** Nunca incluye el correo completo: `nombre` es la parte local. */
+export interface Autor {
+  id: number;
+  nombre: string;
+  rolPerfil: RolPerfil;
+}
+
+export interface Comentario {
+  id: number;
+  ejercicioId: number;
+  /** `null` en comentarios raíz. */
+  padreId: number | null;
+  /** `null` si el comentario fue eliminado. */
+  autor: Autor | null;
+  /** Texto plano (nunca HTML); `null` si fue eliminado. */
+  texto: string | null;
+  estado: EstadoComentario;
+  /** `true` solo para el propio autor: se muestra atenuado, "esperando revisión". */
+  enRevision: boolean;
+  eliminado: boolean;
+  /** `true` si la persona autenticada es la autora (Editar / Eliminar). */
+  propio: boolean;
+  createdAt: string;
+  editadoAt: string | null;
+  /** Solo en raíces (vacío en respuestas), en orden cronológico. */
+  respuestas: Comentario[];
+}
+
+/** Cuerpo de POST/PUT de comentarios y respuestas. */
+export interface ComentarioRequest {
+  texto: string;
+}
+
+// --- Métricas --------------------------------------------------------------------
+
+/** Cuerpo de POST /metricas/visitas (docs/API.md, sección 9). */
+export type VisitaRequest = { tipo: 'FICHA'; ejercicioId: number } | { tipo: 'ATLAS' };
+
+/** Respuesta de POST /metricas/sesion/ping. */
+export interface Sesion {
+  sesionId: number;
+  nuevaSesion: boolean;
+  inicio: string;
+  ultimoPing: string;
+  duracionSegundos: number;
+}
+
 // --- Errores ---------------------------------------------------------------------
 
 /** Un campo inválido dentro de `fieldErrors`. */

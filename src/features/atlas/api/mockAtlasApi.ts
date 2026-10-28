@@ -97,6 +97,7 @@ export function crearMockAtlasApi({
       );
     },
     registrarVisita: () => Promise.resolve(),
+    registrarVisitaAtlas: () => Promise.resolve(),
   };
 }
 

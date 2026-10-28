@@ -6,9 +6,14 @@ import { AdminApiProvider } from './features/admin/api/AdminApiProvider';
 import { adminApiDesdeEntorno } from './features/admin/api/contexto';
 import { apiDesdeEntorno } from './features/atlas/api/apiDesdeEntorno';
 import { AtlasApiProvider } from './features/atlas/api/AtlasApiProvider';
+import { comentariosApiDesdeEntorno } from './features/comentarios/api/contexto';
+import { ComentariosApiProvider } from './features/comentarios/api/ComentariosApiProvider';
 import { useSessionLifecycle } from './features/auth/sessionLifecycle';
 import { useSession } from './features/auth/sessionStore';
 import { AvisosSistema } from './pwa/AvisosSistema';
+import { metricasApiDesdeEntorno } from './features/metricas/api/contexto';
+import { MetricasApiProvider } from './features/metricas/api/MetricasApiProvider';
+import { PingDeSesion } from './features/metricas/PingDeSesion';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +27,8 @@ export function App() {
   const [router] = useState(() => createBrowserRouter(routes));
   const [atlasApi] = useState(apiDesdeEntorno);
   const [adminApi] = useState(adminApiDesdeEntorno);
+  const [comentariosApi] = useState(comentariosApiDesdeEntorno);
+  const [metricasApi] = useState(metricasApiDesdeEntorno);
   useSessionLifecycle();
   useEffect(() => {
     void useSession.getState().recuperar();
@@ -32,6 +39,12 @@ export function App() {
         <AdminApiProvider api={adminApi}>
           <AvisosSistema />
           <RouterProvider router={router} />
+          <MetricasApiProvider api={metricasApi}>
+            <ComentariosApiProvider api={comentariosApi}>
+              <PingDeSesion />
+              <RouterProvider router={router} />
+            </ComentariosApiProvider>
+          </MetricasApiProvider>
         </AdminApiProvider>
       </AtlasApiProvider>
     </QueryClientProvider>

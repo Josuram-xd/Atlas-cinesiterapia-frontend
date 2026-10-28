@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Categoria, Region } from '@/lib/api';
 import { prefersReducedMotion } from '@/lib/motion';
 import { esPantallaAncha } from '@/lib/viewport';
+import { useAtlasApi } from './api/contexto';
 import { useCategorias, useEjercicios, useRegiones } from './api/hooks';
 import { BodyAtlas } from './body/BodyAtlas';
 import type { VistaId } from './body/geometry';
@@ -20,6 +21,12 @@ export function InicioPage() {
   const [apuntada, setApuntada] = useState<Region | null>(null);
   const ventana = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLElement>(null);
+
+  // Una visita al atlas por apertura de la página (RF_032); el backend absorbe dobles disparos.
+  const atlasApi = useAtlasApi();
+  useEffect(() => {
+    void atlasApi.registrarVisitaAtlas().catch(() => {});
+  }, [atlasApi]);
 
   const regiones = useRegiones();
   const categorias = useCategorias(elegida?.id ?? null);

@@ -25,7 +25,9 @@ export interface AtlasApi {
   buscarEjercicios(texto: string, signal?: AbortSignal): Promise<EjercicioResumen[]>;
   /**
    * Registra que alguien abrió una ficha (RF_032). Nunca falla hacia la interfaz: si el
-   * backend aún no tiene el endpoint (404) o está caído, se ignora en silencio.
+   * backend está caído o rechaza la visita, se ignora en silencio.
    */
   registrarVisita(ejercicioId: number): Promise<void>;
+  /** Registra que alguien abrió la página del atlas (cuerpo interactivo). Mismas garantías. */
+  registrarVisitaAtlas(): Promise<void>;
 }
