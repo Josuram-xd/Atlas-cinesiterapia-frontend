@@ -9,6 +9,9 @@ import { crearMockAdminApi } from '@/features/admin/api/mockAdminApi';
 import { ComentariosApiProvider } from '@/features/comentarios/api/ComentariosApiProvider';
 import type { ComentariosApi } from '@/features/comentarios/api/comentariosApi';
 import { crearMockComentariosApi } from '@/features/comentarios/api/mockComentariosApi';
+import { MetricasApiProvider } from '@/features/metricas/api/MetricasApiProvider';
+import type { MetricasApi } from '@/features/metricas/api/metricasApi';
+import { crearMockMetricasApi } from '@/features/metricas/api/mockMetricasApi';
 import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
 
 /** Renderiza rutas reales con un router en memoria y un QueryClient limpio. */
@@ -18,6 +21,7 @@ export function renderWithRouter(
   atlasApi: AtlasApi = crearMockAtlasApi(),
   adminApi: AdminApi = crearMockAdminApi(),
   comentariosApi: ComentariosApi = crearMockComentariosApi(),
+  metricasApi: MetricasApi = crearMockMetricasApi(),
 ) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -30,7 +34,9 @@ export function renderWithRouter(
       <AtlasApiProvider api={atlasApi}>
         <AdminApiProvider api={adminApi}>
           <ComentariosApiProvider api={comentariosApi}>
-            <RouterProvider router={router} />
+            <MetricasApiProvider api={metricasApi}>
+              <RouterProvider router={router} />
+            </MetricasApiProvider>
           </ComentariosApiProvider>
         </AdminApiProvider>
       </AtlasApiProvider>

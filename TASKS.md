@@ -72,7 +72,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 5.6 Gestión de palabras ofensivas (admin)
 
 ## Fase 6 — Métricas (HU-30 a HU-34)
-- [ ] 6.1 Página de métricas protegida para admin
+- [x] 6.1 Página de métricas protegida para admin
 - [ ] 6.2 Gráfico de visitas por periodo con selector de rango
 - [ ] 6.3 Ranking de ejercicios más consultados
 - [ ] 6.4 Usuarios activos por rol

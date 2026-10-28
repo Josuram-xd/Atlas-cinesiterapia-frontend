@@ -27,6 +27,7 @@ export function AppShell() {
               <Link to="/admin">Administración</Link>
               <Link to="/admin/moderacion">Moderación</Link>
               <Link to="/admin/palabras-ofensivas">Palabras ofensivas</Link>
+              <Link to="/admin/metricas">Métricas</Link>
             </>
           ) : null}
           <span className="text-tinta-2 max-sm:hidden">{usuario?.correo}</span>
