@@ -43,5 +43,7 @@ export function useAccionesComentario(ejercicioId: number) {
       mutationFn: (id: number) => api.eliminar(id),
       ...opciones,
     }),
+    // Un reporte no cambia lo que se ve, así que no vuelve a pedir la lista.
+    reportar: useMutation({ mutationFn: (id: number) => api.reportar(id) }),
   };
 }

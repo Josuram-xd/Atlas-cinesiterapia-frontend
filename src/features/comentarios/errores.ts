@@ -8,6 +8,7 @@ const MENSAJES_POR_CODIGO: Record<string, string> = {
   COMENTARIO_NO_ENCONTRADO: 'Ese comentario ya no existe o dejó de estar disponible.',
   COMENTARIO_NO_RESPONDIBLE:
     'Ese comentario todavía no se puede responder: aún no está publicado.',
+  REPORTE_PROPIO: 'No puedes reportar tu propio comentario.',
   NO_ES_AUTOR: 'Solo la persona que escribió el comentario puede modificarlo.',
 };
 

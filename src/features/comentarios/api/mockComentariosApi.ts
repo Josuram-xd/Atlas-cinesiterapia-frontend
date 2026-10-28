@@ -40,6 +40,8 @@ interface Registro {
   estado: EstadoComentario;
   createdAt: string;
   editadoAt: string | null;
+  /** Ids de quienes lo reportaron (cada persona una sola vez). */
+  reportes: Set<number>;
 }
 
 const TAMANO = 20;
@@ -55,7 +57,12 @@ function haceHoras(horas: number): string {
 }
 
 function semilla(yo: Autor): Registro[] {
-  const base = { ejercicioId: 1, estado: 'PUBLICADO' as const, editadoAt: null };
+  const base = {
+    ejercicioId: 1,
+    estado: 'PUBLICADO' as const,
+    editadoAt: null,
+    reportes: new Set<number>(),
+  };
   return [
     {
       ...base,
@@ -199,6 +206,7 @@ export function crearMockComentariosApi({
       estado: estadoPara(limpio),
       createdAt: new Date().toISOString(),
       editadoAt: null,
+      reportes: new Set(),
     };
     registros.push(registro);
     return registro;
@@ -261,6 +269,16 @@ export function crearMockComentariosApi({
         if (r.autor.id !== yo.id) throw new ApiError(403, { code: 'NO_ES_AUTOR' });
         r.estado = 'ELIMINADO';
         r.texto = '';
+        r.reportes.clear();
+      }),
+
+    reportar: (id) =>
+      respuesta(() => {
+        const r = registros.find((x) => x.id === id);
+        if (!r || r.estado === 'ELIMINADO' || !visible(r)) throw noEncontrado();
+        if (r.autor.id === yo.id) throw new ApiError(403, { code: 'REPORTE_PROPIO' });
+        if (r.reportes.has(yo.id)) throw new ApiError(409, { code: 'YA_REPORTADO' });
+        r.reportes.add(yo.id);
       }),
   };
 }

@@ -21,4 +21,7 @@ export const httpComentariosApi: ComentariosApi = {
   editar: (id, texto) =>
     api.put<Comentario>(`/comentarios/${id}`, { texto } satisfies ComentarioRequest),
   eliminar: (id) => api.delete<void>(`/comentarios/${id}`),
+  async reportar(id) {
+    await api.post<{ comentarioId: number }>(`/comentarios/${id}/reportes`);
+  },
 };

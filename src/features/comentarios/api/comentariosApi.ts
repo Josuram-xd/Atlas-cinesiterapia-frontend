@@ -16,4 +16,9 @@ export interface ComentariosApi {
   editar(id: number, texto: string): Promise<Comentario>;
   /** Borrado blando del comentario propio; si tenía respuestas queda como «eliminado». */
   eliminar(id: number): Promise<void>;
+  /**
+   * Reporta un comentario ajeno (sin motivo). Sigue visible mientras se revisa. 403
+   * REPORTE_PROPIO si es tuyo; 409 YA_REPORTADO si ya lo reportaste.
+   */
+  reportar(id: number): Promise<void>;
 }
