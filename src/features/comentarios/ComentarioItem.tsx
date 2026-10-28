@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BotonTexto } from '@/components/BotonTexto';
 import { ConfirmarAccion } from '@/components/ConfirmarAccion';
 import { IconoAdvertencia } from '@/components/IconoAdvertencia';
 import type { Comentario } from '@/lib/api';
@@ -10,9 +11,6 @@ import { FormularioComentario } from './FormularioComentario';
 import { avisoDeResultado } from './avisos';
 
 const NOMBRE_ROL = Object.fromEntries(ROLES_PERFIL.map((r) => [r.valor, r.nombre]));
-
-const ACCION =
-  'text-acento hover:text-tinta min-h-11 cursor-pointer px-1 font-semibold underline underline-offset-4';
 
 interface ComentarioItemProps {
   comentario: Comentario;
@@ -119,30 +117,20 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
       {!editando && (puedeResponder || puedeReportar || c.propio) ? (
         <div className="flex flex-wrap gap-x-4">
           {puedeResponder ? (
-            <button
-              type="button"
-              className={ACCION}
-              onClick={() => setRespondiendo(true)}
-            >
+            <BotonTexto onClick={() => setRespondiendo(true)}>
               Responder
               <span className="sr-only"> a {c.autor?.nombre}</span>
-            </button>
+            </BotonTexto>
           ) : null}
           {puedeReportar ? (
-            <button
-              type="button"
-              className={ACCION}
-              onClick={() => setConfirmandoReporte(true)}
-            >
+            <BotonTexto onClick={() => setConfirmandoReporte(true)}>
               Reportar
               <span className="sr-only"> a {c.autor?.nombre}</span>
-            </button>
+            </BotonTexto>
           ) : null}
           {c.propio ? (
             <>
-              <button
-                type="button"
-                className={ACCION}
+              <BotonTexto
                 onClick={() => {
                   setAviso(undefined);
                   setEditando(true);
@@ -150,15 +138,11 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
               >
                 Editar
                 <span className="sr-only"> tu comentario</span>
-              </button>
-              <button
-                type="button"
-                className={ACCION}
-                onClick={() => setConfirmandoBorrado(true)}
-              >
+              </BotonTexto>
+              <BotonTexto onClick={() => setConfirmandoBorrado(true)}>
                 Eliminar
                 <span className="sr-only"> tu comentario</span>
-              </button>
+              </BotonTexto>
             </>
           ) : null}
         </div>

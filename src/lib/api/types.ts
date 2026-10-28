@@ -187,6 +187,10 @@ export interface Pagina<T> {
   totalPages: number;
 }
 
+/** `getNextPageParam` de los listados con «Ver más»: la página siguiente o nada. */
+export const siguientePagina = (u: Pagina<unknown>) =>
+  u.page + 1 < u.totalPages ? u.page + 1 : undefined;
+
 export interface UsuarioRef {
   id: number;
   correo: string;

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { BotonTexto } from '@/components/BotonTexto';
 import { Button } from '@/components/Button';
 import { ConfirmarAccion } from '@/components/ConfirmarAccion';
 import { Notice } from '@/components/Notice';
@@ -7,18 +8,15 @@ import { useDebounce } from '@/hooks/useDebounce';
 import type { PalabraOfensiva } from '@/lib/api';
 import { EstadoError } from '../atlas/EstadoError';
 import { mensajeDeErrorAtlas } from '../atlas/mensajes';
-import { useAccionesModeracion, usePalabras } from './api/hooks';
+import { useAccionesPalabras, usePalabras } from './api/hooks';
 import { mensajeErrorPalabra } from './erroresPalabras';
-
-const ACCION =
-  'text-acento hover:text-tinta min-h-11 cursor-pointer px-1 font-semibold underline underline-offset-4';
 
 /** Lista de palabras que el filtro automático manda a revisión (solo ADMIN). */
 export function PalabrasOfensivasPage() {
   const [busqueda, setBusqueda] = useState('');
   const q = useDebounce(busqueda.trim(), 300);
   const palabras = usePalabras(q);
-  const acciones = useAccionesModeracion();
+  const acciones = useAccionesPalabras();
 
   const [nueva, setNueva] = useState('');
   const [errorAgregar, setErrorAgregar] = useState<string>();
@@ -40,7 +38,7 @@ export function PalabrasOfensivasPage() {
       return;
     }
     try {
-      const creada = await acciones.agregarPalabra.mutateAsync(palabra);
+      const creada = await acciones.agregar.mutateAsync(palabra);
       setNueva('');
       setAviso(`Palabra «${creada.palabra}» agregada.`);
     } catch (fallo) {
@@ -51,7 +49,7 @@ export function PalabrasOfensivasPage() {
   async function eliminar(p: PalabraOfensiva) {
     setErrorBorrar(undefined);
     try {
-      await acciones.eliminarPalabra.mutateAsync(p.id);
+      await acciones.eliminar.mutateAsync(p.id);
       setBorrando(undefined);
       setAviso(`Palabra «${p.palabra}» eliminada.`);
     } catch (fallo) {
@@ -84,11 +82,7 @@ export function PalabrasOfensivasPage() {
           onChange={(e) => setNueva(e.target.value)}
           className="sm:flex-1"
         />
-        <Button
-          type="submit"
-          cargando={acciones.agregarPalabra.isPending}
-          className="sm:mt-8"
-        >
+        <Button type="submit" cargando={acciones.agregar.isPending} className="sm:mt-8">
           Agregar palabra
         </Button>
       </form>
@@ -135,9 +129,7 @@ export function PalabrasOfensivasPage() {
                 className="bg-fondo-2 flex items-center justify-between gap-4 px-4 py-2"
               >
                 <span className="font-semibold break-all">{p.palabra}</span>
-                <button
-                  type="button"
-                  className={ACCION}
+                <BotonTexto
                   aria-label={`Eliminar «${p.palabra}»`}
                   onClick={() => {
                     setErrorBorrar(undefined);
@@ -145,7 +137,7 @@ export function PalabrasOfensivasPage() {
                   }}
                 >
                   Eliminar
-                </button>
+                </BotonTexto>
               </li>
             ))}
           </ul>
@@ -167,7 +159,7 @@ export function PalabrasOfensivasPage() {
           titulo={`¿Eliminar «${borrando.palabra}»?`}
           confirmar="Eliminar palabra"
           error={errorBorrar}
-          cargando={acciones.eliminarPalabra.isPending}
+          cargando={acciones.eliminar.isPending}
           onConfirmar={() => void eliminar(borrando)}
           onCancelar={() => setBorrando(undefined)}
         >

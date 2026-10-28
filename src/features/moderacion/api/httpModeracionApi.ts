@@ -2,7 +2,7 @@ import { api } from '@/lib/api';
 import type { ComentarioRevision, Pagina, PalabraOfensiva } from '@/lib/api';
 import type { ModeracionApi } from './moderacionApi';
 
-export const TAMANO_PAGINA = 20;
+const TAMANO_PAGINA = 20;
 
 export const httpModeracionApi: ModeracionApi = {
   listarRevision: (pagina, signal) =>

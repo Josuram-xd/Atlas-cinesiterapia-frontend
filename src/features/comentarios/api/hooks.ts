@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { siguientePagina } from '@/lib/api';
 import { useComentariosApi } from './contexto';
 
 export const claveComentarios = (ejercicioId: number) =>
@@ -11,8 +12,7 @@ export function useComentarios(ejercicioId: number) {
     queryKey: claveComentarios(ejercicioId),
     queryFn: ({ pageParam, signal }) => api.listar(ejercicioId, pageParam, signal),
     initialPageParam: 0,
-    getNextPageParam: (ultima) =>
-      ultima.page + 1 < ultima.totalPages ? ultima.page + 1 : undefined,
+    getNextPageParam: siguientePagina,
     // Dependen de quien consulta: siempre se piden de nuevo al volver a la ficha.
     staleTime: 0,
   });

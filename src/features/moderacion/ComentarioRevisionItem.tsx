@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BotonTexto } from '@/components/BotonTexto';
 import { Button } from '@/components/Button';
 import { ConfirmarAccion } from '@/components/ConfirmarAccion';
 import { Notice } from '@/components/Notice';
@@ -6,12 +7,9 @@ import type { ComentarioRevision } from '@/lib/api';
 import { ROLES_PERFIL } from '../auth/roles';
 import { fechaLarga } from '../atlas/ficha/texto';
 import { mensajeErrorComentario } from '../comentarios/errores';
-import { useAccionesModeracion } from './api/hooks';
+import { useAccionesCola } from './api/hooks';
 
 const NOMBRE_ROL = Object.fromEntries(ROLES_PERFIL.map((r) => [r.valor, r.nombre]));
-
-const ACCION =
-  'text-acento hover:text-tinta min-h-11 cursor-pointer px-1 font-semibold underline underline-offset-4';
 
 interface ComentarioRevisionItemProps {
   comentario: ComentarioRevision;
@@ -24,7 +22,7 @@ export function ComentarioRevisionItem({
   comentario: c,
   onHecho,
 }: ComentarioRevisionItemProps) {
-  const acciones = useAccionesModeracion();
+  const acciones = useAccionesCola();
   const [confirmando, setConfirmando] = useState(false);
   const [errorAceptar, setErrorAceptar] = useState<string>();
   const [errorEliminar, setErrorEliminar] = useState<string>();
@@ -86,10 +84,10 @@ export function ComentarioRevisionItem({
           Aceptar
           <span className="sr-only"> comentario de {c.autor.correo}</span>
         </Button>
-        <button type="button" className={ACCION} onClick={() => setConfirmando(true)}>
+        <BotonTexto onClick={() => setConfirmando(true)}>
           Eliminar
           <span className="sr-only"> comentario de {c.autor.correo}</span>
-        </button>
+        </BotonTexto>
       </div>
       {errorAceptar ? <Notice tipo="error">{errorAceptar}</Notice> : null}
 
