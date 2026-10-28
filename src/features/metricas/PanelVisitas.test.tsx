@@ -74,7 +74,7 @@ describe('PanelVisitas', () => {
 
   it('muestra cargando mientras llega la respuesta', () => {
     montar(RANGO, () => new Promise(() => {}));
-    expect(screen.getByRole('status')).toHaveTextContent('Cargando visitas');
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando el gráfico');
   });
 
   it('muestra el error con reintento que vuelve a consultar', async () => {

@@ -71,7 +71,7 @@ describe('PanelUsuarios', () => {
 
   it('muestra cargando mientras llega la respuesta', () => {
     montar(RANGO, () => new Promise(() => {}));
-    expect(screen.getByRole('status')).toHaveTextContent('Cargando usuarios activos');
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando los usuarios activos');
   });
 
   it('muestra el error con reintento que vuelve a consultar', async () => {

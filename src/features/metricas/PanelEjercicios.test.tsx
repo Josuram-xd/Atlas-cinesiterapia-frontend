@@ -76,7 +76,7 @@ describe('PanelEjercicios', () => {
 
   it('muestra cargando mientras llega el ranking', () => {
     montar(RANGO, () => new Promise(() => {}));
-    expect(screen.getByRole('status')).toHaveTextContent('Cargando ranking');
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando el ranking');
   });
 
   it('muestra el error con reintento que vuelve a consultar', async () => {

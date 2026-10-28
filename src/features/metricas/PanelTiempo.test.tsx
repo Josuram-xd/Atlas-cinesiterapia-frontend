@@ -79,7 +79,7 @@ describe('PanelTiempo', () => {
 
   it('muestra cargando mientras llega la respuesta', () => {
     montar(RANGO, () => new Promise(() => {}));
-    expect(screen.getByRole('status')).toHaveTextContent('Cargando tiempo de uso');
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando el tiempo de uso');
   });
 
   it('muestra el error con reintento que vuelve a consultar', async () => {
