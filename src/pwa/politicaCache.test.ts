@@ -3,7 +3,7 @@ import { esLecturaCacheable } from './politicaCache';
 
 const API = 'https://api.atlas.test';
 const ok = (ruta: string, metodo = 'GET', origen = API) =>
-  esLecturaCacheable({ url: new URL(ruta, origen), method: metodo }, API);
+  esLecturaCacheable(new URL(ruta, origen), metodo, API);
 
 describe('esLecturaCacheable', () => {
   it.each([
@@ -23,6 +23,8 @@ describe('esLecturaCacheable', () => {
     '/admin/ejercicios/4',
     '/ejercicios/42/comentarios',
     '/ejercicios/42/visitas',
+    '/ejercicios/42/favoritos',
+    '/regiones/3/categorias/privadas',
     '/metricas/resumen',
     '/usuarios/yo',
   ])('nunca cachea %s', (ruta) => {

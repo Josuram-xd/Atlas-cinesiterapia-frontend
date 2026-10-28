@@ -7,7 +7,7 @@ import {
   precacheAndRoute,
 } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import { NetworkFirst } from 'workbox-strategies';
 import { API_URL } from '../src/lib/api/config';
 import { CACHE_DATOS, esLecturaCacheable } from '../src/pwa/politicaCache';
 
@@ -21,12 +21,14 @@ cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')));
 
-// Lecturas del atlas: se responde con lo guardado y se renueva en segundo plano.
+// Lecturas del atlas: primero la red (datos al día, URLs de media vigentes y el 401 llega
+// al cliente para renovar la sesión); sin conexión o si tarda más de 3 s, lo guardado.
 // Lo que no esté en la lista blanca de `esLecturaCacheable` ni se intercepta.
 registerRoute(
-  ({ url, request }) => esLecturaCacheable({ url, method: request.method }, origenApi),
-  new StaleWhileRevalidate({
+  ({ url, request }) => esLecturaCacheable(url, request.method, origenApi),
+  new NetworkFirst({
     cacheName: CACHE_DATOS,
+    networkTimeoutSeconds: 3,
     plugins: [
       new CacheableResponsePlugin({ statuses: [200] }),
       new ExpirationPlugin({
