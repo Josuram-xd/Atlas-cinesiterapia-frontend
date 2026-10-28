@@ -14,9 +14,5 @@ function suscribir(avisar: () => void): () => void {
  * sin salida), por eso una petición que falla sigue llegando como error de red.
  */
 export function useEnLinea(): boolean {
-  return useSyncExternalStore(
-    suscribir,
-    () => navigator.onLine,
-    () => true,
-  );
+  return useSyncExternalStore(suscribir, () => navigator.onLine);
 }

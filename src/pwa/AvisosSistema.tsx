@@ -29,18 +29,17 @@ function AvisoSinConexion() {
 }
 
 function AvisoVersionNueva() {
-  const disponible = useActualizacion((s) => s.disponible);
   const aplicar = useActualizacion((s) => s.aplicar);
   const descartar = useActualizacion((s) => s.descartar);
 
-  if (!disponible) return null;
+  if (!aplicar) return null;
   return (
     <div className={FRANJA}>
       <p role="status" className="font-medium">
         Hay una versión nueva del atlas lista para usar.
       </p>
       <div className="flex gap-3">
-        <Button className="min-h-10 px-4 py-1.5" onClick={() => aplicar?.()}>
+        <Button className="min-h-10 px-4 py-1.5" onClick={aplicar}>
           Actualizar ahora
         </Button>
         <Button
