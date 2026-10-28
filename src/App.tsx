@@ -8,9 +8,14 @@ import { apiDesdeEntorno } from './features/atlas/api/apiDesdeEntorno';
 import { AtlasApiProvider } from './features/atlas/api/AtlasApiProvider';
 import { useSessionLifecycle } from './features/auth/sessionLifecycle';
 import { useSession } from './features/auth/sessionStore';
+import { AvisosSistema } from './pwa/AvisosSistema';
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+  defaultOptions: {
+    // `offlineFirst`: sin conexi�n tambi�n se intenta la petici�n; el service worker
+    // responde con lo guardado si lo tiene (si no, falla como cualquier error de red).
+    queries: { retry: 1, refetchOnWindowFocus: false, networkMode: 'offlineFirst' },
+  },
 });
 
 export function App() {
@@ -25,6 +30,7 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <AtlasApiProvider api={atlasApi}>
         <AdminApiProvider api={adminApi}>
+          <AvisosSistema />
           <RouterProvider router={router} />
         </AdminApiProvider>
       </AtlasApiProvider>
