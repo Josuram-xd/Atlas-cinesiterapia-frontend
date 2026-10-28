@@ -27,9 +27,13 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
   const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
   const [errorBorrado, setErrorBorrado] = useState<string>();
   const [aviso, setAviso] = useState<string>();
+  const [confirmandoReporte, setConfirmandoReporte] = useState(false);
+  const [errorReporte, setErrorReporte] = useState<string>();
+  const [reportado, setReportado] = useState(false);
 
   const esRespuesta = c.padreId !== null;
   const puedeResponder = !c.eliminado && !c.enRevision;
+  const puedeReportar = !c.propio && !c.eliminado && !reportado;
 
   async function responder(texto: string) {
     const creada = await acciones.responder.mutateAsync({ id: c.id, texto });
@@ -50,6 +54,18 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
       setConfirmandoBorrado(false);
     } catch (fallo) {
       setErrorBorrado(mensajeErrorComentario(fallo));
+    }
+  }
+
+  async function reportar() {
+    setErrorReporte(undefined);
+    try {
+      await acciones.reportar.mutateAsync(c.id);
+      setConfirmandoReporte(false);
+      setReportado(true);
+      setAviso('Gracias. Seguirá visible mientras un administrador lo revisa.');
+    } catch (fallo) {
+      setErrorReporte(mensajeErrorComentario(fallo));
     }
   }
 
@@ -100,7 +116,7 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
         </>
       )}
 
-      {!editando && (puedeResponder || c.propio) ? (
+      {!editando && (puedeResponder || puedeReportar || c.propio) ? (
         <div className="flex flex-wrap gap-x-4">
           {puedeResponder ? (
             <button
@@ -109,6 +125,16 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
               onClick={() => setRespondiendo(true)}
             >
               Responder
+              <span className="sr-only"> a {c.autor?.nombre}</span>
+            </button>
+          ) : null}
+          {puedeReportar ? (
+            <button
+              type="button"
+              className={ACCION}
+              onClick={() => setConfirmandoReporte(true)}
+            >
+              Reportar
               <span className="sr-only"> a {c.autor?.nombre}</span>
             </button>
           ) : null}
@@ -169,6 +195,22 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
           <p>
             El texto se borrará para todas las personas. Si tiene respuestas, se mostrará
             como «Comentario eliminado». No se puede deshacer.
+          </p>
+        </ConfirmarAccion>
+      ) : null}
+
+      {confirmandoReporte ? (
+        <ConfirmarAccion
+          titulo="¿Reportar este comentario?"
+          confirmar="Reportar comentario"
+          error={errorReporte}
+          cargando={acciones.reportar.isPending}
+          onConfirmar={() => void reportar()}
+          onCancelar={() => setConfirmandoReporte(false)}
+        >
+          <p>
+            Una persona administradora lo revisará. Mientras tanto seguirá visible para
+            todas las personas.
           </p>
         </ConfirmarAccion>
       ) : null}

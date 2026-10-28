@@ -9,6 +9,7 @@ const MENSAJES_POR_CODIGO: Record<string, string> = {
   COMENTARIO_NO_RESPONDIBLE:
     'Ese comentario todavía no se puede responder: aún no está publicado.',
   REPORTE_PROPIO: 'No puedes reportar tu propio comentario.',
+  YA_REPORTADO: 'Ya reportaste este comentario. Un administrador lo revisará.',
   NO_ES_AUTOR: 'Solo la persona que escribió el comentario puede modificarlo.',
 };
 

@@ -363,3 +363,76 @@ describe('SeccionComentarios: esperando revisión (RF_045)', () => {
     expect(within(articulo).queryByText('Esperando revisión')).not.toBeInTheDocument();
   });
 });
+
+describe('SeccionComentarios: reportar', () => {
+  async function ana() {
+    const texto = await screen.findByText(/post-operatorio/);
+    return texto.closest('article')!;
+  }
+
+  it('ofrece Reportar en comentarios ajenos, no en los propios ni en los eliminados', async () => {
+    montar();
+    await ana();
+    expect(screen.getAllByRole('button', { name: /Reportar/ })).toHaveLength(4);
+    const propio = (await screen.findByText(/Faltaría una foto/)).closest('article')!;
+    expect(within(propio).queryByRole('button', { name: /Reportar/ })).toBeNull();
+    const eliminado = screen.getByRole('article', { name: 'Comentario eliminado' });
+    expect(within(eliminado).queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('pide confirmación, reporta y deja el aviso sin ofrecer reportar otra vez', async () => {
+    const api = crearMockComentariosApi();
+    const reportar = vi.spyOn(api, 'reportar');
+    const user = userEvent.setup();
+    montar(api);
+    const raiz = await ana();
+    await user.click(within(raiz).getByRole('button', { name: /Reportar/ }));
+    expect(reportar).not.toHaveBeenCalled();
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', {
+        name: 'Reportar comentario',
+      }),
+    );
+    expect(reportar).toHaveBeenCalledWith(100);
+    expect(await screen.findByText(/Seguirá visible/)).toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(within(raiz).queryByRole('button', { name: /Reportar/ })).toBeNull();
+  });
+
+  it('cancelar la confirmación no reporta', async () => {
+    const api = crearMockComentariosApi();
+    const reportar = vi.spyOn(api, 'reportar');
+    const user = userEvent.setup();
+    montar(api);
+    const raiz = await ana();
+    await user.click(within(raiz).getByRole('button', { name: /Reportar/ }));
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(reportar).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('explica el 403 REPORTE_PROPIO sin cerrar el diálogo', async () => {
+    const api = crearMockComentariosApi();
+    api.reportar = () => Promise.reject(new ApiError(403, { code: 'REPORTE_PROPIO' }));
+    const user = userEvent.setup();
+    montar(api);
+    const raiz = await ana();
+    await user.click(within(raiz).getByRole('button', { name: /Reportar/ }));
+    await user.click(screen.getByRole('button', { name: 'Reportar comentario' }));
+    expect(
+      await screen.findByText('No puedes reportar tu propio comentario.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+  });
+
+  it('explica el 409 YA_REPORTADO', async () => {
+    const api = crearMockComentariosApi();
+    api.reportar = () => Promise.reject(new ApiError(409, { code: 'YA_REPORTADO' }));
+    const user = userEvent.setup();
+    montar(api);
+    const raiz = await ana();
+    await user.click(within(raiz).getByRole('button', { name: /Reportar/ }));
+    await user.click(screen.getByRole('button', { name: 'Reportar comentario' }));
+    expect(await screen.findByText(/Ya reportaste este comentario/)).toBeInTheDocument();
+  });
+});
