@@ -19,9 +19,11 @@ import { ModeracionApiProvider } from './features/moderacion/api/ModeracionApiPr
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    // `offlineFirst`: sin conexi�n tambi�n se intenta la petici�n; el service worker
+    // `offlineFirst`: sin conexión también se intenta la petición; el service worker
     // responde con lo guardado si lo tiene (si no, falla como cualquier error de red).
     queries: { retry: 1, refetchOnWindowFocus: false, networkMode: 'offlineFirst' },
+    // Una escritura sin red falla al momento; no se queda en cola para enviarse sola luego.
+    mutations: { networkMode: 'always' },
   },
 });
 

@@ -83,7 +83,7 @@ export function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           error={errores.password}
         />
-        <Button type="submit" cargando={login.isPending} className="mt-1">
+        <Button type="submit" cargando={login.isPending} soloEnLinea className="mt-1">
           {login.isPending ? 'Entrando…' : 'Entrar'}
         </Button>
       </form>

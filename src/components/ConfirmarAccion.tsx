@@ -86,7 +86,7 @@ export function ConfirmarAccion({
           </p>
         ) : null}
         <div className="mt-6 flex flex-col gap-3 sm:flex-row-reverse">
-          <Button onClick={onConfirmar} cargando={cargando}>
+          <Button onClick={onConfirmar} cargando={cargando} soloEnLinea>
             {confirmar}
           </Button>
           <Button

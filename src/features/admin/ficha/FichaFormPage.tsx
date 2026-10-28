@@ -195,6 +195,7 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
               }
               onClick={() => void guardarBorrador()}
               cargando={guardando}
+              soloEnLinea
               disabled={publicando}
             >
               {ficha && ficha.estado !== 'BORRADOR'
@@ -205,6 +206,7 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
               <Button
                 onClick={() => void publicar()}
                 cargando={publicando}
+                soloEnLinea
                 disabled={guardando}
               >
                 Publicar

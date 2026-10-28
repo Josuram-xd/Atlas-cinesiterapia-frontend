@@ -81,7 +81,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 
 ## Fase 7 — Offline, calidad y despliegue (RNF_003, RNF_004)
 - [x] 7.1 PWA: manifest, íconos, service worker, caché de app y de GET del atlas
-- [ ] 7.2 Indicador de modo sin conexión y deshabilitar acciones de escritura
+- [x] 7.2 Indicador de modo sin conexión y deshabilitar acciones de escritura
 - [ ] 7.3 Pruebas E2E con Playwright: login, explorar por región, ver ficha, comentar, publicar ficha
 - [ ] 7.4 Auditoría de accesibilidad y rendimiento (Lighthouse), revisión en móvil/tablet/PC
 - [ ] 7.5 Despliegue en Vercel con `VITE_API_URL` y reescritura para SPA
