@@ -26,3 +26,17 @@ describe('httpMetricasApi', () => {
     );
   });
 });
+
+describe('httpMetricasApi: ranking de ejercicios', () => {
+  it('pide el ranking del rango con límite 10', async () => {
+    const get = vi.spyOn(api, 'get').mockResolvedValue({});
+    await httpMetricasApi.ejerciciosMasConsultados({
+      desde: '2026-10-01',
+      hasta: '2026-10-28',
+    });
+    expect(get).toHaveBeenCalledWith(
+      '/admin/metricas/ejercicios-mas-consultados?desde=2026-10-01&hasta=2026-10-28&limite=10',
+      { signal: undefined },
+    );
+  });
+});

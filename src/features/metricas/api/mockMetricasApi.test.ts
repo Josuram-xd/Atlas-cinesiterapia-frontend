@@ -45,3 +45,15 @@ describe('mockMetricasApi: visitas por periodo', () => {
     expect(b).toEqual(a);
   });
 });
+
+describe('mockMetricasApi: ranking de ejercicios', () => {
+  it('devuelve las fichas de mayor a menor número de visualizaciones', async () => {
+    const r = await crearMockMetricasApi().ejerciciosMasConsultados({
+      desde: '2026-10-01',
+      hasta: '2026-10-28',
+    });
+    const visitas = r.items.map((i) => i.visitas);
+    expect(visitas.length).toBeGreaterThan(1);
+    expect([...visitas].sort((a, b) => b - a)).toEqual(visitas);
+  });
+});

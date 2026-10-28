@@ -1,4 +1,5 @@
 import type { Agrupacion, Rango } from '@/lib/api';
+import { CATEGORIAS_MOCK, REGIONES_MOCK } from '../../atlas/data/regiones';
 import { inicioCubo } from '../rangos';
 import type { MetricasApi } from './metricasApi';
 
@@ -6,6 +7,31 @@ const DIA_MS = 86_400_000;
 
 /** Visitas de ejemplo de un día: fijas por fecha, así el gráfico no cambia entre cargas. */
 const visitasDelDia = (dia: string) => ((Date.parse(dia) / DIA_MS) * 37) % 23;
+
+/** Ranking de ejemplo ya ordenado de mayor a menor (el backend lo ordena igual). */
+const RANKING_MOCK = [
+  {
+    ejercicioId: 1,
+    nombre: 'Flexoextensión pasiva de rodilla',
+    regionId: 11,
+    categoriaId: 1,
+    visitas: 42,
+  },
+  {
+    ejercicioId: 2,
+    nombre: 'Péndulo de Codman',
+    regionId: 2,
+    categoriaId: 1,
+    visitas: 27,
+  },
+  {
+    ejercicioId: 3,
+    nombre: 'Flexión de rodilla en sedestación',
+    regionId: 112,
+    categoriaId: 3,
+    visitas: 9,
+  },
+];
 
 /** Datos de ejemplo detrás de la misma interfaz que el backend. */
 export function crearMockMetricasApi(): MetricasApi {
@@ -30,5 +56,18 @@ export function crearMockMetricasApi(): MetricasApi {
       const total = serie.reduce((suma, c) => suma + c.visitas, 0);
       return Promise.resolve({ ...rango, agrupacion, total, serie });
     },
+    // shortcut: ignora el rango y devuelve siempre el mismo ranking, usar la API real al tenerla
+    ejerciciosMasConsultados: (rango: Rango) =>
+      Promise.resolve({
+        ...rango,
+        limite: 10,
+        items: RANKING_MOCK.map((f) => ({
+          ejercicioId: f.ejercicioId,
+          nombre: f.nombre,
+          region: REGIONES_MOCK.find((r) => r.id === f.regionId)!,
+          categoria: CATEGORIAS_MOCK.find((c) => c.id === f.categoriaId)!,
+          visitas: f.visitas,
+        })),
+      }),
   };
 }

@@ -11,3 +11,13 @@ export function useVisitasPeriodo(rango: Rango | null, agrupacion: Agrupacion) {
     enabled: rango !== null,
   });
 }
+
+/** Ranking de fichas más vistas del rango; con `rango` nulo no consulta. */
+export function useEjerciciosMasConsultados(rango: Rango | null) {
+  const api = useMetricasApi();
+  return useQuery({
+    queryKey: ['metricas', 'ejercicios', rango],
+    queryFn: ({ signal }) => api.ejerciciosMasConsultados(rango!, signal),
+    enabled: rango !== null,
+  });
+}

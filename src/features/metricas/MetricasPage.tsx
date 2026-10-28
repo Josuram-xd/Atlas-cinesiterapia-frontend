@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PanelEjercicios } from './PanelEjercicios';
 import { PanelVisitas } from './PanelVisitas';
 import { SelectorRango } from './SelectorRango';
 import { hoyUtc, rangoDePeriodo, validarRango, type Periodo } from './rangos';
@@ -13,6 +14,7 @@ export function MetricasPage() {
   const [fechas, setFechas] = useState(() => rangoDePeriodo('MES', hoy));
   const rango = periodo === 'FECHAS' ? fechas : rangoDePeriodo(periodo, hoy);
   const error = validarRango(rango);
+  const rangoValido = error ? null : rango;
 
   return (
     <section className="flex flex-col gap-10 pt-4 pb-16">
@@ -30,7 +32,8 @@ export function MetricasPage() {
         onFechas={setFechas}
         error={error}
       />
-      <PanelVisitas rango={error ? null : rango} />
+      <PanelVisitas rango={rangoValido} />
+      <PanelEjercicios rango={rangoValido} />
     </section>
   );
 }

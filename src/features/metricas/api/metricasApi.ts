@@ -1,4 +1,4 @@
-import type { Agrupacion, Rango, Sesion, VisitasPeriodo } from '@/lib/api';
+import type { Agrupacion, Rango, Sesion, TopEjercicios, VisitasPeriodo } from '@/lib/api';
 
 /** Lo que el front necesita de `/metricas/**` y `/admin/metricas/**` (docs/API.md, sección 9). */
 export interface MetricasApi {
@@ -13,4 +13,6 @@ export interface MetricasApi {
     agrupacion: Agrupacion,
     signal?: AbortSignal,
   ): Promise<VisitasPeriodo>;
+  /** Fichas publicadas más vistas dentro del rango (HU-32). */
+  ejerciciosMasConsultados(rango: Rango, signal?: AbortSignal): Promise<TopEjercicios>;
 }

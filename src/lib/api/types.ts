@@ -383,6 +383,21 @@ export interface VisitasPeriodo extends Rango {
   serie: { inicio: string; visitas: number }[];
 }
 
+/** GET /admin/metricas/ejercicios-mas-consultados: solo fichas publicadas con visitas. */
+export interface TopEjercicios {
+  /** `null` si la consulta no pidió rango (todo el histórico). */
+  desde: string | null;
+  hasta: string | null;
+  limite: number;
+  items: {
+    ejercicioId: number;
+    nombre: string;
+    region: RegionRef;
+    categoria: CategoriaRef;
+    visitas: number;
+  }[];
+}
+
 // --- Errores ---------------------------------------------------------------------
 
 /** Un campo inválido dentro de `fieldErrors`. */
