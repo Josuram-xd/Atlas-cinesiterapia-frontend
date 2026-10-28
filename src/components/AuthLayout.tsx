@@ -19,7 +19,7 @@ export function AuthLayout({ titulo, descripcion, children, pie }: AuthLayoutPro
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <aside className="superficie-oscura px-gutter flex flex-col justify-between gap-10 py-6 lg:py-10">
         <Wordmark className="text-xl" />
-        <p className="font-display text-gigante max-w-[11ch] font-extrabold tracking-tighter max-lg:text-[2.6rem] max-lg:leading-none">
+        <p className="font-display text-gigante max-w-[11ch] font-extrabold tracking-[-0.03em] max-lg:text-[2.6rem] max-lg:leading-none">
           El cuerpo es el menú.
         </p>
         <p className="text-fondo/80 max-w-[34ch] max-lg:hidden">

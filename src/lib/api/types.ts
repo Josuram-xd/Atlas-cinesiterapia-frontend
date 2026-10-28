@@ -1,20 +1,19 @@
 /**
- * Contrato de la API en un solo lugar.
- * El backend aún no está desplegado: estos tipos reflejan el contrato descrito en
- * Atlas-cinesiterapia-backend/TASKS.md y deben ajustarse cuando exista el OpenAPI real.
+ * Contrato de la API en un solo lugar. Fuente de verdad: el backend
+ * (Atlas-cinesiterapia-backend, rama task-1-autenticacion: DTOs de auth y ApiError).
  */
 
 /** Rol elegido al registrarse (HU-17). */
 export type RolPerfil = 'ESTUDIANTE' | 'PROFESIONAL' | 'PRACTICANTE' | 'VISITANTE';
 
 /** Rol de sistema que decide los permisos. */
-export type RolSistema = 'USUARIO' | 'ADMIN';
+export type RolSistema = 'USER' | 'ADMIN';
 
 export interface Usuario {
-  id: string;
+  id: number;
   correo: string;
   rolPerfil: RolPerfil;
-  rol: RolSistema;
+  rolSistema: RolSistema;
 }
 
 export interface Tokens {
@@ -22,8 +21,11 @@ export interface Tokens {
   refreshToken: string;
 }
 
-/** Respuesta de /auth/login, /auth/registro y /auth/refresh. */
+/** Respuesta de /auth/login y /auth/refresh. */
 export interface AuthResponse extends Tokens {
+  tokenType: 'Bearer';
+  /** Vigencia del access token en segundos. */
+  expiresIn: number;
   usuario: Usuario;
 }
 
@@ -40,6 +42,9 @@ export interface RegistroRequest {
   rolPerfil: RolPerfil;
 }
 
+/** Respuesta de /auth/registro: la cuenta queda creada y la persona inicia sesión aparte. */
+export type RegistroResponse = Usuario;
+
 export interface RefreshRequest {
   refreshToken: string;
 }
@@ -52,9 +57,15 @@ export interface RecuperarRequest {
   correo: string;
 }
 
+/** POST /auth/recuperar responde 202 con un mensaje neutro (no revela si el correo existe). */
+export interface RecuperarResponse {
+  mensaje: string;
+}
+
 export interface RestablecerRequest {
   token: string;
-  password: string;
+  /** El backend la llama nuevaPassword (no password). */
+  nuevaPassword: string;
 }
 
 /** POST /auth/cierre-pendiente: lo envía `navigator.sendBeacon` en `pagehide`. */
@@ -69,22 +80,231 @@ export type VistaCuerpo = 'ANTERIOR' | 'POSTERIOR';
 export interface Region {
   id: number;
   nombre: string;
-  /** Id del `<path>` dentro del SVG del cuerpo. */
+  /**
+   * Id del `<path>` dentro del SVG (columna `svg_id` del backend). Lleva el prefijo de la
+   * vista, `<vista>-<region>` (ej. `anterior-rodilla`), porque algunas regiones como
+   * cabeza-cuello existen en ambas vistas y el id debe ser único.
+   */
   svgId: string;
   vista: VistaCuerpo;
+  orden: number;
 }
 
 export interface Categoria {
   id: number;
   nombre: string;
+  orden: number;
+}
+
+/** GET /regiones/{id}/categorias: las 9 categorías con las fichas publicadas de esa región. */
+export interface CategoriaConConteo extends Categoria {
+  totalEjercicios: number;
+}
+
+export interface RegionRef {
+  id: number;
+  nombre: string;
+  svgId: string;
+  vista?: VistaCuerpo;
+}
+
+export interface CategoriaRef {
+  id: number;
+  nombre: string;
+}
+
+/** Ejercicio publicado tal como aparece en listados y búsqueda (EjercicioResumenResponse). */
+export interface EjercicioResumen {
+  id: number;
+  nombre: string;
+  region: RegionRef;
+  categoria: CategoriaRef;
+}
+
+// --- Ficha de ejercicio ----------------------------------------------------------
+
+export type MediaTipo = 'VIDEO' | 'IMAGEN';
+export type MediaRol = 'POSICION_INICIAL' | 'POSICION_FINAL' | 'TOMA_TERAPEUTA' | 'OTRO';
+
+export interface Media {
+  id: number;
+  tipo: MediaTipo;
+  /** `null` en video. */
+  rol: MediaRol | null;
+  contentType: string;
+  tamanoBytes: number;
+  /** URL de lectura; puede ser temporal, se usa tal cual. */
+  url: string;
+  orden: number;
+}
+
+/** Texto libre por campo ("3x12", "hasta fatiga"). */
+export interface Dosificacion {
+  series: string;
+  repeticiones: string;
+  intensidad: string;
+  tiempo: string;
+  descanso: string;
+  frecuencia: string;
+}
+
+/** Ficha completa publicada (GET /ejercicios/{id}). */
+export interface Ejercicio {
+  id: number;
+  nombre: string;
+  region: RegionRef & { vista: VistaCuerpo };
+  categoria: CategoriaRef;
+  objetivoTerapeutico: string;
+  estructurasIntervenidas: string;
+  indicaciones: string;
+  precaucionesContraindicaciones: string;
+  posicionPaciente: string;
+  posicionFisioterapeuta: string;
+  ejecucion: string;
+  comandosVerbales: string;
+  dosificacion: Dosificacion;
+  progresion: string | null;
+  erroresComunes: string | null;
+  estudiantesCreadores: string[];
+  /** "AAAA-N", p. ej. "2025-1". */
+  cohorte: string;
+  profesoraRevisora: string;
+  video: Media | null;
+  imagenes: Media[];
+  actualizadoEn: string;
+}
+
+// --- Administración de fichas ----------------------------------------------------
+
+export type EstadoFicha = 'BORRADOR' | 'PUBLICADO' | 'ARCHIVADO';
+
+/** Respuesta paginada de los listados de administración. */
+export interface Pagina<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface UsuarioRef {
+  id: number;
+  correo: string;
+}
+
+/** Cuerpo de POST y PUT /admin/ejercicios. Los textos vacíos viajan como `null`. */
+export interface EjercicioRequest {
+  nombre: string;
+  regionId: number;
+  categoriaId: number;
+  objetivoTerapeutico: string | null;
+  estructurasIntervenidas: string | null;
+  indicaciones: string | null;
+  precaucionesContraindicaciones: string | null;
+  posicionPaciente: string | null;
+  posicionFisioterapeuta: string | null;
+  ejecucion: string | null;
+  comandosVerbales: string | null;
+  dosificacion: Partial<Record<keyof Dosificacion, string | null>> | null;
+  progresion: string | null;
+  erroresComunes: string | null;
+  estudiantesCreadores: string[] | null;
+  cohorte: string | null;
+  profesoraRevisora: string | null;
+}
+
+export interface MediaAdmin extends Media {
+  estado: 'CONFIRMADO' | 'PENDIENTE';
+}
+
+/** Ficha en cualquier estado, con los campos que falten como `null` (EjercicioAdminResponse). */
+export interface EjercicioAdmin {
+  id: number;
+  estado: EstadoFicha;
+  nombre: string;
+  region: RegionRef;
+  categoria: CategoriaRef;
+  objetivoTerapeutico: string | null;
+  estructurasIntervenidas: string | null;
+  indicaciones: string | null;
+  precaucionesContraindicaciones: string | null;
+  posicionPaciente: string | null;
+  posicionFisioterapeuta: string | null;
+  ejecucion: string | null;
+  comandosVerbales: string | null;
+  dosificacion: Partial<Record<keyof Dosificacion, string | null>> | null;
+  progresion: string | null;
+  erroresComunes: string | null;
+  estudiantesCreadores: string[] | null;
+  cohorte: string | null;
+  profesoraRevisora: string | null;
+  media: MediaAdmin[];
+  creadoPor: UsuarioRef;
+  actualizadoPor: UsuarioRef | null;
+  creadoEn: string;
+  actualizadoEn: string;
+  publicadoEn: string | null;
+  archivadoEn: string | null;
+  /** Lo que falta para publicar (`[]` = lista). Usa los nombres de campo de `fieldErrors`. */
+  camposFaltantes: string[];
+  version: number;
+}
+
+export interface EjercicioAdminResumen {
+  id: number;
+  nombre: string;
+  estado: EstadoFicha;
+  region: RegionRef;
+  categoria: CategoriaRef;
+  creadoPor: UsuarioRef;
+  actualizadoEn: string;
+}
+
+export interface FiltroFichas {
+  estado?: EstadoFicha;
+  regionId?: number;
+  categoriaId?: number;
+  q?: string;
+  page?: number;
+  size?: number;
+}
+
+/** Paso 1 de la subida con URL prefirmada: POST /admin/ejercicios/{id}/media/subida. */
+export interface SolicitudSubida {
+  tipo: MediaTipo;
+  /** Obligatorio en imágenes; se ignora en video. */
+  rol?: MediaRol;
+  nombreArchivo: string;
+  contentType: string;
+  tamanoBytes: number;
+}
+
+export interface SubidaPrefirmada {
+  mediaId: number;
+  urlSubida: string;
+  metodo: 'PUT';
+  cabeceras: Record<string, string>;
+  expiraEn: string;
 }
 
 // --- Errores ---------------------------------------------------------------------
 
-/** Formato uniforme de error del backend (ControllerAdvice). */
+/** Un campo inválido dentro de `fieldErrors`. */
+export interface FieldViolation {
+  field: string;
+  message: string;
+}
+
+/**
+ * Formato uniforme de error del backend (ApiError). `code` es estable; `message` va en
+ * español sin tildes y no se muestra tal cual. `fieldErrors` se omite si está vacío.
+ */
 export interface ApiErrorBody {
-  message?: string;
+  timestamp?: string;
+  status?: number;
+  error?: string;
   code?: string;
-  /** Errores por campo, cuando aplica. */
-  errors?: Record<string, string>;
+  message?: string;
+  path?: string;
+  fieldErrors?: FieldViolation[];
 }

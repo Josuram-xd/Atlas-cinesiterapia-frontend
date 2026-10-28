@@ -22,9 +22,10 @@ npm run dev            # http://localhost:5173
 
 ## Variables de entorno
 
-| Variable       | Descripción                                                       | Ejemplo                 |
-| -------------- | ----------------------------------------------------------------- | ----------------------- |
-| `VITE_API_URL` | URL base del backend, sin barra final. Obligatoria en producción. | `http://localhost:8080` |
+| Variable         | Descripción                                                                                                                                                                | Ejemplo                 |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `VITE_API_URL`   | URL base del backend, sin barra final. Obligatoria en producción.                                                                                                          | `http://localhost:8080` |
+| `VITE_ATLAS_API` | Origen de los datos del atlas: `mock` (por defecto) o `http` (backend real; **valor para producción**). En desarrollo, `?mock=error` o `?mock=lento` fuerzan esos estados. | `mock`                  |
 
 `.env` no se versiona. Las variables `VITE_*` quedan dentro del bundle: nunca pongas secretos.
 
@@ -56,10 +57,29 @@ src/
 
 ## Contrato con el backend
 
-Todos los tipos de la API están en [`src/lib/api/types.ts`](./src/lib/api/types.ts). Mientras
-el backend no esté desplegado, el contrato es el descrito en su `TASKS.md`:
-`POST /auth/registro`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/recuperar`,
-`/auth/restablecer` y `/auth/cierre-pendiente`.
+Todos los tipos de la API están en [`src/lib/api/types.ts`](./src/lib/api/types.ts). La fuente
+de verdad es `docs/API.md` del repositorio del backend: auth (`/auth/*`), catálogos
+(`/regiones`, `/regiones/{id}/categorias`), atlas (`/ejercicios`, `/ejercicios/{id}`,
+`/ejercicios/buscar?q=`) y administración (`/admin/ejercicios/**`).
+
+Con `VITE_ATLAS_API=http` el atlas usa el backend real; con `mock` usa datos de ejemplo
+(`src/features/atlas/data`, imágenes en `public/mock`). El registro de visitas a una ficha
+llama a `POST /ejercicios/{id}/visitas`, endpoint que llegará con la Fase 5 del backend: hasta
+entonces responde 404 y el frontend lo ignora sin avisar a la persona.
+
+## Panel de administración
+
+Rutas `/admin` (lista de fichas con filtros y paginación), `/admin/fichas/nueva` y
+`/admin/fichas/:id` (formulario por pasos). Solo entra quien tiene `rolSistema` `ADMIN`
+(`RequireRole`); el backend lo vuelve a exigir en `/admin/**`. Con `VITE_ATLAS_API=mock` el panel
+trabaja con datos en memoria; con `http` usa el backend real.
+
+La multimedia se sube sin pasar por el backend: 1) `POST /admin/ejercicios/{id}/media/subida`
+devuelve una URL prefirmada, 2) el archivo se envía con `PUT` a esa URL (con barra de progreso), 3) `POST .../media/{mediaId}/confirmar`. Antes del paso 1 se valida el tipo y el tamaño (video
+MP4/WebM/GIF hasta 25 MB, imágenes JPG/PNG/WebP hasta 5 MB). En desarrollo el backend usa
+almacenamiento `fake`: su URL es de un dominio `.invalid` y el frontend omite el paso 2. En
+producción el bucket de R2 necesita CORS que permita `PUT` con la cabecera `Content-Type` desde
+el origen del frontend.
 
 Sesión: los tokens se guardan en `sessionStorage` (se borran al cerrar la pestaña). El cliente
 HTTP renueva el access token ante un 401. Al cerrar la pestaña (`pagehide`) se avisa con
