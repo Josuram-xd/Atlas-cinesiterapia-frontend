@@ -64,9 +64,9 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 4.6 Archivar, restaurar y eliminar con confirmación
 
 ## Fase 5 — Comentarios y moderación (HU-21 a HU-29)
-- [ ] 5.1 Lista de comentarios con hilos y formulario de nuevo comentario
-- [ ] 5.2 Editar y eliminar comentario propio
-- [ ] 5.3 Estado "esperando revisión": atenuado en gris, ícono de advertencia a la derecha y mensaje (RF_045)
+- [x] 5.1 Lista de comentarios con hilos y formulario de nuevo comentario
+- [x] 5.2 Editar y eliminar comentario propio
+- [x] 5.3 Estado "esperando revisión": atenuado en gris, ícono de advertencia a la derecha y mensaje (RF_045)
 - [ ] 5.4 Reportar comentario
 - [ ] 5.5 Página de moderación: ocultados y reportados, aceptar y eliminar
 - [ ] 5.6 Gestión de palabras ofensivas (admin)
@@ -77,7 +77,7 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [ ] 6.3 Ranking de ejercicios más consultados
 - [ ] 6.4 Usuarios activos por rol
 - [ ] 6.5 Tiempo promedio de uso por sesión
-- [ ] 6.6 Ping de sesión para alimentar la métrica de tiempo
+- [x] 6.6 Ping de sesión para alimentar la métrica de tiempo
 
 ## Fase 7 — Offline, calidad y despliegue (RNF_003, RNF_004)
 - [ ] 7.1 PWA: manifest, íconos, service worker, caché de app y de GET del atlas
