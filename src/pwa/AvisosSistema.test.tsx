@@ -4,7 +4,25 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useActualizacion } from './actualizacion';
 import { AvisosSistema } from './AvisosSistema';
 
-afterEach(() => useActualizacion.getState().descartar());
+afterEach(() => {
+  useActualizacion.getState().descartar();
+  vi.restoreAllMocks();
+});
+
+describe('AvisosSistema: sin conexión', () => {
+  it('avisa al perder la conexión y se quita al recuperarla', () => {
+    render(<AvisosSistema />);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    act(() => void window.dispatchEvent(new Event('offline')));
+    expect(screen.getByRole('status')).toHaveTextContent(/sin conexión/i);
+
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
+    act(() => void window.dispatchEvent(new Event('online')));
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+});
 
 describe('AvisosSistema: versión nueva', () => {
   it('no muestra nada si no hay versión nueva', () => {
