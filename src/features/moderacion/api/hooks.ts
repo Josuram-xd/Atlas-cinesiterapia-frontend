@@ -29,10 +29,10 @@ export function usePalabras(q: string) {
   });
 }
 
-/** Vuelve a pedir `clave` cuando la acción sale bien. */
+/** Vuelve a pedir `clave` al terminar, también si falló: un 404 quita la fila ya resuelta. */
 function useRefrescar(clave: readonly string[]) {
   const cliente = useQueryClient();
-  return { onSuccess: () => cliente.invalidateQueries({ queryKey: clave }) };
+  return { onSettled: () => cliente.invalidateQueries({ queryKey: clave }) };
 }
 
 /** Aceptar o eliminar un comentario de la cola. */

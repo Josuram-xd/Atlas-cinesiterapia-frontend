@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { BotonTexto } from '@/components/BotonTexto';
 import { Button } from '@/components/Button';
 import { ConfirmarAccion } from '@/components/ConfirmarAccion';
@@ -20,7 +20,12 @@ export function PalabrasOfensivasPage() {
 
   const [nueva, setNueva] = useState('');
   const [errorAgregar, setErrorAgregar] = useState<string>();
-  const [aviso, setAviso] = useState<string>();
+  const [aviso, setAviso] = useState<{ texto: string; foco?: boolean }>();
+  const titulo = useRef<HTMLHeadingElement>(null);
+  // Al borrar, la fila desaparece con su botón: el foco vuelve al título, no a <body>.
+  useEffect(() => {
+    if (aviso?.foco) titulo.current?.focus();
+  }, [aviso]);
   const [borrando, setBorrando] = useState<PalabraOfensiva>();
   const [errorBorrar, setErrorBorrar] = useState<string>();
 
@@ -40,7 +45,7 @@ export function PalabrasOfensivasPage() {
     try {
       const creada = await acciones.agregar.mutateAsync(palabra);
       setNueva('');
-      setAviso(`Palabra «${creada.palabra}» agregada.`);
+      setAviso({ texto: `Palabra «${creada.palabra}» agregada.` });
     } catch (fallo) {
       setErrorAgregar(mensajeErrorPalabra(fallo));
     }
@@ -51,7 +56,7 @@ export function PalabrasOfensivasPage() {
     try {
       await acciones.eliminar.mutateAsync(p.id);
       setBorrando(undefined);
-      setAviso(`Palabra «${p.palabra}» eliminada.`);
+      setAviso({ texto: `Palabra «${p.palabra}» eliminada.`, foco: true });
     } catch (fallo) {
       setErrorBorrar(mensajeErrorPalabra(fallo));
     }
@@ -60,7 +65,9 @@ export function PalabrasOfensivasPage() {
   return (
     <section className="flex flex-col gap-8 pt-4 pb-16">
       <header>
-        <h1 className="font-display text-titulo">Palabras ofensivas</h1>
+        <h1 ref={titulo} tabIndex={-1} className="font-display text-titulo">
+          Palabras ofensivas
+        </h1>
         <p className="text-tinta-2 mt-1">
           Un comentario que contenga alguna de estas palabras queda oculto para revisión.
           Los cambios aplican de inmediato a comentarios nuevos y ediciones; los ya
@@ -87,7 +94,7 @@ export function PalabrasOfensivasPage() {
         </Button>
       </form>
 
-      {aviso ? <Notice tipo="info">{aviso}</Notice> : null}
+      {aviso ? <Notice tipo="info">{aviso.texto}</Notice> : null}
 
       <TextField
         label="Buscar en la lista"

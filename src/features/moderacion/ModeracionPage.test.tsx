@@ -92,6 +92,18 @@ describe('ModeracionPage: aceptar y eliminar', () => {
     expect(luis).toBeInTheDocument();
   });
 
+  it('tras un fallo vuelve a pedir la cola (un 404 quita la fila ya resuelta)', async () => {
+    const api = crearMockModeracionApi();
+    api.aceptar = () =>
+      Promise.reject(new ApiError(404, { code: 'COMENTARIO_NO_ENCONTRADO' }));
+    const listar = vi.spyOn(api, 'listarRevision');
+    const user = userEvent.setup();
+    montar(api);
+    const luis = await articulo('luis.rojas@correo.com');
+    await user.click(within(luis).getByRole('button', { name: /Aceptar/ }));
+    await vi.waitFor(() => expect(listar).toHaveBeenCalledTimes(2));
+  });
+
   it('eliminar pide confirmación y luego lo quita de la cola', async () => {
     const api = crearMockModeracionApi();
     const eliminar = vi.spyOn(api, 'eliminar');
@@ -112,6 +124,7 @@ describe('ModeracionPage: aceptar y eliminar', () => {
         screen.queryByRole('article', { name: 'Comentario de marta@correo.com' }),
       ).not.toBeInTheDocument(),
     );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveFocus();
   });
 
   it('cancelar la confirmación no elimina nada', async () => {

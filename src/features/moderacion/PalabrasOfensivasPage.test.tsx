@@ -121,6 +121,7 @@ describe('PalabrasOfensivasPage: eliminar', () => {
     expect(await screen.findByText('Palabra «idiota» eliminada.')).toBeInTheDocument();
     expect(await screen.findByText('3 palabras')).toBeInTheDocument();
     expect(palabrasEnPantalla()).not.toContain('idiota');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveFocus();
   });
 
   it('cancelar la confirmación no elimina nada', async () => {

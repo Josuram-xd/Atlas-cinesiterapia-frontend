@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/Button';
 import { Notice } from '@/components/Notice';
 import { EstadoError } from '../atlas/EstadoError';
@@ -9,7 +9,13 @@ import { ComentarioRevisionItem } from './ComentarioRevisionItem';
 /** Cola de moderación (solo ADMIN): comentarios ocultados por el filtro o reportados. */
 export function ModeracionPage() {
   const cola = useColaModeracion();
-  const [aviso, setAviso] = useState<string>();
+  // Objeto: el mismo texto dos veces vuelve a mover el foco.
+  const [aviso, setAviso] = useState<{ texto: string }>();
+  const titulo = useRef<HTMLHeadingElement>(null);
+  // La fila resuelta desaparece con su botón: el foco vuelve al título, no a <body>.
+  useEffect(() => {
+    if (aviso) titulo.current?.focus();
+  }, [aviso]);
 
   const paginas = cola.data?.pages ?? [];
   const lista = paginas.flatMap((p) => p.content);
@@ -18,14 +24,16 @@ export function ModeracionPage() {
   return (
     <section className="flex flex-col gap-8 pt-4 pb-16">
       <header>
-        <h1 className="font-display text-titulo">Moderación de comentarios</h1>
+        <h1 ref={titulo} tabIndex={-1} className="font-display text-titulo">
+          Moderación de comentarios
+        </h1>
         <p className="text-tinta-2 mt-1">
           Comentarios ocultados por el filtro automático o reportados por personas
           usuarias. Los más antiguos van primero.
         </p>
       </header>
 
-      {aviso ? <Notice tipo="info">{aviso}</Notice> : null}
+      {aviso ? <Notice tipo="info">{aviso.texto}</Notice> : null}
 
       {cola.isPending ? (
         <div role="status" className="flex flex-col gap-2">
@@ -55,7 +63,10 @@ export function ModeracionPage() {
           <ul className="flex flex-col gap-2">
             {lista.map((c) => (
               <li key={c.id}>
-                <ComentarioRevisionItem comentario={c} onHecho={setAviso} />
+                <ComentarioRevisionItem
+                  comentario={c}
+                  onHecho={(texto) => setAviso({ texto })}
+                />
               </li>
             ))}
           </ul>
