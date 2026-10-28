@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BotonTexto } from '@/components/BotonTexto';
 import { ConfirmarAccion } from '@/components/ConfirmarAccion';
 import { IconoAdvertencia } from '@/components/IconoAdvertencia';
-import type { Comentario } from '@/lib/api';
+import { ApiError, type Comentario } from '@/lib/api';
 import { ROLES_PERFIL } from '../auth/roles';
 import { useSession } from '../auth/sessionStore';
 import { fechaLarga } from '../atlas/ficha/texto';
@@ -64,12 +64,17 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
     setErrorReporte(undefined);
     try {
       await acciones.reportar.mutateAsync(c.id);
-      setConfirmandoReporte(false);
-      setReportado(true);
       setAviso('Gracias. Seguirá visible mientras un administrador lo revisa.');
     } catch (fallo) {
-      setErrorReporte(mensajeErrorComentario(fallo));
+      // Ya reportado acaba igual que un reporte nuevo: se cierra y se explica.
+      if (!(fallo instanceof ApiError && fallo.code === 'YA_REPORTADO')) {
+        setErrorReporte(mensajeErrorComentario(fallo));
+        return;
+      }
+      setAviso(mensajeErrorComentario(fallo));
     }
+    setConfirmandoReporte(false);
+    setReportado(true);
   }
 
   return (

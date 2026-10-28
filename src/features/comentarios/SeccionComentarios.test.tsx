@@ -427,7 +427,7 @@ describe('SeccionComentarios: reportar', () => {
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 
-  it('explica el 409 YA_REPORTADO', async () => {
+  it('el 409 YA_REPORTADO cierra el diálogo, lo explica y deja de ofrecer reportar', async () => {
     const api = crearMockComentariosApi();
     api.reportar = () => Promise.reject(new ApiError(409, { code: 'YA_REPORTADO' }));
     const user = userEvent.setup();
@@ -436,6 +436,25 @@ describe('SeccionComentarios: reportar', () => {
     await user.click(within(raiz).getByRole('button', { name: /Reportar/ }));
     await user.click(screen.getByRole('button', { name: 'Reportar comentario' }));
     expect(await screen.findByText(/Ya reportaste este comentario/)).toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(within(raiz).queryByRole('button', { name: /Reportar/ })).toBeNull();
+  });
+
+  it('el 429 al reportar da un mensaje que no habla de comentar', async () => {
+    const api = crearMockComentariosApi();
+    api.reportar = () =>
+      Promise.reject(new ApiError(429, { code: 'DEMASIADOS_INTENTOS' }));
+    const user = userEvent.setup();
+    montar(api);
+    const raiz = await ana();
+    await user.click(within(raiz).getByRole('button', { name: /Reportar/ }));
+    await user.click(screen.getByRole('button', { name: 'Reportar comentario' }));
+    expect(
+      await screen.findByText(
+        'Vas demasiado rápido. Espera un momento e inténtalo de nuevo.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 });
 

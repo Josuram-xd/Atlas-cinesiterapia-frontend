@@ -21,7 +21,7 @@ export function mensajeErrorComentario(error: unknown): string {
   if (error instanceof ApiError) {
     if (error.status === 401) return 'Tu sesión venció. Vuelve a iniciar sesión.';
     if (error.status === 429) {
-      return 'Estás comentando demasiado rápido. Espera un momento e inténtalo de nuevo.';
+      return 'Vas demasiado rápido. Espera un momento e inténtalo de nuevo.';
     }
     if (error.status >= 500) {
       return 'El servidor tuvo un problema. Inténtalo en unos minutos.';
