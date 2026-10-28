@@ -15,7 +15,21 @@ export function useColaModeracion() {
   });
 }
 
-/** Aceptar o eliminar; ambas sacan el comentario de la cola, así que vuelven a pedirla. */
+/** Lista de palabras ofensivas filtrada por `q`, página a página. */
+export function usePalabras(q: string) {
+  const api = useModeracionApi();
+  return useInfiniteQuery({
+    queryKey: [...CLAVE_MODERACION, 'palabras', q],
+    queryFn: ({ pageParam, signal }) => api.listarPalabras(q, pageParam, signal),
+    initialPageParam: 0,
+    getNextPageParam: (ultima) =>
+      ultima.page + 1 < ultima.totalPages ? ultima.page + 1 : undefined,
+    // Mientras se teclea la búsqueda se conserva la lista anterior, sin parpadeo.
+    placeholderData: (previo) => previo,
+  });
+}
+
+/** Acciones de moderación; todas invalidan lo de moderación (cola y palabras). */
 export function useAccionesModeracion() {
   const api = useModeracionApi();
   const cliente = useQueryClient();
@@ -25,5 +39,13 @@ export function useAccionesModeracion() {
   return {
     aceptar: useMutation({ mutationFn: (id: number) => api.aceptar(id), ...opciones }),
     eliminar: useMutation({ mutationFn: (id: number) => api.eliminar(id), ...opciones }),
+    agregarPalabra: useMutation({
+      mutationFn: (palabra: string) => api.agregarPalabra(palabra),
+      ...opciones,
+    }),
+    eliminarPalabra: useMutation({
+      mutationFn: (id: number) => api.eliminarPalabra(id),
+      ...opciones,
+    }),
   };
 }

@@ -91,6 +91,7 @@ describe('guardas de rutas', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Administración' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Moderación' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Palabras ofensivas' })).toBeInTheDocument();
   });
 
   it('cerrar sesión limpia los tokens, avisa al backend y vuelve al login', async () => {

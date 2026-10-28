@@ -343,6 +343,13 @@ export interface ComentarioRevision {
   editadoAt: string | null;
 }
 
+/** Entrada de la lista de palabras ofensivas (se compara normalizada en el backend). */
+export interface PalabraOfensiva {
+  id: number;
+  palabra: string;
+  createdAt: string;
+}
+
 // --- Métricas --------------------------------------------------------------------
 
 /** Cuerpo de POST /metricas/visitas (docs/API.md, sección 9). */
