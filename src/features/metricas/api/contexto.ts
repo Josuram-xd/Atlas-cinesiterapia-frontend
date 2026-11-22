@@ -1,3 +1,4 @@
+import { usaBackend } from '@/lib/api/config';
 import { createContext, useContext } from 'react';
 import type { MetricasApi } from './metricasApi';
 import { httpMetricasApi } from './httpMetricasApi';
@@ -11,8 +12,8 @@ export function useMetricasApi(): MetricasApi {
   return api;
 }
 
-/** Misma variable que el atlas: `VITE_ATLAS_API=http` usa el backend; si no, datos en memoria. */
+/** Misma variable que el atlas: `usaBackend` (`lib/api/config`) elige backend real o datos en memoria. */
 export function metricasApiDesdeEntorno(): MetricasApi {
-  if (import.meta.env.VITE_ATLAS_API === 'http') return httpMetricasApi;
+  if (usaBackend) return httpMetricasApi;
   return crearMockMetricasApi();
 }

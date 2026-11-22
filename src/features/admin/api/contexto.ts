@@ -1,3 +1,4 @@
+import { usaBackend } from '@/lib/api/config';
 import { createContext, useContext } from 'react';
 import type { AdminApi } from './adminApi';
 import { httpAdminApi } from './httpAdminApi';
@@ -11,8 +12,8 @@ export function useAdminApi(): AdminApi {
   return api;
 }
 
-/** Misma variable que el atlas: `VITE_ATLAS_API=http` usa el backend; si no, datos en memoria. */
+/** Misma variable que el atlas: `usaBackend` (`lib/api/config`) elige backend real o datos en memoria. */
 export function adminApiDesdeEntorno(): AdminApi {
-  if (import.meta.env.VITE_ATLAS_API === 'http') return httpAdminApi;
+  if (usaBackend) return httpAdminApi;
   return crearMockAdminApi({ latenciaMs: 300 });
 }

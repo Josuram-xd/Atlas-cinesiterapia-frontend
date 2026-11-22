@@ -1,3 +1,4 @@
+import { usaBackend } from '@/lib/api/config';
 import { createContext, useContext } from 'react';
 import type { ComentariosApi } from './comentariosApi';
 import { httpComentariosApi } from './httpComentariosApi';
@@ -13,8 +14,8 @@ export function useComentariosApi(): ComentariosApi {
   return api;
 }
 
-/** Misma variable que el atlas: `VITE_ATLAS_API=http` usa el backend; si no, datos en memoria. */
+/** Misma variable que el atlas: `usaBackend` (`lib/api/config`) elige backend real o datos en memoria. */
 export function comentariosApiDesdeEntorno(): ComentariosApi {
-  if (import.meta.env.VITE_ATLAS_API === 'http') return httpComentariosApi;
+  if (usaBackend) return httpComentariosApi;
   return crearMockComentariosApi({ latenciaMs: 300 });
 }
