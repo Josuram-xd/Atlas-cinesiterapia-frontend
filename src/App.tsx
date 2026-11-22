@@ -43,7 +43,6 @@ export function App() {
       <AtlasApiProvider api={atlasApi}>
         <AdminApiProvider api={adminApi}>
           <AvisosSistema />
-          <RouterProvider router={router} />
           <MetricasApiProvider api={metricasApi}>
             <ComentariosApiProvider api={comentariosApi}>
               <ModeracionApiProvider api={moderacionApi}>
