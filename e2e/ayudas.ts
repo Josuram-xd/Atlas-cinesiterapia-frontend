@@ -24,3 +24,22 @@ export async function abrirFichaDeRodilla(page: Page) {
     page.getByRole('heading', { level: 1, name: 'Flexoextensión pasiva de rodilla' }),
   ).toBeVisible();
 }
+
+/** URLs que el service worker guardó como datos (sin el precache de la aplicación). */
+export function datosGuardados(page: Page): Promise<string[]> {
+  return page.evaluate(async () => {
+    const urls: string[] = [];
+    for (const nombre of await caches.keys()) {
+      if (nombre.startsWith('workbox-precache')) continue;
+      for (const r of await (await caches.open(nombre)).keys()) urls.push(r.url);
+    }
+    return urls;
+  });
+}
+
+/** Espera a que la ficha abierta quede guardada: el SW la escribe después de responder. */
+export async function esperarFichaGuardada(page: Page) {
+  await expect
+    .poll(() => datosGuardados(page))
+    .toContainEqual(expect.stringMatching(/\/ejercicios\/\d+$/));
+}

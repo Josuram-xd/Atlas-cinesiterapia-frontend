@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { abrirFichaDeRodilla, iniciarSesion } from './ayudas';
+import {
+  abrirFichaDeRodilla,
+  datosGuardados,
+  esperarFichaGuardada,
+  iniciarSesion,
+} from './ayudas';
 
 test.describe('PWA: service worker y caché de datos', () => {
   test('tras visitar el atlas, regiones y ficha siguen disponibles sin conexión', async ({
@@ -11,8 +16,7 @@ test.describe('PWA: service worker y caché de datos', () => {
     await page.reload(); // la pestaña ya está controlada por el service worker
     await expect(page.getByRole('button', { name: 'Rodilla' }).first()).toBeVisible();
     await abrirFichaDeRodilla(page);
-    // Deja que la revalidación en segundo plano termine de guardar.
-    await page.waitForLoadState('networkidle');
+    await esperarFichaGuardada(page);
 
     await context.setOffline(true);
     await page.reload();
@@ -29,20 +33,10 @@ test.describe('PWA: service worker y caché de datos', () => {
     await page.evaluate(() => navigator.serviceWorker.ready);
     await page.reload();
     await abrirFichaDeRodilla(page);
-    await page.waitForLoadState('networkidle');
+    await esperarFichaGuardada(page);
 
-    const rutas = () =>
-      page.evaluate(async () => {
-        const nombres = await caches.keys();
-        const urls: string[] = [];
-        for (const n of nombres) {
-          if (n.startsWith('workbox-precache')) continue;
-          for (const r of await (await caches.open(n)).keys()) urls.push(r.url);
-        }
-        return urls;
-      });
+    const rutas = () => datosGuardados(page);
     const guardadas = await rutas();
-    expect(guardadas.length).toBeGreaterThan(0);
     expect(guardadas.every((u) => /\/(regiones|ejercicios)(\/|\?|$)/.test(u))).toBe(true);
     expect(guardadas.some((u) => /\/(auth|admin)\//.test(u))).toBe(false);
 
