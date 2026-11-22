@@ -79,11 +79,12 @@ export function ComentarioRevisionItem({
         <Button
           variante="secundario"
           cargando={acciones.aceptar.isPending}
+          soloEnLinea
           onClick={() => void aceptar()}
         >
           Aceptar <span className="sr-only">comentario de {c.autor.correo}</span>
         </Button>
-        <BotonTexto onClick={() => setConfirmando(true)}>
+        <BotonTexto soloEnLinea onClick={() => setConfirmando(true)}>
           Eliminar <span className="sr-only">comentario de {c.autor.correo}</span>
         </BotonTexto>
       </div>

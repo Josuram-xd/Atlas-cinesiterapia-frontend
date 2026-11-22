@@ -89,7 +89,12 @@ export function PalabrasOfensivasPage() {
           onChange={(e) => setNueva(e.target.value)}
           className="sm:flex-1"
         />
-        <Button type="submit" cargando={acciones.agregar.isPending} className="sm:mt-8">
+        <Button
+          type="submit"
+          cargando={acciones.agregar.isPending}
+          soloEnLinea
+          className="sm:mt-8"
+        >
           Agregar palabra
         </Button>
       </form>
@@ -137,6 +142,7 @@ export function PalabrasOfensivasPage() {
               >
                 <span className="font-semibold break-all">{p.palabra}</span>
                 <BotonTexto
+                  soloEnLinea
                   aria-label={`Eliminar «${p.palabra}»`}
                   onClick={() => {
                     setErrorBorrar(undefined);

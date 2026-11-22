@@ -127,17 +127,18 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
       {!editando && (puedeResponder || puedeReportar || puedeEliminar) ? (
         <div className="flex flex-wrap gap-x-4">
           {puedeResponder ? (
-            <BotonTexto onClick={() => setRespondiendo(true)}>
+            <BotonTexto soloEnLinea onClick={() => setRespondiendo(true)}>
               Responder <span className="sr-only">a {c.autor?.nombre}</span>
             </BotonTexto>
           ) : null}
           {puedeReportar ? (
-            <BotonTexto onClick={() => setConfirmandoReporte(true)}>
+            <BotonTexto soloEnLinea onClick={() => setConfirmandoReporte(true)}>
               Reportar <span className="sr-only">a {c.autor?.nombre}</span>
             </BotonTexto>
           ) : null}
           {c.propio ? (
             <BotonTexto
+              soloEnLinea
               onClick={() => {
                 setAviso(undefined);
                 setEditando(true);
@@ -147,7 +148,7 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
             </BotonTexto>
           ) : null}
           {puedeEliminar ? (
-            <BotonTexto onClick={() => setConfirmandoBorrado(true)}>
+            <BotonTexto soloEnLinea onClick={() => setConfirmandoBorrado(true)}>
               Eliminar <span className="sr-only">{deQuien}</span>
             </BotonTexto>
           ) : null}

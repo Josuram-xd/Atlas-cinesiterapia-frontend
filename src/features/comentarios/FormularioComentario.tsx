@@ -73,7 +73,7 @@ export function FormularioComentario({
         }
       />
       <div className="flex flex-wrap gap-3">
-        <Button type="submit" cargando={enviando}>
+        <Button type="submit" cargando={enviando} soloEnLinea>
           {textoBoton}
         </Button>
         {onCancelar ? (
