@@ -36,10 +36,9 @@ export function ModeracionPage() {
       {aviso ? <Notice tipo="info">{aviso.texto}</Notice> : null}
 
       {cola.isPending ? (
-        <div role="status" className="flex flex-col gap-2">
-          <p className="text-tinta-2">Cargando comentarios…</p>
-          <div aria-hidden className="bg-fondo-2 h-24" />
-        </div>
+        <p role="status" className="text-tinta-2">
+          Cargando comentarios…
+        </p>
       ) : null}
 
       {cola.isError ? (

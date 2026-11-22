@@ -17,13 +17,17 @@ export function AvisosSistema() {
 
 function AvisoSinConexion() {
   const enLinea = useEnLinea();
-  if (enLinea) return null;
+  // El contenedor de estado va siempre montado: los lectores de pantalla anuncian los cambios.
   return (
-    <div className={FRANJA}>
-      <p role="status" className="font-medium">
-        Sin conexión: puedes seguir leyendo lo que ya abriste. Las acciones que cambian
-        datos se habilitan cuando vuelva la conexión.
-      </p>
+    <div role="status">
+      {enLinea ? null : (
+        <div className={FRANJA}>
+          <p className="font-medium">
+            Sin conexión: puedes seguir leyendo lo que ya abriste. Las acciones que
+            cambian datos se habilitan cuando vuelva la conexión.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

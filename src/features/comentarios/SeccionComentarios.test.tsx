@@ -302,7 +302,7 @@ describe('SeccionComentarios: esperando revisión (RF_045)', () => {
       'article',
     )!;
     expect(articulo).toHaveAccessibleName(/esperando revisión/);
-    expect(articulo).toHaveClass('bg-fondo-3', 'text-tinta-2');
+    expect(articulo).toHaveClass('bg-fondo-2', 'text-tinta-2');
     const mensaje = within(articulo).getByText('Esperando revisión');
     expect(mensaje.closest('p')!.querySelector('svg[aria-hidden="true"]')).not.toBeNull();
     // El ícono va a la derecha: después del mensaje.

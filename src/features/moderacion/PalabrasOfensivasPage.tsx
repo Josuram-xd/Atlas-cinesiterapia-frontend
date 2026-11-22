@@ -103,6 +103,7 @@ export function PalabrasOfensivasPage() {
 
       <TextField
         label="Buscar en la lista"
+        type="search"
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
         className="max-w-md"

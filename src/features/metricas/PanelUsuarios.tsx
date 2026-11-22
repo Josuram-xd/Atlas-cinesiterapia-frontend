@@ -17,7 +17,7 @@ export function PanelUsuarios({ rango }: { rango: Rango | null }) {
     >
       {({ total, porRol }) => (
         <div className="flex flex-col gap-4">
-          <p className="font-display text-3xl font-semibold">
+          <p className="font-display text-3xl font-semibold tabular-nums">
             {total} {total === 1 ? 'usuario activo' : 'usuarios activos'}
           </p>
           <ul className="flex flex-col gap-2">

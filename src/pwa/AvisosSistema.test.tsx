@@ -12,7 +12,7 @@ afterEach(() => {
 describe('AvisosSistema: sin conexión', () => {
   it('avisa al perder la conexión y se quita al recuperarla', () => {
     render(<AvisosSistema />);
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
 
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
     act(() => void window.dispatchEvent(new Event('offline')));
@@ -20,21 +20,22 @@ describe('AvisosSistema: sin conexión', () => {
 
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
     act(() => void window.dispatchEvent(new Event('online')));
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 });
 
 describe('AvisosSistema: versión nueva', () => {
   it('no muestra nada si no hay versión nueva', () => {
-    const { container } = render(<AvisosSistema />);
-    expect(container).toBeEmptyDOMElement();
+    render(<AvisosSistema />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
   it('avisa y aplica la actualización solo cuando la persona lo pide', async () => {
     const aplicar = vi.fn();
     render(<AvisosSistema />);
     act(() => useActualizacion.getState().anunciar(aplicar));
-    expect(screen.getByRole('status')).toHaveTextContent(/versión nueva/i);
+    expect(screen.getByText(/versión nueva/i)).toBeInTheDocument();
     expect(aplicar).not.toHaveBeenCalled();
 
     await userEvent.click(screen.getByRole('button', { name: /actualizar ahora/i }));
@@ -46,7 +47,7 @@ describe('AvisosSistema: versión nueva', () => {
     render(<AvisosSistema />);
     act(() => useActualizacion.getState().anunciar(aplicar));
     await userEvent.click(screen.getByRole('button', { name: /más tarde/i }));
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByText(/versión nueva/i)).not.toBeInTheDocument();
     expect(aplicar).not.toHaveBeenCalled();
   });
 });

@@ -94,7 +94,7 @@ export function GraficoVisitas({ datos }: { datos: VisitasPeriodo }) {
                 <th scope="row" className="py-2 font-normal">
                   {fechaCorta(c.inicio)}
                 </th>
-                <td className="py-2 text-right">{c.visitas}</td>
+                <td className="py-2 text-right tabular-nums">{c.visitas}</td>
               </tr>
             ))}
           </tbody>

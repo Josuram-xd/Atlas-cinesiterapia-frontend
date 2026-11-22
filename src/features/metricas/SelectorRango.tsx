@@ -39,7 +39,7 @@ export function SelectorRango({
               type="button"
               aria-pressed={activa}
               onClick={() => onPeriodo(op.id)}
-              className={`font-display cursor-pointer text-xl font-semibold underline decoration-4 underline-offset-8 transition-colors duration-150 ${
+              className={`font-display min-h-11 cursor-pointer text-xl font-semibold underline decoration-4 underline-offset-8 transition-colors duration-150 ${
                 activa
                   ? 'text-tinta decoration-acento'
                   : 'text-tinta-2 hover:text-tinta decoration-transparent'
