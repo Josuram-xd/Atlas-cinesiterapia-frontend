@@ -1,13 +1,24 @@
 import { api } from '@/lib/api';
-import type { CategoriaConConteo, Ejercicio, EjercicioResumen, Region } from '@/lib/api';
+import type {
+  CategoriaConConteo,
+  Ejercicio,
+  EjercicioResumen,
+  Region,
+  VisitaRequest,
+} from '@/lib/api';
 import type { AtlasApi } from './atlasApi';
 
-/**
- * Registro de visita al abrir una ficha. El endpoint llega con la Fase 5 del backend
- * (entidad `visita`, RF_032); hasta entonces el backend responde 404 y se ignora.
- * Ruta provisional, a confirmar contra `docs/API.md` cuando se publique esa fase.
- */
-export const RUTA_VISITA = (ejercicioId: number) => `/ejercicios/${ejercicioId}/visitas`;
+/** Registro de visitas (RF_032): `POST /metricas/visitas`, docs/API.md sección 9. */
+export const RUTA_VISITA = '/metricas/visitas';
+
+async function enviarVisita(visita: VisitaRequest): Promise<void> {
+  try {
+    await api.post<void>(RUTA_VISITA, visita);
+  } catch {
+    // Un fallo al medir (red, 5xx, sesión, 404 de una ficha ya despublicada) nunca debe
+    // interrumpir la lectura.
+  }
+}
 
 /** Implementación contra el backend real (contrato en `docs/API.md` del backend). */
 export const httpAtlasApi: AtlasApi = {
@@ -27,11 +38,9 @@ export const httpAtlasApi: AtlasApi = {
       signal,
     }),
   async registrarVisita(ejercicioId) {
-    try {
-      await api.post<void>(RUTA_VISITA(ejercicioId));
-    } catch {
-      // 404: el backend todavía no ofrece el endpoint (Fase 5). Cualquier otro fallo
-      // (red, 5xx, sesión) tampoco debe interrumpir la lectura de la ficha.
-    }
+    await enviarVisita({ tipo: 'FICHA', ejercicioId });
+  },
+  async registrarVisitaAtlas() {
+    await enviarVisita({ tipo: 'ATLAS' });
   },
 };

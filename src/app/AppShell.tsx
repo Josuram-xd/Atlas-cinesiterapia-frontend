@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
 import { Button } from '@/components/Button';
 import { BuscadorEjercicios } from '@/features/atlas/busqueda/BuscadorEjercicios';
@@ -23,7 +23,41 @@ export function AppShell() {
       actions={
         <>
           {usuario?.rolSistema === 'ADMIN' ? (
-            <Link to="/admin">Administración</Link>
+            <nav aria-label="Administración" className="contents">
+              <NavLink
+                to="/admin"
+                end
+                className={({ isActive }) =>
+                  isActive ? 'text-tinta decoration-acento decoration-4' : undefined
+                }
+              >
+                Administración
+              </NavLink>
+              <NavLink
+                to="/admin/moderacion"
+                className={({ isActive }) =>
+                  isActive ? 'text-tinta decoration-acento decoration-4' : undefined
+                }
+              >
+                Moderación
+              </NavLink>
+              <NavLink
+                to="/admin/palabras-ofensivas"
+                className={({ isActive }) =>
+                  isActive ? 'text-tinta decoration-acento decoration-4' : undefined
+                }
+              >
+                Palabras ofensivas
+              </NavLink>
+              <NavLink
+                to="/admin/metricas"
+                className={({ isActive }) =>
+                  isActive ? 'text-tinta decoration-acento decoration-4' : undefined
+                }
+              >
+                Métricas
+              </NavLink>
+            </nav>
           ) : null}
           <span className="text-tinta-2 max-sm:hidden">{usuario?.correo}</span>
           <Button

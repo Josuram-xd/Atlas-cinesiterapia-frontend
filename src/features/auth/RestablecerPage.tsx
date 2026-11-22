@@ -113,7 +113,7 @@ export function RestablecerPage() {
           onChange={(e) => setConfirmacion(e.target.value)}
           error={errores.confirmacion}
         />
-        <Button type="submit" cargando={restablecer.isPending}>
+        <Button type="submit" cargando={restablecer.isPending} soloEnLinea>
           {restablecer.isPending ? 'Guardando…' : 'Guardar contraseña'}
         </Button>
       </form>

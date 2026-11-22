@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { ConfirmarAccion } from '@/components/ConfirmarAccion';
+import { useEnLinea } from '@/hooks/useEnLinea';
 import type { EjercicioAdmin, EstadoFicha } from '@/lib/api';
 import { useAccionesFicha } from '../api/hooks';
 import { describirError } from '../erroresAdmin';
@@ -44,6 +45,7 @@ const TEXTOS: Record<
  */
 export function AccionesFicha({ ficha, compacto = false, onHecho }: AccionesFichaProps) {
   const acciones = useAccionesFicha();
+  const enLinea = useEnLinea();
   const [pendiente, setPendiente] = useState<Accion | null>(null);
   const [error, setError] = useState<string>();
   const [cargando, setCargando] = useState(false);
@@ -84,13 +86,19 @@ export function AccionesFicha({ ficha, compacto = false, onHecho }: AccionesFich
             key={a}
             type="button"
             onClick={() => setPendiente(a)}
+            disabled={!enLinea}
             aria-label={`${etiqueta(a)} ${ficha.nombre}`}
             className="text-acento min-h-11 cursor-pointer px-1 font-semibold underline underline-offset-4"
           >
             {etiqueta(a)}
           </button>
         ) : (
-          <Button key={a} variante="secundario" onClick={() => setPendiente(a)}>
+          <Button
+            key={a}
+            variante="secundario"
+            soloEnLinea
+            onClick={() => setPendiente(a)}
+          >
             {etiqueta(a)}
           </Button>
         ),

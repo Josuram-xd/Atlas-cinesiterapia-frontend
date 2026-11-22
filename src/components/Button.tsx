@@ -1,10 +1,13 @@
 import type { ButtonHTMLAttributes, Ref } from 'react';
+import { useEnLinea } from '@/hooks/useEnLinea';
 
 type Variante = 'primario' | 'secundario';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variante?: Variante;
   cargando?: boolean;
+  /** Acción que cambia datos: se deshabilita sin conexión. */
+  soloEnLinea?: boolean;
   ref?: Ref<HTMLButtonElement>;
 }
 
@@ -16,16 +19,18 @@ const estilos: Record<Variante, string> = {
 export function Button({
   variante = 'primario',
   cargando = false,
+  soloEnLinea = false,
   className = '',
   disabled,
   children,
   type = 'button',
   ...rest
 }: ButtonProps) {
+  const enLinea = useEnLinea();
   return (
     <button
       type={type}
-      disabled={disabled || cargando}
+      disabled={disabled || cargando || (soloEnLinea && !enLinea)}
       aria-busy={cargando || undefined}
       className={`rounded-campo inline-flex min-h-12 cursor-pointer items-center justify-center border-2 px-6 py-2.5 font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60 ${estilos[variante]} ${className}`}
       {...rest}

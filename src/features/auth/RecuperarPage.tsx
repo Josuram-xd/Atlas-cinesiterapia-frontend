@@ -75,7 +75,7 @@ export function RecuperarPage() {
           onChange={(e) => setCorreo(e.target.value)}
           error={error}
         />
-        <Button type="submit" cargando={recuperar.isPending}>
+        <Button type="submit" cargando={recuperar.isPending} soloEnLinea>
           {recuperar.isPending ? 'Enviando…' : 'Enviar enlace'}
         </Button>
       </form>

@@ -21,16 +21,32 @@ describe('httpAtlasApi', () => {
     ]);
   });
 
-  it('el registro de visita ignora el 404 de un backend sin el endpoint', async () => {
-    const post = vi
-      .spyOn(api, 'post')
-      .mockRejectedValue(new ApiError(404, { code: 'NOT_FOUND' }));
+  it('registra la visita de una ficha en la ruta real del backend', async () => {
+    const post = vi.spyOn(api, 'post').mockResolvedValue(undefined);
+    await httpAtlasApi.registrarVisita(5);
+    expect(RUTA_VISITA).toBe('/metricas/visitas');
+    expect(post).toHaveBeenCalledWith('/metricas/visitas', {
+      tipo: 'FICHA',
+      ejercicioId: 5,
+    });
+  });
+
+  it('registra la visita del atlas sin ejercicioId', async () => {
+    const post = vi.spyOn(api, 'post').mockResolvedValue(undefined);
+    await httpAtlasApi.registrarVisitaAtlas();
+    expect(post).toHaveBeenCalledWith('/metricas/visitas', { tipo: 'ATLAS' });
+  });
+
+  it('el registro de visita ignora el 404 de una ficha ya despublicada', async () => {
+    vi.spyOn(api, 'post').mockRejectedValue(
+      new ApiError(404, { code: 'EJERCICIO_NO_ENCONTRADO' }),
+    );
     await expect(httpAtlasApi.registrarVisita(5)).resolves.toBeUndefined();
-    expect(post).toHaveBeenCalledWith(RUTA_VISITA(5));
   });
 
   it('el registro de visita tampoco propaga errores de red ni del servidor', async () => {
     vi.spyOn(api, 'post').mockRejectedValue(new ApiError(500));
     await expect(httpAtlasApi.registrarVisita(5)).resolves.toBeUndefined();
+    await expect(httpAtlasApi.registrarVisitaAtlas()).resolves.toBeUndefined();
   });
 });

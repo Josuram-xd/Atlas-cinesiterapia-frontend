@@ -42,7 +42,7 @@ export function AppLayout({ children, actions, centro }: AppLayoutProps) {
             {centro}
           </div>
         ) : null}
-        <div className="flex items-center gap-4">{actions}</div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">{actions}</div>
       </header>
       <main
         id="contenido"

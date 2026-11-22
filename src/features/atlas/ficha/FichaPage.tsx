@@ -6,6 +6,7 @@ import { useAtlasApi } from '../api/contexto';
 import { useEjercicio } from '../api/hooks';
 import { EstadoError } from '../EstadoError';
 import { mensajeDeErrorAtlas } from '../mensajes';
+import { SeccionComentarios } from '../../comentarios/SeccionComentarios';
 import { GaleriaImagenes } from './GaleriaImagenes';
 import { ReproductorVideo } from './ReproductorVideo';
 import { Campo, Seccion } from './Seccion';
@@ -53,6 +54,7 @@ function Ficha({ e }: { e: Ejercicio }) {
       ? [['errores-comunes', 'Errores comunes'] as [string, string]]
       : []),
     ['metadatos', 'Metadatos académicos'],
+    ['comentarios', 'Comentarios'],
   ];
   return (
     <article className="flex flex-col gap-12 pb-16 lg:gap-16">
@@ -188,6 +190,8 @@ function Ficha({ e }: { e: Ejercicio }) {
               ) : null}
             </dl>
           </Seccion>
+
+          <SeccionComentarios ejercicioId={e.id} />
         </div>
       </div>
     </article>

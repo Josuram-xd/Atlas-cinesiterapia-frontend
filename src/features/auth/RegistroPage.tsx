@@ -98,7 +98,7 @@ export function RegistroPage() {
           onChange={setRolPerfil}
           error={errores.rolPerfil}
         />
-        <Button type="submit" cargando={registro.isPending} className="mt-1">
+        <Button type="submit" cargando={registro.isPending} soloEnLinea className="mt-1">
           {registro.isPending ? 'Creando cuenta…' : 'Crear cuenta'}
         </Button>
       </form>

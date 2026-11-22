@@ -75,13 +75,23 @@ describe('guardas de rutas', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('un administrador sí entra y ve el enlace de administración', async () => {
+  it('un usuario común no entra a la moderación', async () => {
+    conSesion(usuario);
+    renderWithRouter(routes, ['/admin/moderacion']);
+    expect(
+      await screen.findByRole('heading', { name: 'Sin permiso' }),
+    ).toBeInTheDocument();
+  });
+
+  it('un administrador sí entra y ve los enlaces de administración y moderación', async () => {
     conSesion(admin);
     renderWithRouter(routes, ['/admin']);
     expect(
       await screen.findByRole('heading', { name: 'Fichas de ejercicios' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Administración' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Moderación' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Palabras ofensivas' })).toBeInTheDocument();
   });
 
   it('cerrar sesión limpia los tokens, avisa al backend y vuelve al login', async () => {

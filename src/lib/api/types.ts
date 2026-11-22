@@ -187,6 +187,10 @@ export interface Pagina<T> {
   totalPages: number;
 }
 
+/** `getNextPageParam` de los listados con «Ver más»: la página siguiente o nada. */
+export const siguientePagina = (u: Pagina<unknown>) =>
+  u.page + 1 < u.totalPages ? u.page + 1 : undefined;
+
 export interface UsuarioRef {
   id: number;
   correo: string;
@@ -285,6 +289,135 @@ export interface SubidaPrefirmada {
   metodo: 'PUT';
   cabeceras: Record<string, string>;
   expiraEn: string;
+}
+
+// --- Comentarios (docs/API.md, sección 8) --------------------------------------
+
+export type EstadoComentario = 'PUBLICADO' | 'EN_REVISION' | 'ELIMINADO';
+
+/** Nunca incluye el correo completo: `nombre` es la parte local. */
+export interface Autor {
+  id: number;
+  nombre: string;
+  rolPerfil: RolPerfil;
+}
+
+export interface Comentario {
+  id: number;
+  ejercicioId: number;
+  /** `null` en comentarios raíz. */
+  padreId: number | null;
+  /** `null` si el comentario fue eliminado. */
+  autor: Autor | null;
+  /** Texto plano (nunca HTML); `null` si fue eliminado. */
+  texto: string | null;
+  estado: EstadoComentario;
+  /** `true` solo para el propio autor: se muestra atenuado, "esperando revisión". */
+  enRevision: boolean;
+  eliminado: boolean;
+  /** `true` si la persona autenticada es la autora (Editar / Eliminar). */
+  propio: boolean;
+  createdAt: string;
+  editadoAt: string | null;
+  /** Solo en raíces (vacío en respuestas), en orden cronológico. */
+  respuestas: Comentario[];
+}
+
+/** Cuerpo de POST/PUT de comentarios y respuestas. */
+export interface ComentarioRequest {
+  texto: string;
+}
+
+// --- Moderación (solo ADMIN, docs/API.md, sección 8) ----------------------------
+
+/** Comentario cola de revisión: ocultado por el filtro y/o reportado. Ve el correo completo. */
+export interface ComentarioRevision {
+  id: number;
+  padreId: number | null;
+  /** `nombre` es `null` si la ficha fue eliminada. */
+  ejercicio: { id: number; nombre: string | null };
+  autor: { id: number; correo: string; rolPerfil: RolPerfil };
+  texto: string;
+  estado: 'PUBLICADO' | 'EN_REVISION';
+  /** `true` = lo ocultó el filtro automático. */
+  ocultadoAutomaticamente: boolean;
+  /** Mayor que 0 = reportado por personas usuarias. */
+  totalReportes: number;
+  createdAt: string;
+  editadoAt: string | null;
+}
+
+/** Entrada de la lista de palabras ofensivas (se compara normalizada en el backend). */
+export interface PalabraOfensiva {
+  id: number;
+  palabra: string;
+  createdAt: string;
+}
+
+// --- Métricas --------------------------------------------------------------------
+
+/** Cuerpo de POST /metricas/visitas (docs/API.md, sección 9). */
+export type VisitaRequest = { tipo: 'FICHA'; ejercicioId: number } | { tipo: 'ATLAS' };
+
+/** Respuesta de POST /metricas/sesion/ping. */
+export interface Sesion {
+  sesionId: number;
+  nuevaSesion: boolean;
+  inicio: string;
+  ultimoPing: string;
+  duracionSegundos: number;
+}
+
+/** Días UTC `AAAA-MM-DD`, ambos incluidos (docs/API.md, sección 9). */
+export interface Rango {
+  desde: string;
+  hasta: string;
+}
+
+export type Agrupacion = 'DIA' | 'SEMANA' | 'MES';
+
+/** GET /admin/metricas/visitas. Los cubos vacíos vienen con `visitas: 0`. */
+export interface VisitasPeriodo extends Rango {
+  agrupacion: Agrupacion;
+  total: number;
+  serie: { inicio: string; visitas: number }[];
+}
+
+/** GET /admin/metricas/tiempo-promedio. `anterior` es el periodo previo de igual longitud. */
+export interface TiempoPromedio extends Rango {
+  /** Sesiones con duración registrada en el periodo. */
+  sesiones: number;
+  /** Ausente si no hay datos. */
+  promedioSegundos?: number;
+  anterior: {
+    desde: string;
+    hasta: string;
+    sesiones: number;
+    promedioSegundos?: number;
+  };
+  /** (actual - anterior) / anterior * 100, una decimal; ausente si falta alguno de los dos. */
+  variacionPorcentaje?: number;
+}
+
+/** GET /admin/metricas/usuarios-activos. Cada persona cuenta una vez; siempre 4 roles, en orden. */
+export interface UsuariosActivos extends Rango {
+  total: number;
+  porRol: { rol: RolPerfil; usuarios: number }[];
+}
+
+/** GET /admin/metricas/ejercicios-mas-consultados: solo fichas publicadas con visitas. */
+export interface TopEjercicios {
+  /** `null` si la consulta no pidió rango (todo el histórico). */
+  desde: string | null;
+  hasta: string | null;
+  limite: number;
+  items: {
+    ejercicioId: number;
+    nombre: string;
+    region: RegionRef;
+    categoria: CategoriaRef;
+    visitas: number;
+  }[];
 }
 
 // --- Errores ---------------------------------------------------------------------

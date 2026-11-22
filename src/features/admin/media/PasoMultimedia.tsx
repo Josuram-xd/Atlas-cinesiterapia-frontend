@@ -3,6 +3,7 @@ import { Button } from '@/components/Button';
 import { SelectField } from '@/components/Campos';
 import { ConfirmarAccion } from '@/components/ConfirmarAccion';
 import { Notice } from '@/components/Notice';
+import { useEnLinea } from '@/hooks/useEnLinea';
 import type { EjercicioAdmin, MediaAdmin, MediaRol, MediaTipo } from '@/lib/api';
 import { urlSegura } from '@/lib/urlSegura';
 import { ReproductorVideo } from '../../atlas/ficha/ReproductorVideo';
@@ -55,12 +56,13 @@ export function PasoMultimedia({
   const cancelar = useRef<AbortController | null>(null);
   const campoVideo = useRef<HTMLInputElement>(null);
   const campoImagen = useRef<HTMLInputElement>(null);
+  const enLinea = useEnLinea();
 
   if (!ficha) {
     return (
       <div className="flex max-w-prose flex-col items-start gap-4">
         <p>Para agregar archivos primero hay que guardar el borrador.</p>
-        <Button onClick={() => void onGuardarBorrador()}>
+        <Button soloEnLinea onClick={() => void onGuardarBorrador()}>
           Guardar borrador y continuar
         </Button>
       </div>
@@ -171,7 +173,7 @@ export function PasoMultimedia({
             <p className="text-tinta-2">
               {formatearTamano(video.tamanoBytes)} · {video.contentType}
             </p>
-            <Button variante="secundario" onClick={() => setAEliminar(video)}>
+            <Button variante="secundario" soloEnLinea onClick={() => setAEliminar(video)}>
               Eliminar video
             </Button>
           </div>
@@ -196,6 +198,7 @@ export function PasoMultimedia({
             <Button
               variante="secundario"
               disabled={ocupado}
+              soloEnLinea
               onClick={() => void subir('VIDEO', campoVideo.current)}
             >
               Subir video
@@ -232,6 +235,7 @@ export function PasoMultimedia({
                     <button
                       type="button"
                       onClick={() => setAEliminar(m)}
+                      disabled={!enLinea}
                       aria-label={`Eliminar imagen: ${etiqueta}`}
                       className="text-acento min-h-11 cursor-pointer font-semibold underline underline-offset-4"
                     >
@@ -278,6 +282,7 @@ export function PasoMultimedia({
             <Button
               variante="secundario"
               disabled={ocupado}
+              soloEnLinea
               onClick={() => void subir('IMAGEN', campoImagen.current)}
             >
               Subir imagen

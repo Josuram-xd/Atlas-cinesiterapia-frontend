@@ -7,6 +7,9 @@ import { LoginPage } from '@/features/auth/LoginPage';
 import { RecuperarPage } from '@/features/auth/RecuperarPage';
 import { RegistroPage } from '@/features/auth/RegistroPage';
 import { RestablecerPage } from '@/features/auth/RestablecerPage';
+import { ModeracionPage } from '@/features/moderacion/ModeracionPage';
+import { PalabrasOfensivasPage } from '@/features/moderacion/PalabrasOfensivasPage';
+import { MetricasPage } from '@/features/metricas/MetricasPage';
 import { AppShell } from './AppShell';
 import { PublicOnly, RequireAuth, RequireRole } from './guards';
 
@@ -34,6 +37,9 @@ export const routes: RouteObject[] = [
               { path: '/admin', element: <ListaFichasPage /> },
               { path: '/admin/fichas/nueva', element: <FichaFormPage /> },
               { path: '/admin/fichas/:id', element: <FichaFormPage /> },
+              { path: '/admin/moderacion', element: <ModeracionPage /> },
+              { path: '/admin/palabras-ofensivas', element: <PalabrasOfensivasPage /> },
+              { path: '/admin/metricas', element: <MetricasPage /> },
             ],
           },
         ],
