@@ -73,3 +73,14 @@ test('un administrador completa un borrador y lo publica', async ({ page }) => {
     page.getByText('Ficha publicada. Ya la ven todas las personas usuarias.'),
   ).toBeVisible();
 });
+
+test('comenta una ficha y el comentario aparece en la lista', async ({ page }) => {
+  await iniciarSesion(page);
+  await abrirFichaDeRodilla(page);
+  const texto = `Buena guía para el control del rango ${Date.now()}`;
+  await page.getByLabel('Escribe un comentario').fill(texto);
+  await page.getByRole('button', { name: 'Publicar comentario' }).click();
+  await expect(
+    page.getByRole('region', { name: 'Comentarios' }).getByText(texto),
+  ).toBeVisible();
+});
