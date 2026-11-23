@@ -20,50 +20,33 @@ export function AppShell() {
     <AppLayout
       // La clave reinicia la búsqueda (texto y lista) al cambiar de pantalla.
       centro={<BuscadorEjercicios key={pathname} />}
+      navegacion={
+        usuario?.rolSistema === 'ADMIN' ? (
+          <nav aria-label="Administración" className="flex w-max gap-1">
+            <NavLink to="/admin" end className="chip">
+              Administración
+            </NavLink>
+            <NavLink to="/admin/moderacion" className="chip">
+              Moderación
+            </NavLink>
+            <NavLink to="/admin/palabras-ofensivas" className="chip">
+              Palabras ofensivas
+            </NavLink>
+            <NavLink to="/admin/metricas" className="chip">
+              Métricas
+            </NavLink>
+          </nav>
+        ) : null
+      }
       actions={
         <>
-          {usuario?.rolSistema === 'ADMIN' ? (
-            <nav aria-label="Administración" className="contents">
-              <NavLink
-                to="/admin"
-                end
-                className={({ isActive }) =>
-                  isActive ? 'text-tinta decoration-acento decoration-4' : undefined
-                }
-              >
-                Administración
-              </NavLink>
-              <NavLink
-                to="/admin/moderacion"
-                className={({ isActive }) =>
-                  isActive ? 'text-tinta decoration-acento decoration-4' : undefined
-                }
-              >
-                Moderación
-              </NavLink>
-              <NavLink
-                to="/admin/palabras-ofensivas"
-                className={({ isActive }) =>
-                  isActive ? 'text-tinta decoration-acento decoration-4' : undefined
-                }
-              >
-                Palabras ofensivas
-              </NavLink>
-              <NavLink
-                to="/admin/metricas"
-                className={({ isActive }) =>
-                  isActive ? 'text-tinta decoration-acento decoration-4' : undefined
-                }
-              >
-                Métricas
-              </NavLink>
-            </nav>
-          ) : null}
-          <span className="text-tinta-2 max-sm:hidden">{usuario?.correo}</span>
+          <span className="text-tinta-2 max-w-[16ch] truncate max-2xl:hidden">
+            {usuario?.correo}
+          </span>
           <Button
             variante="secundario"
             onClick={salir}
-            className="min-h-10 px-4 py-1.5 whitespace-nowrap"
+            className="min-h-11 px-4 py-1.5 whitespace-nowrap"
           >
             Cerrar sesión
           </Button>
