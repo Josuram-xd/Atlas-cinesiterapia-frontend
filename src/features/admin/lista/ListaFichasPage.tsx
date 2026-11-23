@@ -146,7 +146,7 @@ export function ListaFichasPage() {
         <div role="status" className="flex flex-col gap-2">
           <p className="text-tinta-2">Cargando fichas…</p>
           {[0, 1, 2].map((i) => (
-            <div key={i} aria-hidden className="bg-fondo-2 h-20" />
+            <div key={i} aria-hidden className="superficie h-20 animate-pulse" />
           ))}
         </div>
       ) : null}
@@ -159,7 +159,7 @@ export function ListaFichasPage() {
       ) : null}
 
       {pagina && pagina.content.length === 0 ? (
-        <div role="status" className="bg-fondo-2 flex flex-col gap-1 px-4 py-5">
+        <div role="status" className="superficie flex flex-col gap-1 px-5 py-5">
           <p className="font-display text-lg font-semibold">
             {hayFiltros
               ? 'Ninguna ficha coincide con los filtros.'
@@ -181,12 +181,12 @@ export function ListaFichasPage() {
           <p className="text-tinta-2 mb-3" aria-live="polite">
             {pagina.totalElements} {pagina.totalElements === 1 ? 'ficha' : 'fichas'}
           </p>
-          <ul className="flex flex-col gap-2">
+          <ul className="revelar flex flex-col gap-2">
             {pagina.content.map((f) => (
-              <li key={f.id} className="bg-fondo-2">
+              <li key={f.id} className="superficie overflow-hidden">
                 <Link
                   to={`/admin/fichas/${f.id}`}
-                  className="hover:bg-fondo-3 text-tinta grid gap-x-6 gap-y-1 px-4 pt-4 pb-2 no-underline transition-colors duration-150 sm:grid-cols-[minmax(0,1fr)_auto]"
+                  className="fila-enlace text-tinta grid gap-x-6 gap-y-1 px-5 pt-4 pb-2 no-underline sm:grid-cols-[minmax(0,1fr)_auto]"
                 >
                   <span className="font-display text-xl leading-snug font-semibold">
                     {f.nombre}
@@ -199,7 +199,7 @@ export function ListaFichasPage() {
                     actualizada el {fechaCorta(f.actualizadoEn)}
                   </span>
                 </Link>
-                <div className="flex flex-wrap gap-x-4 px-3 pb-2">
+                <div className="flex flex-wrap gap-x-4 px-4 pb-2">
                   <AccionesFicha
                     ficha={f}
                     compacto

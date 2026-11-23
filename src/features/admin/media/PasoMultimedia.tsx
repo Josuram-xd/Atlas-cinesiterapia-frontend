@@ -143,7 +143,7 @@ export function PasoMultimedia({
       ) : null}
 
       {subida ? (
-        <div role="status" className="bg-fondo-2 flex flex-col gap-3 p-4">
+        <div role="status" className="superficie flex flex-col gap-3 p-5">
           <p className="font-semibold">
             Subiendo {subida.nombre}: {progresoPct} %
           </p>
@@ -151,7 +151,7 @@ export function PasoMultimedia({
             value={progresoPct}
             max={100}
             aria-label={`Progreso de la subida de ${subida.nombre}`}
-            className="h-3 w-full [&::-moz-progress-bar]:bg-acento [&::-webkit-progress-bar]:bg-fondo-3 [&::-webkit-progress-value]:bg-acento"
+            className="h-3 w-full overflow-hidden rounded-full [&::-moz-progress-bar]:bg-acento [&::-webkit-progress-bar]:rounded-full [&::-webkit-progress-bar]:bg-fondo-3 [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-acento"
           />
           <div>
             <Button variante="secundario" onClick={() => cancelar.current?.abort()}>
@@ -220,7 +220,10 @@ export function PasoMultimedia({
               const url = urlSegura(m.url);
               const etiqueta = etiquetaImagen(m, i + 1);
               return (
-                <li key={m.id} className="bg-fondo-2 flex flex-col">
+                <li
+                  key={m.id}
+                  className="superficie entrada flex flex-col overflow-hidden"
+                >
                   {url ? (
                     <img
                       src={url}
