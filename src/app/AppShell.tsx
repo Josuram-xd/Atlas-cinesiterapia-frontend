@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
 import { Button } from '@/components/Button';
@@ -10,6 +11,14 @@ export function AppShell() {
   const { pathname } = useLocation();
   const usuario = useSession((s) => s.usuario);
   const cerrarSesion = useSession((s) => s.cerrarSesion);
+  const navAdmin = useRef<HTMLElement>(null);
+
+  // En móvil la fila de chips se desplaza: la página actual queda a la vista.
+  useEffect(() => {
+    navAdmin.current
+      ?.querySelector('[aria-current="page"]')
+      ?.scrollIntoView?.({ inline: 'center', block: 'nearest' });
+  }, [pathname]);
 
   function salir() {
     navigate('/login', { replace: true });
@@ -22,7 +31,7 @@ export function AppShell() {
       centro={<BuscadorEjercicios key={pathname} />}
       navegacion={
         usuario?.rolSistema === 'ADMIN' ? (
-          <nav aria-label="Administración" className="flex w-max gap-1">
+          <nav ref={navAdmin} aria-label="Administración" className="flex w-max gap-1">
             <NavLink to="/admin" end className="chip">
               Administración
             </NavLink>
