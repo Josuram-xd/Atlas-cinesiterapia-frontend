@@ -19,8 +19,8 @@ export type VistaId = 'anterior' | 'posterior';
 
 // --- Cabeza y cuello ------------------------------------------------------------------
 
-const HEAD = { cx: 200, cy: 64, rx: 31, ry: 44 };
-const CHIN_CUT_Y = 104;
+const HEAD = { cx: 200, cy: 64, rx: 28, ry: 41 };
+const CHIN_CUT_Y = 102;
 
 /** Mitad izquierda de la cabeza, desde la coronilla hasta el corte de la mandíbula. */
 function headLeft(): Pt[] {
@@ -41,8 +41,8 @@ const chinL = headPts[headPts.length - 1];
 
 const neck = new Curve([
   [chinL[0], chinL[1], 'chin'],
-  [188, 118],
-  [186, 130],
+  [187, 116],
+  [185, 130],
   [178, 141, 'N'],
 ]);
 
@@ -98,20 +98,20 @@ const handCap = new Curve([
 /** Costado del tronco, cadera y cara externa de la pierna hasta el dedo del pie. */
 const sideOuter = new Curve([
   [147, 214, 'Q'],
-  [151, 262, 'R'],
+  [149, 262, 'R'],
   [152, 270, 'torax'],
-  [157, 330, 'lumbar'],
-  [153, 385, 'abdomen'],
+  [160, 330, 'lumbar'],
+  [154, 385, 'abdomen'],
   [147, 405, 'gluteo'],
-  [139, 452, 'hip'],
+  [138, 450, 'hip'],
   [138, 488, 'gluteoFin'],
   [138, 525],
   [142, 570],
   [148, 612, 'muslo'],
   [150, 644],
-  [151, 676, 'rodilla'],
-  [149, 710],
-  [148, 742],
+  [152, 676, 'rodilla'],
+  [148, 712],
+  [149, 744],
   [154, 780],
   [159, 800, 'ankle'],
   [153, 830],
@@ -128,8 +128,8 @@ const legInner = new Curve([
   [187, 612, 'muslo'],
   [188, 644],
   [188, 676, 'rodilla'],
-  [186, 710],
-  [184, 742],
+  [189, 712],
+  [186, 744],
   [181, 800, 'ankle'],
   [184, 830],
   [188, 858],
