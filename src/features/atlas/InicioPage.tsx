@@ -21,6 +21,7 @@ export function InicioPage() {
   const [apuntada, setApuntada] = useState<Region | null>(null);
   const ventana = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLElement>(null);
+  const lectura = useRef<HTMLParagraphElement>(null);
 
   // Una visita al atlas por apertura de la página (RF_032); el backend absorbe dobles disparos.
   const atlasApi = useAtlasApi();
@@ -32,6 +33,18 @@ export function InicioPage() {
   const categorias = useCategorias(elegida?.id ?? null);
   const ejercicios = useEjercicios(elegida?.id ?? null, categoria?.id ?? null);
   const nombre = (apuntada ?? elegida)?.nombre ?? 'Ninguna todavía';
+
+  // El nombre de la región entra con un pequeño ascenso cada vez que cambia.
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    lectura.current?.animate?.(
+      [
+        { opacity: 0.2, transform: 'translateY(6px)' },
+        { opacity: 1, transform: 'none' },
+      ],
+      { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+    );
+  }, [nombre]);
 
   // En móvil el listado queda debajo del cuerpo: al elegir una categoría se lleva a la vista.
   const categoriaId = categoria?.id;
@@ -56,15 +69,26 @@ export function InicioPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 lg:grid lg:h-[calc(100dvh-8rem)] lg:flex-none lg:grid-cols-[minmax(0,26rem)_1fr] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-x-8 lg:gap-y-6">
-      <div className="flex flex-col gap-3 lg:gap-6">
-        <h1 className="font-display text-titulo">Elige una región del cuerpo</h1>
+      <div className="revelar flex flex-col gap-4 lg:gap-7 lg:pt-4">
+        <h1 className="font-display text-titulo max-w-[12ch]">
+          Elige una región del cuerpo
+        </h1>
         <VistaToggle vista={vista} onChange={cambiarVista} />
         <p
-          className="font-display min-h-12 text-xl lg:min-h-0 lg:text-titulo"
+          ref={lectura}
+          className={`font-display flex min-h-9 flex-wrap items-baseline gap-x-2 text-[1.75rem] leading-tight tracking-[-0.025em] lg:min-h-0 lg:flex-col lg:text-[2.5rem] ${
+            (apuntada ?? elegida) ? 'text-tinta font-semibold' : 'text-tinta-2 font-light'
+          }`}
           aria-live="polite"
         >
-          <span className="text-tinta-2 font-light">Región: </span>
+          <span className="text-tinta-2 text-base font-medium tracking-normal">
+            Región:{' '}
+          </span>
           {nombre}
+        </p>
+        <p className="text-tinta-2 max-w-[34ch] text-base max-lg:hidden">
+          Pasa el cursor por el cuerpo y elige una región. Con teclado: Tab recorre, Enter
+          elige y Escape vuelve al cuerpo completo.
         </p>
         {regiones.isPending ? (
           <p role="status" className="text-tinta-2">
@@ -78,7 +102,7 @@ export function InicioPage() {
           />
         ) : null}
       </div>
-      <div className="relative min-h-[28rem] flex-1 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:min-h-0">
+      <div className="escenario rounded-escenario entrada relative min-h-[30rem] flex-1 overflow-hidden lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:min-h-0">
         <BodyAtlas
           vista={vista}
           regiones={regiones.data ?? SIN_REGIONES}
@@ -87,8 +111,8 @@ export function InicioPage() {
           onClear={() => elegirRegion(null)}
           onHover={setApuntada}
           ventana={ventana}
-          className={`absolute inset-0 h-full w-full transition-opacity duration-300 ${
-            regiones.isPending ? 'opacity-40' : ''
+          className={`absolute inset-0 h-full w-full transition-opacity duration-500 ${
+            regiones.isPending ? 'opacity-30' : ''
           }`}
         />
         {elegida ? (

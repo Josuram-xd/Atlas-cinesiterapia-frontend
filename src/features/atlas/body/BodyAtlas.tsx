@@ -10,6 +10,7 @@ import {
 import gsap from 'gsap';
 import type { Region } from '@/lib/api';
 import { prefersReducedMotion } from '@/lib/motion';
+import { BodyFondo, BodyRelieve } from './BodyDetalle';
 import { BodyFigure, type EventoSeleccion } from './BodyFigure';
 import type { Box } from './curves';
 import { BODY_VIEWBOX, type VistaId } from './geometry';
@@ -312,6 +313,7 @@ export function BodyAtlas({
       className={`touch-none select-none ${className ?? ''}`}
     >
       <g ref={grupo}>
+        <BodyFondo vista={mostrada} />
         <BodyFigure
           vista={mostrada}
           regiones={regiones}
@@ -319,6 +321,7 @@ export function BodyAtlas({
           onSelect={alElegir}
           onHover={onHover}
         />
+        <BodyRelieve vista={mostrada} />
       </g>
     </svg>
   );
