@@ -24,7 +24,7 @@ export function PanelTiempo({ rango }: { rango: Rango | null }) {
     >
       {({ promedioSegundos, sesiones, variacionPorcentaje, anterior }) => (
         <div className="flex flex-col gap-2">
-          <p className="font-display text-4xl font-semibold tabular-nums">
+          <p className="font-display text-[clamp(2.75rem,1.8rem+3.6vw,5rem)] leading-none font-bold tracking-[-0.04em] tabular-nums">
             {formatearDuracion(promedioSegundos!)}
           </p>
           <p className="text-tinta-2">

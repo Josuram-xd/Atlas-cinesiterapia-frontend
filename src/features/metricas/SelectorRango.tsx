@@ -30,20 +30,19 @@ export function SelectorRango({
 }: SelectorRangoProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div role="group" aria-label="Periodo" className="flex flex-wrap gap-x-6 gap-y-2">
+      <div
+        role="group"
+        aria-label="Periodo"
+        className="bg-fondo-2 flex w-fit max-w-full flex-wrap gap-1 rounded-[1.6rem] p-1"
+      >
         {OPCIONES.map((op) => {
-          const activa = periodo === op.id;
           return (
             <button
               key={op.id}
               type="button"
-              aria-pressed={activa}
+              aria-pressed={periodo === op.id}
               onClick={() => onPeriodo(op.id)}
-              className={`font-display min-h-11 cursor-pointer text-xl font-semibold underline decoration-4 underline-offset-8 transition-colors duration-150 ${
-                activa
-                  ? 'text-tinta decoration-acento'
-                  : 'text-tinta-2 hover:text-tinta decoration-transparent'
-              }`}
+              className="chip font-display cursor-pointer px-5 text-lg"
             >
               {op.texto}
             </button>

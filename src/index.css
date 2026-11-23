@@ -417,3 +417,22 @@ svg[data-zoom='si'] .trazo-anatomico {
   stroke: #d9fff4;
   filter: drop-shadow(0 0 14px rgb(60 207 174 / 0.7));
 }
+
+/* Gráfico de visitas: las barras crecen desde el eje, escalonadas. */
+.barra {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transition: fill 200ms var(--ease-atlas);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .barra {
+    animation: crecer 700ms var(--ease-atlas) backwards;
+  }
+}
+
+@keyframes crecer {
+  from {
+    transform: scaleY(0);
+  }
+}
