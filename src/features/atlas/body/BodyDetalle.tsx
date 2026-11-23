@@ -9,147 +9,191 @@ import { BODY_VIEWBOX, GEOMETRIA, ORDEN_REGIONES, type VistaId } from './geometr
 const RELIEVE: Record<VistaId, string[]> = {
   anterior: [
     // Esternocleidomastoideo y clavícula.
-    'M176 98 C182 116 189 133 197 147',
-    'M190 148 C176 146 163 148 152 154',
+    'M182 112 C185 124 190 137 195 149',
+    'M195 152 C181 150 165 152 151 158',
     // Pectoral mayor: borde inferior hasta la axila.
-    'M199 252 C186 263 164 258 148 224',
-    // Surco deltopectoral.
-    'M154 156 C142 176 134 200 131 226',
-    // Recto abdominal: borde lateral e intersecciones tendinosas.
-    'M178 270 C180 305 183 345 188 382',
-    'M181 294 Q191 299 200 296',
-    'M183 320 Q192 325 200 322',
-    'M185 347 Q193 351 200 349',
+    'M200 232 C188 241 168 241 153 221',
+    // Surco deltopectoral y borde anterior del deltoides.
+    'M148 158 Q160 194 150 226',
+    'M137 166 C125 186 117 208 113 228',
     // Serrato anterior.
-    'M152 236 L161 243',
-    'M153 251 L163 257',
-    // Línea inguinal.
-    'M156 362 C166 398 180 434 196 468',
-    // Bíceps braquial.
-    'M120 236 C114 268 108 300 104 332',
-    // Braquiorradial.
-    'M97 352 C89 388 81 418 75 452',
-    // Sartorio y recto femoral.
-    'M147 474 C164 524 179 584 188 640',
-    'M159 486 C162 530 165 575 167 632',
-    // Vasto medial.
-    'M186 594 C177 612 173 638 179 660',
-    // Rótula.
-    'M168 647 C177 647 179 657 178 664 C177 673 160 673 158 664 C157 656 160 647 168 647 Z',
-    // Cresta tibial y gemelo medial.
-    'M171 690 C169 730 167 768 169 800',
-    'M186 702 C192 724 190 748 184 768',
+    'M154 246 l7 4',
+    'M155 259 l7 4',
+    // Arco costal, recto abdominal e intersecciones tendinosas.
+    'M153 274 Q180 272 200 246',
+    'M182 258 C180 292 182 332 188 384',
+    'M183 286 Q192 289 200 288',
+    'M184 314 Q192 317 200 316',
+    // Oblicuo externo y línea inguinal.
+    'M156 304 C162 330 166 352 168 372',
+    'M151 386 Q174 412 200 420',
+    // Bíceps y braquiorradial.
+    'M118 246 C112 270 106 298 104 324',
+    'M92 344 C86 372 81 400 77 426',
+    'M115 352 C109 380 101 404 92 428',
+    // Pulgar y dedos.
+    'M71 462 C67 472 67 482 71 490',
+    'M77 494 L78 515',
+    'M83 493 L85 516',
+    // Sartorio, recto femoral y vasto medial.
+    'M143 440 C162 500 178 560 186 618',
+    'M150 470 C152 520 155 570 159 612',
+    'M186 584 C176 598 172 622 178 642',
+    // Rótula y tendón rotuliano.
+    'M167 630 C176 630 179 640 178 648 C176 657 158 657 156 648 C155 640 159 630 167 630 Z',
+    'M164 660 L165 674',
+    'M170 660 L169 674',
+    // Cresta tibial, tibial anterior y gemelo medial.
+    'M168 692 C166 732 165 780 168 822',
+    'M154 700 C157 732 160 770 164 812',
+    'M184 702 C190 722 188 746 182 766',
+    // Maléolos y dedos del pie.
+    'M157 830 q5 6 1 13',
+    'M178 826 q-5 6 -1 13',
+    'M162 872 C168 876 176 877 184 873',
   ],
   posterior: [
     // Trapecio: borde superior y descendente hasta T12.
-    'M188 118 C176 134 162 146 150 153',
-    'M151 156 C170 192 188 252 200 300',
-    // Escápula.
-    'M179 184 L157 179 C152 206 160 238 178 252 C183 230 183 204 179 184 Z',
-    'M157 190 Q168 194 179 196',
+    'M184 120 C179 136 164 148 150 156',
+    'M184 197 C192 236 196 270 200 300',
+    // Espina y borde medial de la escápula.
+    'M148 177 C162 182 174 188 184 196',
+    'M184 199 C186 222 180 244 167 254',
     // Deltoides posterior.
-    'M150 160 C137 180 130 204 129 228',
+    'M144 162 C135 184 125 208 116 232',
     // Dorsal ancho.
-    'M152 262 C166 300 184 324 200 338',
-    // Erectores lumbares.
-    'M190 300 C187 338 187 370 190 402',
-    // Glúteo mayor y pliegue glúteo.
-    'M198 410 C180 405 160 414 148 432',
-    'M199 472 Q176 488 147 478',
-    // Tríceps braquial.
-    'M114 240 C111 270 107 300 103 330',
-    // Isquiotibiales.
-    'M166 500 C166 540 166 580 168 640',
-    // Hueco poplíteo.
-    'M155 662 Q168 672 183 662',
-    // Gemelos y tendón de Aquiles.
-    'M168 690 C159 716 160 746 169 772',
-    'M171 690 C181 712 185 742 176 772',
-    'M171 776 L171 816',
+    'M153 264 C166 298 184 322 200 336',
+    // Erectores de la columna.
+    'M189 300 C186 336 186 366 190 396',
+    // Glúteo medio y glúteo mayor.
+    'M198 418 C176 420 156 436 145 464',
+    // Tríceps y olécranon.
+    'M112 246 C106 270 101 296 99 322',
+    'M98 330 Q105 338 114 330',
+    // Extensores del antebrazo y nudillos.
+    'M91 350 C85 380 81 404 77 426',
+    'M73 494 Q81 499 90 493',
+    // Isquiotibiales y hueco poplíteo.
+    'M166 506 C164 546 165 584 168 626',
+    'M155 650 Q168 662 181 650',
+    // Gemelos, tendón de Aquiles y talón.
+    'M166 680 C156 704 153 736 161 762',
+    'M168 680 C182 704 187 738 176 764',
+    'M164 772 C166 794 167 812 168 830',
+    'M174 772 C172 794 171 812 170 830',
+    'M157 858 C162 870 176 871 182 860',
   ],
 };
 
 const ESPEJO = `matrix(-1 0 0 1 ${BODY_VIEWBOX.w} 0)`;
 const CENTRO = {
-  anterior: 'M200 150 L200 262 M200 270 L200 382',
-  posterior: 'M200 140 L200 404',
+  anterior:
+    'M200 158 L200 232 M200 250 L200 340 M198.5 347 Q200 351 201.5 347 M200 356 L200 414',
+  posterior: 'M200 126 L200 392 M200 424 L200 452',
 };
 
-/** Capas que van detrás de las regiones: sombra en el suelo y borde de luz de la silueta. */
+/** Silueta: todas las regiones como un solo dibujo (para halos, volumen y recortes). */
+function Silueta({ vista }: { vista: VistaId }) {
+  return (
+    <>
+      {ORDEN_REGIONES[vista].map((slug) => (
+        <path key={slug} d={GEOMETRIA[vista][slug].d} />
+      ))}
+    </>
+  );
+}
+
+/** Capas detrás de las regiones: sombra en el suelo y un halo suave de luz alrededor. */
 export function BodyFondo({ vista }: { vista: VistaId }) {
-  const sombra = useId();
+  const base = useId();
+  const sombra = `${base}-sombra`;
+  const halo = `${base}-halo`;
   return (
     <g aria-hidden className="cuerpo-detalle">
       <defs>
         <radialGradient id={sombra}>
-          <stop offset="0" stopColor="#000" stopOpacity="0.55" />
+          <stop offset="0" stopColor="#000" stopOpacity="0.6" />
           <stop offset="1" stopColor="#000" stopOpacity="0" />
         </radialGradient>
+        <filter id={halo} x="-30%" y="-10%" width="160%" height="120%">
+          <feGaussianBlur stdDeviation="9" />
+        </filter>
       </defs>
-      <ellipse cx="200" cy="886" rx="110" ry="12" fill={`url(#${sombra})`} />
-      <g
-        fill="none"
-        stroke="var(--color-acento-vivo)"
-        strokeOpacity="0.35"
-        strokeWidth="5"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-      >
-        {ORDEN_REGIONES[vista].map((slug) => (
-          <path
-            key={slug}
-            d={GEOMETRIA[vista][slug].d}
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
+      <ellipse cx="200" cy="888" rx="96" ry="10" fill={`url(#${sombra})`} />
+      <g fill="var(--color-acento-vivo)" opacity="0.22" filter={`url(#${halo})`}>
+        <Silueta vista={vista} />
       </g>
     </g>
   );
 }
 
 /**
- * Capas sobre las regiones, recortadas a la silueta: luz principal desde arriba a la izquierda,
- * surcos de sombra entre regiones (dan volumen de yeso) y el relieve anatómico.
+ * Capas sobre las regiones, recortadas a la silueta: volumen de yeso (sombra propia abajo a la
+ * derecha y brillo arriba a la izquierda, calculados sobre la silueta entera para que no se
+ * noten las uniones), surcos musculares difuminados y el trazo anatómico fino encima.
  */
 export function BodyRelieve({ vista }: { vista: VistaId }) {
   const base = useId();
   const silueta = `${base}-silueta`;
   const luz = `${base}-luz`;
-  const regiones = ORDEN_REGIONES[vista].map((slug) => GEOMETRIA[vista][slug].d);
+  const volumen = `${base}-volumen`;
+  const difuso = `${base}-difuso`;
   const trazos = RELIEVE[vista];
+  const lados = [undefined, ESPEJO];
   return (
     <g aria-hidden className="cuerpo-detalle">
       <defs>
         <clipPath id={silueta}>
-          {regiones.map((d, i) => (
-            <path key={i} d={d} />
-          ))}
+          <Silueta vista={vista} />
         </clipPath>
         <linearGradient
           id={luz}
           gradientUnits="userSpaceOnUse"
-          x1="80"
-          y1="60"
-          x2="330"
-          y2="880"
+          x1="90"
+          y1="40"
+          x2="320"
+          y2="890"
         >
-          <stop offset="0" stopColor="#fff" stopOpacity="0.28" />
-          <stop offset="0.45" stopColor="#fff" stopOpacity="0" />
-          <stop offset="1" stopColor="#0f1e1a" stopOpacity="0.3" />
+          <stop offset="0" stopColor="#fff" stopOpacity="0.22" />
+          <stop offset="0.4" stopColor="#fff" stopOpacity="0" />
+          <stop offset="1" stopColor="#0f1e1a" stopOpacity="0.28" />
         </linearGradient>
+        <filter id={volumen} x="-5%" y="-5%" width="110%" height="110%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="b" />
+          <feOffset in="b" dx="-5" dy="-4" result="bs" />
+          <feComposite in="SourceAlpha" in2="bs" operator="out" result="borde" />
+          <feFlood floodColor="#0f1e1a" floodOpacity="0.62" />
+          <feComposite in2="borde" operator="in" result="sombra" />
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="b2" />
+          <feOffset in="b2" dx="2.5" dy="2" result="bl" />
+          <feComposite in="SourceAlpha" in2="bl" operator="out" result="filo" />
+          <feFlood floodColor="#fff" floodOpacity="0.55" />
+          <feComposite in2="filo" operator="in" result="brillo" />
+          <feMerge>
+            <feMergeNode in="sombra" />
+            <feMergeNode in="brillo" />
+          </feMerge>
+        </filter>
+        <filter id={difuso} x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="2.2" />
+        </filter>
       </defs>
+      <g filter={`url(#${volumen})`}>
+        <Silueta vista={vista} />
+      </g>
       <g clipPath={`url(#${silueta})`}>
         <rect width={BODY_VIEWBOX.w} height={BODY_VIEWBOX.h} fill={`url(#${luz})`} />
-        <g fill="none" stroke="#0f1e1a" strokeLinejoin="round">
-          {regiones.map((d, i) => (
-            <path key={`a${i}`} d={d} strokeWidth="6" strokeOpacity="0.05" />
-          ))}
-          {regiones.map((d, i) => (
-            <path key={`b${i}`} d={d} strokeWidth="2.5" strokeOpacity="0.06" />
+        <g className="surco-anatomico" filter={`url(#${difuso})`}>
+          {lados.map((transform) => (
+            <g key={transform ?? 'izq'} transform={transform}>
+              {trazos.map((d) => (
+                <path key={d} d={d} />
+              ))}
+            </g>
           ))}
         </g>
         <path className="trazo-anatomico" d={CENTRO[vista]} pathLength={1} />
-        {[undefined, ESPEJO].map((transform) => (
+        {lados.map((transform) => (
           <g key={transform ?? 'izq'} transform={transform}>
             {trazos.map((d) => (
               <path key={d} className="trazo-anatomico" d={d} pathLength={1} />

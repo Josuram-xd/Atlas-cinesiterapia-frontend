@@ -300,22 +300,24 @@
 /* --- Regiones del cuerpo: yeso marfil que se tiñe al apuntar y se ilumina al elegir ------ */
 
 .region {
+  /* El borde repite el relleno: las uniones entre regiones no se ven, el cuerpo es uno solo. */
   fill: var(--color-marfil);
-  stroke: #7f938b;
+  stroke: var(--color-marfil);
   stroke-width: 1;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
   cursor: pointer;
   outline: none;
   transition:
-    fill 260ms var(--ease-atlas),
-    stroke 260ms var(--ease-atlas),
-    filter 260ms var(--ease-atlas);
+    fill 320ms var(--ease-atlas),
+    stroke 320ms var(--ease-atlas),
+    filter 320ms var(--ease-atlas);
 }
 
 .region:hover {
-  fill: #bfe3d9;
-  stroke: var(--color-acento);
+  fill: #c9ebe1;
+  stroke: #c9ebe1;
+  filter: drop-shadow(0 0 6px rgb(60 207 174 / 0.45));
 }
 
 .region:focus-visible {
@@ -328,8 +330,8 @@
 .region[aria-pressed='true'] {
   fill: var(--color-acento-vivo);
   stroke: #d9fff4;
-  stroke-width: 2;
-  filter: drop-shadow(0 0 14px rgb(60 207 174 / 0.7));
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 16px rgb(60 207 174 / 0.65));
 }
 
 .region[aria-pressed='true']:focus-visible {
@@ -339,7 +341,8 @@
 
 /* Con la cámara acercada, el resto del cuerpo cede protagonismo (sigue siendo operable). */
 svg[data-zoom='si'] .region:not([aria-pressed='true']):not(:hover):not(:focus-visible) {
-  fill: #93a69e;
+  fill: #a3b5ad;
+  stroke: #a3b5ad;
 }
 
 /* Capas decorativas sobre las regiones: no reciben el puntero. */
@@ -347,19 +350,28 @@ svg[data-zoom='si'] .region:not([aria-pressed='true']):not(:hover):not(:focus-vi
   pointer-events: none;
 }
 
+/* Surcos musculares: una sombra ancha y difusa bajo cada trazo da relieve de yeso tallado. */
+.surco-anatomico {
+  fill: none;
+  stroke: #0f1e1a;
+  stroke-opacity: 0.16;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
 /* Líneas anatómicas que se dibujan al montar el cuerpo. */
 .trazo-anatomico {
   fill: none;
-  stroke: #4f655d;
-  stroke-opacity: 0.55;
-  stroke-width: 1.1;
+  stroke: #5b7068;
+  stroke-opacity: 0.6;
+  stroke-width: 0.9;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
 svg[data-zoom='si'] .trazo-anatomico {
-  stroke-opacity: 0.35;
+  stroke-opacity: 0.45;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -367,6 +379,10 @@ svg[data-zoom='si'] .trazo-anatomico {
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
     animation: dibujar 1400ms var(--ease-atlas) 250ms forwards;
+  }
+
+  .surco-anatomico {
+    animation: aparecer 1200ms var(--ease-atlas) 700ms backwards;
   }
 }
 
@@ -414,7 +430,7 @@ svg[data-zoom='si'] .trazo-anatomico {
 
 .region-vitrina[data-encendida] {
   fill: var(--color-acento-vivo);
-  stroke: #d9fff4;
+  stroke: var(--color-acento-vivo);
   filter: drop-shadow(0 0 14px rgb(60 207 174 / 0.7));
 }
 
