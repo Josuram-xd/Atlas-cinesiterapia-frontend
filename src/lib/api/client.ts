@@ -58,9 +58,16 @@ async function parse<T>(response: Response): Promise<T> {
   } catch {
     data = undefined;
   }
-  if (!response.ok) throw new ApiError(response.status, data as ApiErrorBody | undefined);
+  if (!response.ok) {
+    const retry = Number(response.headers.get('Retry-After'));
+    throw new ApiError(response.status, data as ApiErrorBody | undefined, {
+      retryAfter: Number.isFinite(retry) && retry > 0 ? retry : undefined,
+    });
+  }
   return data as T;
 }
+
+const RECHAZO_DE_SESION = new Set([400, 401, 403]);
 
 let refreshing: Promise<boolean> | null = null;
 
@@ -88,8 +95,9 @@ export function refreshSession(): Promise<boolean> {
       onTokensRefreshed?.(auth);
       return true;
     } catch (error) {
-      // Un fallo de red no invalida la sesión; un rechazo del servidor sí.
-      if (error instanceof ApiError) {
+      // Un fallo de red, el límite de intentos o un error 5xx no invalidan la sesión;
+      // el rechazo explícito del refresh token (400/401/403) sí.
+      if (error instanceof ApiError && RECHAZO_DE_SESION.has(error.status)) {
         tokenStorage.clear();
         onSessionExpired?.();
       }

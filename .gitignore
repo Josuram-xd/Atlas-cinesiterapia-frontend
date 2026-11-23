@@ -9,3 +9,7 @@ coverage
 !.vscode/extensions.json
 .DS_Store
 *.log
+.taste-skill
+dist-e2e
+playwright-report
+test-results

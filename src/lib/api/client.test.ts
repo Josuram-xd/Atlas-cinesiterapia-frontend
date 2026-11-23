@@ -2,8 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { api, setSessionExpiredHandler } from './client';
 import { ApiError, NetworkError } from './errors';
 import { tokenStorage } from './tokenStorage';
-
-const usuario = { id: '1', correo: 'a@b.co', rolPerfil: 'ESTUDIANTE', rol: 'USUARIO' };
+import { authDemo } from '@/test/fixtures';
 
 function json(status: number, body?: unknown) {
   return new Response(body === undefined ? null : JSON.stringify(body), { status });
@@ -36,7 +35,7 @@ describe('cliente HTTP', () => {
     fetchMock
       .mockResolvedValueOnce(json(401, { message: 'expirado' }))
       .mockResolvedValueOnce(
-        json(200, { accessToken: 'nuevo', refreshToken: 'r2', usuario }),
+        json(200, authDemo({ accessToken: 'nuevo', refreshToken: 'r2' })),
       )
       .mockResolvedValueOnce(json(200, [{ id: 1 }]));
     const result = await api.get('/regiones');
@@ -48,7 +47,7 @@ describe('cliente HTTP', () => {
   it('comparte un único refresh entre peticiones simultáneas', async () => {
     fetchMock.mockImplementation(async (url: string, init: RequestInit) => {
       if (url.endsWith('/auth/refresh')) {
-        return json(200, { accessToken: 'nuevo', refreshToken: 'r2', usuario });
+        return json(200, authDemo({ accessToken: 'nuevo', refreshToken: 'r2' }));
       }
       return bearer(init) === 'Bearer viejo' ? json(401) : json(200, { ok: true });
     });
@@ -70,11 +69,37 @@ describe('cliente HTTP', () => {
     expect(expired).toHaveBeenCalledOnce();
   });
 
+  it('conserva la sesión si el refresh falla por un error transitorio (503 o 429)', async () => {
+    const expired = vi.fn();
+    setSessionExpiredHandler(expired);
+    fetchMock
+      .mockResolvedValueOnce(json(401))
+      .mockResolvedValueOnce(json(503, { code: 'INTERNAL_ERROR' }));
+    await expect(api.get('/regiones')).rejects.toBeInstanceOf(ApiError);
+    expect(tokenStorage.get()).not.toBeNull();
+    expect(expired).not.toHaveBeenCalled();
+  });
+
+  it('cierra la sesión si el backend responde SESION_EXPIRADA al refrescar', async () => {
+    const expired = vi.fn();
+    setSessionExpiredHandler(expired);
+    fetchMock
+      .mockResolvedValueOnce(json(401))
+      .mockResolvedValueOnce(json(401, { code: 'SESION_EXPIRADA' }));
+    await expect(api.get('/regiones')).rejects.toBeInstanceOf(ApiError);
+    expect(expired).toHaveBeenCalledOnce();
+  });
+
   it('no reintenta en endpoints públicos (auth: false)', async () => {
-    fetchMock.mockResolvedValueOnce(json(401, { message: 'credenciales inválidas' }));
+    fetchMock.mockResolvedValueOnce(
+      json(401, {
+        code: 'CREDENCIALES_INVALIDAS',
+        message: 'Correo o contrasena incorrectos',
+      }),
+    );
     await expect(api.post('/auth/login', {}, { auth: false })).rejects.toMatchObject({
       status: 401,
-      message: 'credenciales inválidas',
+      code: 'CREDENCIALES_INVALIDAS',
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
