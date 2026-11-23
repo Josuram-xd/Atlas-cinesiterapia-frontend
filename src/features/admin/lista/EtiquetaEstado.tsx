@@ -11,7 +11,7 @@ const TONO: Record<EstadoFicha, string> = {
 export function EtiquetaEstado({ estado }: { estado: EstadoFicha }) {
   return (
     <span
-      className={`inline-block px-2.5 py-0.5 text-base font-semibold ${TONO[estado]}`}
+      className={`inline-block rounded-full px-3 py-0.5 text-base font-semibold ${TONO[estado]}`}
     >
       {ETIQUETA_ESTADO[estado]}
     </span>

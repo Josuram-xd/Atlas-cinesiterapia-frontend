@@ -14,13 +14,13 @@ export function ConfirmarSalida({ blocker }: { blocker: Blocker }) {
 
   if (!bloqueado) return null;
   return (
-    <div className="bg-tinta/70 fixed inset-0 z-50 grid place-items-center p-4">
+    <div className="velo bg-tinta/70 fixed inset-0 z-50 grid place-items-center p-4">
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="salida-titulo"
         onKeyDown={(e) => e.key === 'Escape' && blocker.reset()}
-        className="rounded-campo bg-fondo w-full max-w-md p-6"
+        className="dialogo rounded-superficie bg-papel w-full max-w-md p-6 shadow-[0_30px_80px_-20px_rgb(15_30_26/0.55)] sm:p-8"
       >
         <h2 id="salida-titulo" className="font-display text-2xl">
           {MENSAJE_CAMBIOS_SIN_GUARDAR}

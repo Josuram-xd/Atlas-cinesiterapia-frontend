@@ -3,7 +3,7 @@ import { useEnLinea } from '@/hooks/useEnLinea';
 import { useActualizacion } from './actualizacion';
 
 const FRANJA =
-  'px-gutter bg-acento-claro text-tinta flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3';
+  'entrada px-gutter bg-acento-claro text-tinta flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3';
 
 /** Franjas planas sobre el contenido para avisos del sistema (sin conexión, versión nueva). */
 export function AvisosSistema() {
@@ -22,7 +22,11 @@ function AvisoSinConexion() {
     <div role="status">
       {enLinea ? null : (
         <div className={FRANJA}>
-          <p className="font-medium">
+          <p className="flex items-baseline gap-3 font-medium">
+            <span
+              aria-hidden
+              className="bg-acento size-2.5 shrink-0 translate-y-[-1px] animate-pulse rounded-full"
+            />
             Sin conexión: puedes seguir leyendo lo que ya abriste. Las acciones que
             cambian datos se habilitan cuando vuelva la conexión.
           </p>

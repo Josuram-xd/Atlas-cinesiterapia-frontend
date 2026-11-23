@@ -17,11 +17,11 @@ export function PanelEjercicios({ rango }: { rango: Rango | null }) {
       }
     >
       {({ items }) => (
-        <ol className="flex flex-col gap-2">
+        <ol className="revelar flex flex-col gap-2">
           {items.map((e) => (
             <li
               key={e.ejercicioId}
-              className="bg-fondo-2 grid gap-x-6 gap-y-1 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto]"
+              className="superficie grid gap-x-6 gap-y-1 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_auto]"
             >
               <span className="font-display text-lg font-semibold">{e.nombre}</span>
               <span className="text-tinta-2 font-semibold tabular-nums sm:row-span-2 sm:self-center">

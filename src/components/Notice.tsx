@@ -11,8 +11,10 @@ export function Notice({ tipo, children }: NoticeProps) {
   return (
     <div
       role={esError ? 'alert' : 'status'}
-      className={`border-l-4 py-2 pl-4 font-medium ${
-        esError ? 'border-error text-error' : 'border-acento text-tinta'
+      className={`entrada rounded-campo border-l-4 py-3 pr-4 pl-4 font-medium ${
+        esError
+          ? 'border-error text-error bg-[#f3e3df]'
+          : 'border-acento text-tinta bg-fondo-2'
       }`}
     >
       {children}

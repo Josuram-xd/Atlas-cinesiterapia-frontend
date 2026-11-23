@@ -16,13 +16,13 @@ export function ReproductorVideo({ nombre, video }: { nombre: string; video: Med
       <img
         src={url}
         alt={`Video de ${nombre} (animación)`}
-        className="bg-fondo-2 aspect-video w-full object-contain"
+        className="bg-fondo-2 rounded-superficie aspect-video w-full object-contain"
       />
     );
   }
 
   return (
-    <div className="bg-tinta aspect-video w-full">
+    <div className="bg-tinta rounded-superficie aspect-video w-full overflow-hidden">
       {fallo ? (
         <p
           role="status"

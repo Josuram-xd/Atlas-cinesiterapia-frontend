@@ -85,7 +85,7 @@ export function ComentarioItem({ comentario: c, ejercicioId }: ComentarioItemPro
           ? 'Comentario eliminado'
           : `${esRespuesta ? 'Respuesta' : 'Comentario'} de ${c.autor?.nombre ?? ''}${c.enRevision ? ', esperando revisión' : ''}`
       }
-      className={`flex flex-col gap-2 ${c.enRevision ? 'bg-fondo-2 text-tinta-2 px-4 py-3' : ''}`}
+      className={`flex flex-col gap-2 ${c.enRevision ? 'bg-fondo-2 text-tinta-2 rounded-campo px-4 py-3' : ''}`}
     >
       {c.eliminado || !c.autor ? (
         <p className="text-tinta-2 italic">Comentario eliminado</p>

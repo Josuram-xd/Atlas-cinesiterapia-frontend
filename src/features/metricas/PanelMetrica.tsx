@@ -63,7 +63,7 @@ export function PanelMetrica<T>({
     const textoVacio = vacio(consulta.data);
     if (textoVacio) {
       return (
-        <p role="status" className="bg-fondo-2 px-4 py-5">
+        <p role="status" className="superficie px-5 py-5">
           {textoVacio}
         </p>
       );
@@ -72,7 +72,7 @@ export function PanelMetrica<T>({
   }
 
   return (
-    <section aria-labelledby={id} className="flex flex-col gap-4">
+    <section aria-labelledby={id} className="entrada flex flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
         <h2 id={id} className="font-display text-2xl font-semibold">
           {titulo}

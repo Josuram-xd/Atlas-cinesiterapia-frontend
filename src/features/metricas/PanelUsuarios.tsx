@@ -17,12 +17,12 @@ export function PanelUsuarios({ rango }: { rango: Rango | null }) {
     >
       {({ total, porRol }) => (
         <div className="flex flex-col gap-4">
-          <p className="font-display text-3xl font-semibold tabular-nums">
+          <p className="font-display text-[clamp(2.25rem,1.6rem+2.4vw,3.75rem)] leading-none font-bold tracking-[-0.035em] tabular-nums">
             {total} {total === 1 ? 'usuario activo' : 'usuarios activos'}
           </p>
-          <ul className="flex flex-col gap-2">
+          <ul className="revelar flex flex-col gap-2">
             {porRol.map(({ rol, usuarios }) => (
-              <li key={rol} className="bg-fondo-2 flex justify-between gap-4 px-4 py-3">
+              <li key={rol} className="superficie flex justify-between gap-4 px-5 py-3">
                 <span>{NOMBRE_ROL[rol]}</span>
                 <span className="font-semibold tabular-nums">{usuarios}</span>
               </li>

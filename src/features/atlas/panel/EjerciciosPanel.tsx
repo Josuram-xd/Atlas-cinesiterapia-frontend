@@ -30,16 +30,16 @@ export const EjerciciosPanel = forwardRef<HTMLElement, EjerciciosPanelProps>(
         ref={ref}
         aria-labelledby="panel-titulo"
         aria-busy={estado === 'cargando'}
-        className="flex flex-col gap-4"
+        className="entrada flex flex-col gap-4"
       >
         <header className="flex items-start justify-between gap-4">
           <div>
             <p className="text-tinta-2">{region}</p>
-            <h2 id="panel-titulo" className="font-display text-2xl leading-tight">
+            <h2 id="panel-titulo" className="font-display text-[1.75rem] leading-tight">
               {categoria}
             </h2>
             {estado === 'listo' && !vacio ? (
-              <p className="text-tinta-2" aria-live="polite">
+              <p className="text-tinta-2 tabular-nums" aria-live="polite">
                 {ejercicios.length} {ejercicios.length === 1 ? 'ejercicio' : 'ejercicios'}
               </p>
             ) : null}
@@ -57,7 +57,7 @@ export const EjerciciosPanel = forwardRef<HTMLElement, EjerciciosPanelProps>(
           <div role="status" className="flex flex-col gap-2">
             <p className="text-tinta-2">Cargando ejercicios…</p>
             {[0, 1, 2].map((i) => (
-              <div key={i} aria-hidden className="bg-fondo-2 h-20" />
+              <div key={i} aria-hidden className="superficie h-20 animate-pulse" />
             ))}
           </div>
         ) : null}
@@ -70,7 +70,7 @@ export const EjerciciosPanel = forwardRef<HTMLElement, EjerciciosPanelProps>(
         ) : null}
 
         {vacio ? (
-          <div role="status" className="bg-fondo-2 flex flex-col gap-1 px-4 py-4">
+          <div role="status" className="superficie flex flex-col gap-1 px-5 py-5">
             <p className="font-display text-lg font-semibold">
               Todavía no hay ejercicios publicados para esta categoría.
             </p>
@@ -81,18 +81,21 @@ export const EjerciciosPanel = forwardRef<HTMLElement, EjerciciosPanelProps>(
         ) : null}
 
         {estado === 'listo' && !vacio ? (
-          <ul className="flex flex-col gap-2">
+          <ul className="revelar flex flex-col gap-2">
             {ejercicios.map((e) => (
               <li key={e.id}>
                 <Link
                   to={`/ejercicios/${e.id}`}
-                  className="bg-fondo-2 hover:bg-fondo-3 text-tinta flex items-baseline justify-between gap-4 px-4 py-4 no-underline transition-colors duration-150"
+                  className="superficie fila-enlace text-tinta flex items-center justify-between gap-4 px-5 py-4 no-underline"
                 >
                   <span className="font-display text-lg leading-snug font-semibold">
                     {e.nombre}
                   </span>
-                  <span className="text-acento shrink-0 font-semibold underline underline-offset-4">
-                    Ver ficha
+                  <span className="text-acento shrink-0 font-semibold">
+                    Ver ficha{' '}
+                    <span aria-hidden className="flecha">
+                      →
+                    </span>
                   </span>
                 </Link>
               </li>
