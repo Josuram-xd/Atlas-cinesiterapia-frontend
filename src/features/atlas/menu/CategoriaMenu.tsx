@@ -101,7 +101,13 @@ export function CategoriaMenu({
           Cargando categorías…
         </p>
       ) : null}
-      {arriba.map((n, i) => fila(celda(n), n, i === 3 ? 'self-end' : ''))}
+      {arriba.map((n, i) =>
+        fila(
+          celda(n),
+          n,
+          i === 3 ? 'self-end' : i === 1 ? 'justify-self-center px-8' : '',
+        ),
+      )}
       <div ref={ventana} aria-hidden className="col-start-2 row-span-2 row-start-2" />
       {abajo.map((n, i) =>
         fila(celda(n), n, i === 0 ? 'self-end' : i < 3 ? 'self-start' : ''),
@@ -109,7 +115,7 @@ export function CategoriaMenu({
       <button
         type="button"
         onClick={onVolver}
-        className={`${BOTON} col-start-2 row-start-4 bg-escenario-2 text-fondo hover:bg-fondo hover:text-tinta`}
+        className={`${BOTON} col-start-2 row-start-4 justify-self-center px-8 bg-escenario-2 text-fondo hover:bg-fondo hover:text-tinta`}
       >
         Cuerpo completo
       </button>
