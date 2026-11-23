@@ -101,7 +101,7 @@ export function RestablecerPage() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          ayuda={`Entre ${PASSWORD_MIN} y ${PASSWORD_MAX} caracteres.`}
+          ayuda={`Entre ${PASSWORD_MIN} y ${PASSWORD_MAX} caracteres, con letras y números.`}
           error={errores.password}
         />
         <TextField
