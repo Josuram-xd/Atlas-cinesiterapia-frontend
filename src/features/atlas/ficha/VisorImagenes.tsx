@@ -8,7 +8,7 @@ export interface ImagenVisor {
 const FOCALIZABLES = 'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])';
 
 const BOTON =
-  'min-h-12 min-w-12 cursor-pointer px-4 py-2 font-semibold text-fondo underline underline-offset-4 hover:text-acento-claro disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline';
+  'min-h-12 min-w-12 cursor-pointer rounded-full bg-escenario-2 px-5 py-2 font-semibold text-fondo transition-[background-color,color,transform] duration-200 hover:bg-fondo hover:text-tinta active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40';
 
 /**
  * Visor ampliado de imágenes: diálogo modal con foco atrapado, cierre con Escape,
@@ -81,7 +81,7 @@ export function VisorImagenes({
       role="dialog"
       aria-modal="true"
       aria-label={`Visor de imágenes de ${nombre}`}
-      className="superficie-oscura fixed inset-0 z-50 flex flex-col"
+      className="superficie-oscura velo fixed inset-0 z-50 flex flex-col"
     >
       <div className="flex items-center justify-between gap-4 px-4 py-2">
         <p aria-live="polite" className="font-semibold">
@@ -99,7 +99,7 @@ export function VisorImagenes({
         <img
           src={actual.url}
           alt={`${actual.etiqueta} de ${nombre}`}
-          className="max-h-full max-w-full object-contain"
+          className="dialogo max-h-full max-w-full rounded-campo object-contain"
         />
       </div>
       <div className="flex items-center justify-between gap-4 px-4 py-2">

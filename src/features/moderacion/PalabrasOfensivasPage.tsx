@@ -123,7 +123,7 @@ export function PalabrasOfensivasPage() {
       ) : null}
 
       {palabras.isSuccess && lista.length === 0 ? (
-        <p role="status" className="bg-fondo-2 px-4 py-5">
+        <p role="status" className="superficie px-5 py-5">
           {q
             ? 'Ninguna palabra coincide con la búsqueda.'
             : 'Todavía no hay palabras en la lista.'}
@@ -135,11 +135,11 @@ export function PalabrasOfensivasPage() {
           <p className="text-tinta-2 mb-3" aria-live="polite">
             {total} {total === 1 ? 'palabra' : 'palabras'}
           </p>
-          <ul className="flex flex-col gap-2">
+          <ul className="revelar flex flex-col gap-2">
             {lista.map((p) => (
               <li
                 key={p.id}
-                className="bg-fondo-2 flex items-center justify-between gap-4 px-4 py-2"
+                className="bg-fondo-2 flex items-center justify-between gap-4 rounded-full py-1 pr-2 pl-5"
               >
                 <span className="font-semibold break-all">{p.palabra}</span>
                 <BotonTexto

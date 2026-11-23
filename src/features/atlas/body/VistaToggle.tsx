@@ -10,10 +10,14 @@ const OPCIONES: Array<{ id: VistaId; texto: string }> = [
   { id: 'posterior', texto: 'Posterior' },
 ];
 
-/** Alterna entre la vista anterior y la posterior. Texto plano; la elegida lleva subrayado grueso. */
+/** Alterna entre la vista anterior y la posterior: control segmentado en píldora, la elegida rellena. */
 export function VistaToggle({ vista, onChange }: VistaToggleProps) {
   return (
-    <div role="group" aria-label="Vista del cuerpo" className="flex gap-6">
+    <div
+      role="group"
+      aria-label="Vista del cuerpo"
+      className="bg-fondo-2 inline-flex w-fit gap-1 rounded-full p-1"
+    >
       {OPCIONES.map((op) => {
         const activa = vista === op.id;
         return (
@@ -22,11 +26,7 @@ export function VistaToggle({ vista, onChange }: VistaToggleProps) {
             type="button"
             aria-pressed={activa}
             onClick={() => onChange(op.id)}
-            className={`font-display cursor-pointer text-2xl font-semibold underline decoration-4 underline-offset-8 transition-colors duration-150 ${
-              activa
-                ? 'text-tinta decoration-acento'
-                : 'text-tinta-2 hover:text-tinta decoration-transparent'
-            }`}
+            className="chip font-display cursor-pointer px-5 text-lg"
           >
             {op.texto}
           </button>

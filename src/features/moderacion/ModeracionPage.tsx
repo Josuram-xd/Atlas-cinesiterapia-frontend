@@ -49,7 +49,7 @@ export function ModeracionPage() {
       ) : null}
 
       {cola.isSuccess && lista.length === 0 ? (
-        <p role="status" className="bg-fondo-2 px-4 py-5">
+        <p role="status" className="superficie px-5 py-5">
           No hay comentarios pendientes de revisión.
         </p>
       ) : null}
@@ -59,7 +59,7 @@ export function ModeracionPage() {
           <p className="text-tinta-2 mb-3" aria-live="polite">
             {total} {total === 1 ? 'comentario pendiente' : 'comentarios pendientes'}
           </p>
-          <ul className="flex flex-col gap-2">
+          <ul className="revelar flex flex-col gap-2">
             {lista.map((c) => (
               <li key={c.id}>
                 <ComentarioRevisionItem

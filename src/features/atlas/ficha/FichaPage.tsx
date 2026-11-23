@@ -4,6 +4,7 @@ import { ApiError } from '@/lib/api';
 import type { Ejercicio } from '@/lib/api';
 import { useAtlasApi } from '../api/contexto';
 import { useEjercicio } from '../api/hooks';
+import { FiguraVitrina } from '../body/FiguraVitrina';
 import { EstadoError } from '../EstadoError';
 import { mensajeDeErrorAtlas } from '../mensajes';
 import { SeccionComentarios } from '../../comentarios/SeccionComentarios';
@@ -23,8 +24,17 @@ const ETIQUETAS_DOSIS: Array<[keyof Ejercicio['dosificacion'], string]> = [
 
 function VolverAlAtlas() {
   return (
-    <Link to="/" className="inline-flex min-h-12 items-center font-semibold">
-      <span aria-hidden>←&nbsp;</span>Volver al atlas
+    <Link
+      to="/"
+      className="group bg-fondo-2 text-tinta hover:bg-tinta hover:text-fondo inline-flex min-h-11 w-fit items-center gap-2 rounded-full px-4 font-semibold no-underline transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+    >
+      <span
+        aria-hidden
+        className="ease-atlas transition-transform duration-300 group-hover:-translate-x-1"
+      >
+        ←
+      </span>
+      Volver al atlas
     </Link>
   );
 }
@@ -58,20 +68,29 @@ function Ficha({ e }: { e: Ejercicio }) {
   ];
   return (
     <article className="flex flex-col gap-12 pb-16 lg:gap-16">
-      <header className="flex flex-col gap-4">
-        <VolverAlAtlas />
-        <p className="text-tinta-2 text-lg">
-          {e.region.nombre} · {e.categoria.nombre}
-        </p>
-        <h1 className="font-display text-gigante max-w-[20ch] font-extrabold">
-          {e.nombre}
-        </h1>
-        <p
-          className="font-display max-w-[48ch] text-2xl leading-snug font-light"
-          aria-label="Objetivo terapéutico"
-        >
-          {e.objetivoTerapeutico}
-        </p>
+      <header className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-12">
+        <div className="revelar flex flex-col gap-5">
+          <VolverAlAtlas />
+          <p className="text-tinta-2 text-lg">
+            {e.region.nombre} · {e.categoria.nombre}
+          </p>
+          <h1 className="font-display text-gigante max-w-[16ch] font-extrabold">
+            {e.nombre}
+          </h1>
+          <p
+            className="font-display max-w-[44ch] text-2xl leading-snug font-light"
+            aria-label="Objetivo terapéutico"
+          >
+            {e.objetivoTerapeutico}
+          </p>
+        </div>
+        <div className="escenario rounded-escenario entrada flex h-80 items-center justify-center p-4 max-lg:hidden">
+          <FiguraVitrina
+            vista={e.region.vista === 'POSTERIOR' ? 'posterior' : 'anterior'}
+            region={e.region.svgId.replace(/^(anterior|posterior)-/, '')}
+            className="h-full"
+          />
+        </div>
       </header>
 
       {e.video || e.imagenes.length > 0 ? (
@@ -94,10 +113,10 @@ function Ficha({ e }: { e: Ejercicio }) {
 
       <div className="lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-12">
         <nav aria-label="Secciones de la ficha" className="mb-10 lg:mb-0">
-          <ul className="flex flex-wrap gap-x-5 lg:sticky lg:top-6 lg:flex-col lg:gap-0">
+          <ul className="flex flex-wrap gap-1 lg:sticky lg:top-6 lg:flex-col">
             {secciones.map(([id, titulo]) => (
               <li key={id}>
-                <a href={`#${id}`} className="inline-flex min-h-11 items-center">
+                <a href={`#${id}`} className="chip">
                   {titulo}
                 </a>
               </li>
@@ -117,7 +136,7 @@ function Ficha({ e }: { e: Ejercicio }) {
 
           <Seccion id="protocolo-clinico" titulo="Protocolo clínico">
             <Campo titulo="Indicaciones" texto={e.indicaciones} />
-            <div className="border-error bg-fondo-2 border-l-4 px-5 py-4">
+            <div className="border-error rounded-campo border-l-4 bg-[#f3e3df] px-5 py-4">
               <Campo
                 titulo="Precauciones y contraindicaciones"
                 texto={e.precaucionesContraindicaciones}
@@ -136,11 +155,11 @@ function Ficha({ e }: { e: Ejercicio }) {
           </Seccion>
 
           <Seccion id="dosificacion" titulo="Dosificación">
-            <dl className="bg-fondo-2 grid grid-cols-2 gap-x-6 gap-y-6 p-5 sm:grid-cols-3 sm:p-6">
+            <dl className="superficie-oscura escenario rounded-escenario revelar grid grid-cols-2 gap-x-6 gap-y-8 p-6 sm:grid-cols-3 sm:p-8">
               {ETIQUETAS_DOSIS.map(([clave, etiqueta]) => (
                 <div key={clave}>
-                  <dt className="text-tinta-2">{etiqueta}</dt>
-                  <dd className="font-display mt-0.5 text-2xl leading-tight font-semibold">
+                  <dt className="text-fondo/75">{etiqueta}</dt>
+                  <dd className="font-display text-marfil mt-1 text-[clamp(1.5rem,1.1rem+1.6vw,2.5rem)] leading-[1.05] font-bold tracking-[-0.03em] tabular-nums">
                     {e.dosificacion[clave]}
                   </dd>
                 </div>
@@ -218,8 +237,8 @@ export function FichaPage() {
     return (
       <div role="status" className="flex flex-col gap-4 py-6">
         <p className="text-tinta-2">Cargando ficha…</p>
-        <div aria-hidden className="bg-fondo-2 h-16 max-w-xl" />
-        <div aria-hidden className="bg-fondo-2 h-40 max-w-3xl" />
+        <div aria-hidden className="superficie h-16 max-w-xl animate-pulse" />
+        <div aria-hidden className="superficie h-40 max-w-3xl animate-pulse" />
       </div>
     );
   }

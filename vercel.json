@@ -21,6 +21,22 @@
         {
           "key": "X-Frame-Options",
           "value": "DENY"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://8ed5dbebdf58fc54c8ca5e3860948df2.r2.cloudflarestorage.com; media-src 'self' blob: https://8ed5dbebdf58fc54c8ca5e3860948df2.r2.cloudflarestorage.com; font-src 'self' data:; connect-src 'self' https://atlas-cinesiterapia-backend.onrender.com https://8ed5dbebdf58fc54c8ca5e3860948df2.r2.cloudflarestorage.com; worker-src 'self'; manifest-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
         }
       ]
     },

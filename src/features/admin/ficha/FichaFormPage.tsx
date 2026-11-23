@@ -51,8 +51,17 @@ function agruparPorPaso(campos: string[]) {
 
 function VolverALista() {
   return (
-    <Link to="/admin" className="inline-flex min-h-12 items-center font-semibold">
-      <span aria-hidden>←&nbsp;</span>Volver a las fichas
+    <Link
+      to="/admin"
+      className="group bg-fondo-2 text-tinta hover:bg-tinta hover:text-fondo inline-flex min-h-11 w-fit items-center gap-2 rounded-full px-4 font-semibold no-underline transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+    >
+      <span
+        aria-hidden
+        className="ease-atlas transition-transform duration-300 group-hover:-translate-x-1"
+      >
+        ←
+      </span>
+      Volver a las fichas
     </Link>
   );
 }
@@ -242,13 +251,13 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
       </header>
 
       {ficha?.estado === 'PUBLICADO' ? (
-        <p className="bg-fondo-2 max-w-3xl px-5 py-4">
+        <p className="superficie max-w-3xl px-5 py-4">
           Esta ficha está publicada: los cambios se ven en cuanto los guardas y todos los
           campos obligatorios deben seguir completos.
         </p>
       ) : null}
       {ficha?.estado === 'ARCHIVADO' ? (
-        <p className="bg-fondo-2 max-w-3xl px-5 py-4">
+        <p className="superficie max-w-3xl px-5 py-4">
           Esta ficha está archivada y no se ve en el atlas. Puedes editarla; para que
           vuelva a verse hay que restaurarla.
         </p>
@@ -257,7 +266,7 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
       {faltantes.length > 0 && ficha?.estado !== 'ARCHIVADO' ? (
         <section
           aria-labelledby="faltantes-titulo"
-          className="bg-fondo-2 border-error flex flex-col gap-3 border-l-4 px-5 py-4"
+          className="border-error rounded-campo entrada flex flex-col gap-3 border-l-4 bg-[#f3e3df] px-5 py-4"
         >
           <h2 id="faltantes-titulo" className="font-display text-xl">
             {ficha?.estado === 'PUBLICADO'
@@ -294,10 +303,10 @@ function Formulario({ ficha: inicial }: { ficha: EjercicioAdmin | null }) {
                 type="button"
                 onClick={() => setPaso(p.id)}
                 aria-current={p.id === paso ? 'step' : undefined}
-                className={`rounded-campo min-h-12 cursor-pointer border-2 border-tinta px-4 py-2 font-semibold transition-colors duration-150 ${
+                className={`ease-atlas min-h-12 cursor-pointer rounded-full px-5 py-2 font-semibold transition-[background-color,color,transform] duration-200 active:scale-[0.97] ${
                   p.id === paso
                     ? 'bg-tinta text-fondo'
-                    : 'bg-fondo text-tinta hover:bg-acento-claro'
+                    : 'bg-fondo-2 text-tinta hover:bg-acento-claro'
                 }`}
               >
                 {p.titulo}

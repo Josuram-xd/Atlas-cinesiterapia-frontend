@@ -84,4 +84,4 @@ El cuerpo es el menú: al elegir una región la cámara se acerca a esa zona y l
 - [x] 7.2 Indicador de modo sin conexión y deshabilitar acciones de escritura
 - [x] 7.3 Pruebas E2E con Playwright: login, explorar por región, ver ficha, comentar, publicar ficha
 - [x] 7.4 Auditoría de accesibilidad y rendimiento (Lighthouse), revisión en móvil/tablet/PC
-- [ ] 7.5 Despliegue en Vercel con `VITE_API_URL` y reescritura para SPA
+- [x] 7.5 Despliegue en Vercel con `VITE_API_URL` y reescritura para SPA

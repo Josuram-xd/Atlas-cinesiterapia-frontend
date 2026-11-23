@@ -13,7 +13,10 @@ export function Seccion({
 }) {
   return (
     <section id={id} aria-labelledby={`${id}-titulo`} className="scroll-mt-6">
-      <h2 id={`${id}-titulo`} className="font-display text-3xl leading-tight">
+      <h2
+        id={`${id}-titulo`}
+        className="font-display text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] leading-tight"
+      >
         {titulo}
       </h2>
       <div className="mt-6 flex flex-col gap-7">{children}</div>

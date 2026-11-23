@@ -69,7 +69,7 @@ describe('RegistroPage', () => {
     await user.click(screen.getByRole('radio', { name: /Estudiante/ }));
     await user.click(screen.getByRole('button', { name: 'Crear cuenta' }));
 
-    expect(screen.getByText('Usa al menos 8 caracteres.')).toBeInTheDocument();
+    expect(screen.getByText('Usa al menos 10 caracteres.')).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

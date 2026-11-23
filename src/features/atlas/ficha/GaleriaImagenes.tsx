@@ -25,7 +25,7 @@ export function GaleriaImagenes({
 
   return (
     <>
-      <ul className={`grid gap-2 ${className}`}>
+      <ul className={`revelar grid gap-3 ${className}`}>
         {visibles.map((m, i) => (
           <li key={`${m.url}-${i}`}>
             <button
@@ -34,15 +34,15 @@ export function GaleriaImagenes({
                 opener.current = e.currentTarget;
                 setAbierta(i);
               }}
-              className="bg-fondo-2 hover:bg-fondo-3 block w-full cursor-pointer text-left transition-colors duration-150"
+              className="group superficie hover:bg-fondo-3 ease-atlas block w-full cursor-pointer overflow-hidden text-left transition-[background-color,transform] duration-300 active:scale-[0.98]"
             >
               <img
                 src={m.url}
                 alt={`${m.etiqueta} de ${nombre}`}
                 loading="lazy"
-                className="aspect-[4/3] w-full object-cover"
+                className="ease-atlas aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
               />
-              <span className="block px-3 py-2 font-semibold">{m.etiqueta}</span>
+              <span className="block px-4 py-2.5 font-semibold">{m.etiqueta}</span>
             </button>
           </li>
         ))}

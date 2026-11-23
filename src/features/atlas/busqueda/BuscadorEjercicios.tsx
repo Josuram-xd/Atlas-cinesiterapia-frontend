@@ -80,6 +80,26 @@ export function BuscadorEjercicios({
       <label htmlFor={`${idLista}-campo`} className="sr-only">
         Buscar ejercicio por nombre
       </label>
+      <svg
+        viewBox="0 0 20 20"
+        aria-hidden
+        className="text-tinta-2 pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2"
+      >
+        <circle
+          cx="8.5"
+          cy="8.5"
+          r="5.5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+        />
+        <path
+          d="m13 13 4 4"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      </svg>
       <input
         id={`${idLista}-campo`}
         type="text"
@@ -102,11 +122,11 @@ export function BuscadorEjercicios({
         }}
         onFocus={() => setAbierta(true)}
         onKeyDown={alTeclear}
-        className="rounded-campo bg-fondo text-tinta border-tinta block min-h-11 w-full border-2 px-4 py-2"
+        className="campo min-h-11 rounded-full py-2 pl-11"
       />
 
       {visible ? (
-        <div className="bg-fondo border-tinta absolute inset-x-0 top-full z-40 mt-1 max-h-[60vh] overflow-y-auto border-2">
+        <div className="desplegable rounded-superficie bg-papel absolute inset-x-0 top-full z-40 mt-2 max-h-[60vh] overflow-y-auto p-1.5 shadow-[0_24px_60px_-20px_rgb(15_30_26/0.45)]">
           <p aria-live="polite" className="sr-only">
             {hayLista
               ? `${resultados.length} ${resultados.length === 1 ? 'resultado' : 'resultados'}`
@@ -142,7 +162,7 @@ export function BuscadorEjercicios({
                   onMouseDown={(ev) => ev.preventDefault()}
                   onClick={() => elegir(e)}
                   onMouseMove={() => setActiva(i)}
-                  className={`flex min-h-12 cursor-pointer flex-col justify-center px-4 py-2 ${
+                  className={`flex min-h-12 cursor-pointer flex-col justify-center rounded-[calc(var(--radius-superficie)-6px)] px-4 py-2 transition-colors duration-150 ${
                     i === activa ? 'bg-tinta text-fondo' : 'hover:bg-fondo-2'
                   }`}
                 >

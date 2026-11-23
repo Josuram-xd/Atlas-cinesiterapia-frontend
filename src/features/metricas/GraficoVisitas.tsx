@@ -51,7 +51,8 @@ export function GraficoVisitas({ datos }: { datos: VisitasPeriodo }) {
                 y={ALTO - alto}
                 width={ancho}
                 height={alto}
-                className="fill-acento"
+                className="barra fill-acento hover:fill-tinta"
+                style={{ animationDelay: `${Math.min(i * 22, 600)}ms` }}
               >
                 <title>{`${fechaCorta(c.inicio)}: ${c.visitas}`}</title>
               </rect>

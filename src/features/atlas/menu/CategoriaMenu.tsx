@@ -18,7 +18,7 @@ interface CategoriaMenuProps {
 }
 
 const BOTON =
-  'rounded-campo pointer-events-auto flex min-h-12 cursor-pointer items-center justify-center border-2 border-tinta px-2 py-1.5 text-center text-sm leading-tight font-semibold transition-colors duration-150 sm:text-base';
+  'pointer-events-auto flex min-h-12 cursor-pointer items-center justify-center rounded-full px-3 py-1.5 text-center text-sm leading-tight font-semibold transition-[background-color,color,transform] duration-200 ease-atlas active:scale-[0.96] sm:text-base';
 
 /**
  * Las categorías rodean la región ampliada: tres arriba, dos a cada lado y dos abajo, con el
@@ -67,7 +67,9 @@ export function CategoriaMenu({
         aria-pressed={activa}
         onClick={() => onElegir(c)}
         className={`${BOTON} ${posicion} ${
-          activa ? 'bg-tinta text-fondo' : 'bg-fondo text-tinta hover:bg-acento-claro'
+          activa
+            ? 'bg-acento-vivo text-tinta'
+            : 'bg-marfil text-tinta hover:bg-acento-claro'
         }`}
       >
         {etiquetaCorta(c.nombre)}
@@ -79,7 +81,7 @@ export function CategoriaMenu({
     <div
       key={`hueco-${i}`}
       aria-hidden
-      className={`bg-fondo-2 rounded-campo min-h-12 ${posicion}`}
+      className={`min-h-12 animate-pulse rounded-full bg-white/10 ${posicion}`}
     />
   );
   const fila = (c: Categoria | undefined, i: number, posicion = '') =>
@@ -92,14 +94,20 @@ export function CategoriaMenu({
     <nav
       ref={raiz}
       aria-label={`Categorías terapéuticas de ${region}`}
-      className="pointer-events-none absolute inset-0 mx-auto grid max-w-3xl grid-cols-[minmax(5.5rem,1fr)_minmax(0,2fr)_minmax(5.5rem,1fr)] grid-rows-[auto_1fr_1fr_auto] gap-2 sm:grid-cols-[minmax(7rem,1fr)_minmax(0,3fr)_minmax(7rem,1fr)]"
+      className="pointer-events-none absolute inset-0 mx-auto grid p-3 sm:p-4 max-w-3xl grid-cols-[minmax(5.5rem,1fr)_minmax(0,2fr)_minmax(5.5rem,1fr)] grid-rows-[auto_1fr_1fr_auto] gap-2 sm:grid-cols-[minmax(7rem,1fr)_minmax(0,3fr)_minmax(7rem,1fr)]"
     >
       {estado === 'cargando' ? (
         <p role="status" className="sr-only">
           Cargando categorías…
         </p>
       ) : null}
-      {arriba.map((n, i) => fila(celda(n), n, i === 3 ? 'self-end' : ''))}
+      {arriba.map((n, i) =>
+        fila(
+          celda(n),
+          n,
+          i === 3 ? 'self-end' : i === 1 ? 'justify-self-center px-8' : '',
+        ),
+      )}
       <div ref={ventana} aria-hidden className="col-start-2 row-span-2 row-start-2" />
       {abajo.map((n, i) =>
         fila(celda(n), n, i === 0 ? 'self-end' : i < 3 ? 'self-start' : ''),
@@ -107,7 +115,7 @@ export function CategoriaMenu({
       <button
         type="button"
         onClick={onVolver}
-        className={`${BOTON} col-start-2 row-start-4 bg-fondo text-tinta hover:bg-tinta hover:text-fondo`}
+        className={`${BOTON} col-start-2 row-start-4 justify-self-center px-8 bg-escenario-2 text-fondo hover:bg-fondo hover:text-tinta`}
       >
         Cuerpo completo
       </button>
