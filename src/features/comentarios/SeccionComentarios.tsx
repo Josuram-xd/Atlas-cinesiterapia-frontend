@@ -41,7 +41,7 @@ export function SeccionComentarios({ ejercicioId }: { ejercicioId: number }) {
       {comentarios.isPending ? (
         <div role="status" className="flex flex-col gap-2">
           <p className="text-tinta-2">Cargando comentarios…</p>
-          <div aria-hidden className="bg-fondo-2 h-20 max-w-[68ch]" />
+          <div aria-hidden className="superficie h-20 max-w-[68ch] animate-pulse" />
         </div>
       ) : null}
 
@@ -53,7 +53,7 @@ export function SeccionComentarios({ ejercicioId }: { ejercicioId: number }) {
       ) : null}
 
       {comentarios.isSuccess && lista.length === 0 ? (
-        <p className="bg-fondo-2 max-w-[68ch] px-4 py-5">
+        <p className="superficie max-w-[68ch] px-5 py-5">
           Aún no hay comentarios. Sé la primera persona en comentar.
         </p>
       ) : null}
@@ -65,7 +65,10 @@ export function SeccionComentarios({ ejercicioId }: { ejercicioId: number }) {
           </p>
           <ul className="flex flex-col gap-4">
             {lista.map((c) => (
-              <li key={c.id} className="bg-fondo-2 flex flex-col gap-4 px-5 py-4">
+              <li
+                key={c.id}
+                className="superficie entrada flex flex-col gap-4 px-5 py-5 sm:px-6"
+              >
                 <ComentarioItem comentario={c} ejercicioId={ejercicioId} />
                 {c.respuestas.length > 0 ? (
                   <ul
@@ -73,7 +76,7 @@ export function SeccionComentarios({ ejercicioId }: { ejercicioId: number }) {
                     className="flex flex-col gap-4 sm:ml-8"
                   >
                     {c.respuestas.map((r) => (
-                      <li key={r.id} className="bg-fondo px-4 py-3">
+                      <li key={r.id} className="bg-fondo rounded-campo px-4 py-3">
                         <ComentarioItem comentario={r} ejercicioId={ejercicioId} />
                       </li>
                     ))}
