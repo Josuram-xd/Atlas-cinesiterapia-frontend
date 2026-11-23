@@ -51,7 +51,7 @@ export function ComentarioRevisionItem({
   return (
     <article
       aria-label={`Comentario de ${c.autor.correo}`}
-      className="bg-fondo-2 flex flex-col gap-3 px-5 py-4"
+      className="superficie flex flex-col gap-3 px-5 py-5 sm:px-6"
     >
       <p className="flex flex-wrap items-baseline gap-x-2">
         <span className="font-display text-lg font-semibold break-all">
