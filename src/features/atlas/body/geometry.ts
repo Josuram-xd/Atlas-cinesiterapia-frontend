@@ -1,4 +1,5 @@
 import {
+  arco,
   bilateral,
   boundsOf,
   Curve,
@@ -9,9 +10,11 @@ import {
 } from './curves';
 
 /**
- * Silueta estilizada del cuerpo, dibujada por nosotros (sin licencias externas).
- * Lienzo de 400 x 900. Todo se define para el lado izquierdo del dibujo (x < 200) y se
- * refleja. Las regiones se recortan de las mismas curvas, así que comparten bordes.
+ * Figura anatómica dibujada por nosotros (sin licencias externas), con canon de ~8 cabezas:
+ * coronilla en y=22, mentón 126, pezones ~230, ombligo ~345, entrepierna ~452, rodilla ~650,
+ * planta 889. Lienzo de 400 x 900. Todo se define para el lado izquierdo del dibujo (x < 200)
+ * y se refleja. Las regiones se recortan de las mismas curvas y de cortes curvos compartidos
+ * (`arco`), así que encajan sin huecos y sin esquinas de caja.
  */
 export const BODY_VIEWBOX: Box = { x: 0, y: 0, w: 400, h: 900 };
 
@@ -19,130 +22,176 @@ export type VistaId = 'anterior' | 'posterior';
 
 // --- Cabeza y cuello ------------------------------------------------------------------
 
-const HEAD = { cx: 200, cy: 64, rx: 28, ry: 41 };
-const CHIN_CUT_Y = 102;
-
-/** Mitad izquierda de la cabeza, desde la coronilla hasta el corte de la mandíbula. */
-function headLeft(): Pt[] {
-  const t1 = Math.acos((HEAD.cy - CHIN_CUT_Y) / HEAD.ry);
-  const pts: Pt[] = [];
-  const steps = 48;
-  for (let i = 0; i <= steps; i++) {
-    const t = (t1 * i) / steps;
-    // La mandíbula se estrecha un poco: la cabeza queda en forma de huevo.
-    const taper = Math.cos(t) < 0 ? 1 - 0.1 * Math.cos(t) ** 2 : 1;
-    pts.push([HEAD.cx - HEAD.rx * Math.sin(t) * taper, HEAD.cy - HEAD.ry * Math.cos(t)]);
-  }
-  return pts;
-}
-
-const headPts = headLeft();
-const chinL = headPts[headPts.length - 1];
+/** Mitad izquierda de la cabeza: cráneo ovalado, pómulo y ángulo de la mandíbula. */
+const head = new Curve([
+  [200, 24, 'crown'],
+  [186, 27],
+  [175, 37],
+  [170, 54],
+  [170, 73],
+  [172, 91],
+  [178, 108],
+  [184, 116, 'jaw'],
+]);
 
 const neck = new Curve([
-  [chinL[0], chinL[1], 'chin'],
-  [187, 116],
-  [185, 130],
-  [178, 141, 'N'],
+  [184, 116, 'jaw'],
+  [183, 126],
+  [183, 136],
+  [178, 146, 'N'],
 ]);
 
 // --- Brazo (lado izquierdo del dibujo) -----------------------------------------------
 
-/** Contorno exterior: base del cuello, trapecio, deltoides y brazo hasta la mano. */
+/** Contorno exterior: trapecio, deltoides y brazo hasta la muñeca. */
 const armOuter = new Curve([
-  [178, 141, 'N'],
-  [160, 144],
-  [150, 148, 'P'],
-  [132, 155],
-  [116, 168],
-  [108, 182],
-  [106, 196, 'D'],
-  [101, 220],
-  [95, 260],
-  [90, 300, 'brazo'],
-  [88, 325],
-  [86, 342, 'codo'],
-  [77, 380],
-  [70, 420],
-  [66, 442, 'antebrazo'],
-  [62, 470],
-  [59, 500],
-  [58, 520, 'mano'],
+  [178, 146, 'N'],
+  [164, 152],
+  [148, 158, 'P'],
+  [129, 163],
+  [115, 174],
+  [108, 191],
+  [105, 211],
+  [103, 230, 'D'],
+  [98, 252],
+  [95, 276],
+  [94, 298, 'brazo'],
+  [92, 316],
+  [90, 334, 'codo'],
+  [85, 356],
+  [81, 384],
+  [75, 412],
+  [72, 432, 'antebrazo'],
+  [71, 446, 'mano'],
 ]);
 
+/** Contorno interior: axila, bíceps, flexores del antebrazo. */
 const armInner = new Curve([
-  [147, 214, 'Q'],
-  [139, 240],
-  [129, 270],
-  [121, 300, 'brazo'],
-  [117, 325],
-  [114, 342, 'codo'],
-  [106, 380],
-  [95, 420],
-  [89, 442, 'antebrazo'],
-  [87, 470],
-  [84, 500],
-  [78, 520, 'mano'],
+  [150, 226, 'Q'],
+  [140, 250],
+  [133, 274],
+  [125, 298, 'brazo'],
+  [121, 316],
+  [119, 334, 'codo'],
+  [121, 354],
+  [113, 384],
+  [103, 412],
+  [94, 432, 'antebrazo'],
+  [92, 446, 'mano'],
 ]);
 
+/** Mano en posición anatómica, afinada hacia la punta de los dedos. */
 const handCap = new Curve([
-  [58, 520],
-  [60, 533],
-  [68, 540],
-  [76, 534],
-  [78, 520],
+  [71, 446],
+  [68, 462],
+  [67, 482],
+  [69, 502],
+  [75, 516],
+  [82, 520],
+  [88, 512],
+  [91, 494],
+  [93, 472],
+  [92, 446],
 ]).all();
 
 // --- Tronco y pierna -----------------------------------------------------------------
 
-/** Costado del tronco, cadera y cara externa de la pierna hasta el dedo del pie. */
+/** Costado del tronco, cadera y cara externa de la pierna hasta el pie. */
 const sideOuter = new Curve([
-  [147, 214, 'Q'],
-  [149, 262, 'R'],
-  [152, 270, 'torax'],
-  [160, 330, 'lumbar'],
-  [154, 385, 'abdomen'],
-  [147, 405, 'gluteo'],
-  [138, 450, 'hip'],
-  [138, 488, 'gluteoFin'],
-  [138, 525],
-  [142, 570],
-  [148, 612, 'muslo'],
-  [150, 644],
-  [152, 676, 'rodilla'],
-  [148, 712],
-  [149, 744],
-  [154, 780],
-  [159, 800, 'ankle'],
-  [153, 830],
-  [143, 858],
-  [141, 876, 'toe'],
+  [150, 226, 'Q'],
+  [151, 244],
+  [152, 262, 'R'],
+  [152, 274, 'torax'],
+  [155, 300],
+  [157, 326, 'lumbar'],
+  [156, 350],
+  [152, 372],
+  [149, 386, 'abdomen'],
+  [146, 398, 'gluteo'],
+  [141, 420],
+  [138, 436, 'hip'],
+  [135, 462],
+  [136, 488, 'gluteoFin'],
+  [135, 520],
+  [137, 556],
+  [142, 590],
+  [150, 614, 'muslo'],
+  [152, 636],
+  [152, 660],
+  [151, 680, 'rodilla'],
+  [146, 702],
+  [143, 726],
+  [146, 756],
+  [155, 790],
+  [158, 818],
+  [158, 836, 'ankle'],
+  [155, 852],
+  [149, 866],
+  [146, 878, 'toe'],
 ]);
 
-/** Cara interna de la pierna, desde la entrepierna. */
+/** Cara interna de la pierna, desde la entrepierna: aductores, vasto medial, gemelo. */
 const legInner = new Curve([
-  [197, 472, 'crotch'],
-  [195, 488, 'gluteoFin'],
-  [191, 525],
-  [188, 570],
-  [187, 612, 'muslo'],
-  [188, 644],
-  [188, 676, 'rodilla'],
-  [189, 712],
-  [186, 744],
-  [181, 800, 'ankle'],
-  [184, 830],
-  [188, 858],
-  [190, 877, 'toe'],
+  [198, 452, 'crotch'],
+  [196, 488, 'gluteoFin'],
+  [195, 520],
+  [192, 556],
+  [187, 590],
+  [184, 614, 'muslo'],
+  [186, 634],
+  [185, 658],
+  [182, 680, 'rodilla'],
+  [187, 700],
+  [191, 724],
+  [188, 752],
+  [179, 790],
+  [177, 818],
+  [178, 836, 'ankle'],
+  [182, 852],
+  [187, 866],
+  [190, 880, 'toe'],
 ]);
 
 const footCap = new Curve([
-  [141, 876],
-  [146, 884],
-  [165, 887],
-  [184, 884],
-  [190, 877],
+  [146, 878],
+  [149, 886],
+  [166, 890],
+  [184, 888],
+  [190, 880],
 ]).all();
+
+// --- Cortes curvos compartidos -------------------------------------------------------
+
+const rev = (pts: Pt[]): Pt[] => [...pts].reverse();
+const C = (y: number): Pt => [200, y];
+
+/** Corte de extremidad entre el borde exterior y el interior en la misma etiqueta. */
+const corteBrazo = (l: string, c: Pt) => arco(armOuter.at(l), armInner.at(l), c);
+const cortePierna = (l: string, c: Pt) => arco(sideOuter.at(l), legInner.at(l), c);
+
+const CORTE = {
+  // Borde inferior del deltoides y surco deltopectoral.
+  deltoides: arco(armOuter.at('D'), armInner.at('Q'), [125, 246]),
+  surco: arco(armInner.at('Q'), armOuter.at('P'), [160, 194]),
+  brazo: corteBrazo('brazo', [109, 292]),
+  codo: corteBrazo('codo', [105, 342]),
+  muneca: corteBrazo('antebrazo', [83, 437]),
+  muslo: cortePierna('muslo', [167, 600]),
+  rodilla: cortePierna('rodilla', [166, 692]),
+  tobillo: cortePierna('ankle', [168, 830]),
+  // Anterior: base del cuello, arco costal, línea inguinal y pliegue de la ingle.
+  cuello: arco(neck.at('N'), C(152), [190, 152]),
+  costal: arco(sideOuter.at('torax'), C(246), [180, 272]),
+  inguinal: arco(sideOuter.at('abdomen'), C(420), [174, 412]),
+  ingle: arco(sideOuter.at('hip'), legInner.at('crotch'), [166, 460]),
+  // Posterior: nuca, trapecio, escápula, dorsal, cresta ilíaca y pliegue glúteo.
+  nuca: arco(neck.at('jaw'), C(118), [192, 120]),
+  trapecio: arco(armOuter.at('P'), C(190), [172, 184]),
+  escapula: arco(sideOuter.at('R'), C(214), [188, 256]),
+  dorsal: arco(sideOuter.at('lumbar'), C(338), [182, 340]),
+  cresta: arco(sideOuter.at('gluteo'), C(394), [172, 384]),
+  pliegue: arco(sideOuter.at('gluteoFin'), legInner.at('gluteoFin'), [167, 504]),
+};
 
 // --- Regiones ------------------------------------------------------------------------
 
@@ -156,16 +205,17 @@ function build(polys: Pt[][]): Geometria {
   return { d: toPath(polys), focos: polys.map(boundsOf) };
 }
 
-const CENTRO_ARRIBA = (y: number): Pt => [200, y];
-
-const brazo = (a: string, b: string): Pt[] => [
-  ...armOuter.slice(a, b),
-  ...armInner.slice(b, a),
-];
-
-const D: Pt = [106, 196];
-const Q: Pt = [147, 214];
-const P: Pt = [150, 148];
+/** Tramo de extremidad entre dos cortes (cada corte va de fuera hacia dentro). */
+function tramo(
+  outer: Curve,
+  inner: Curve,
+  a: string,
+  b: string,
+  corteA: Pt[],
+  corteB: Pt[],
+): Pt[] {
+  return [...outer.slice(a, b), ...corteB, ...inner.slice(b, a), ...rev(corteA)];
+}
 
 /** Cortes comunes a las dos vistas: extremidades superiores e inferiores. */
 function extremidades(
@@ -184,38 +234,43 @@ function extremidades(
   return {
     brazo: build(
       bilateral([
-        D,
-        ...armOuter.slice('D', 'brazo').slice(1),
+        ...armOuter.slice('D', 'brazo'),
+        ...CORTE.brazo,
         ...armInner.slice('brazo', 'Q'),
+        ...rev(CORTE.deltoides),
       ]),
     ),
-    codo: build(bilateral(brazo('brazo', 'codo'))),
-    antebrazo: build(bilateral(brazo('codo', 'antebrazo'))),
+    codo: build(
+      bilateral(tramo(armOuter, armInner, 'brazo', 'codo', CORTE.brazo, CORTE.codo)),
+    ),
+    antebrazo: build(
+      bilateral(tramo(armOuter, armInner, 'codo', 'antebrazo', CORTE.codo, CORTE.muneca)),
+    ),
     'muneca-mano': build(
       bilateral([
         ...armOuter.slice('antebrazo', 'mano'),
         ...handCap,
         ...armInner.slice('mano', 'antebrazo'),
+        ...rev(CORTE.muneca),
       ]),
     ),
     muslo: build(bilateral(muslo)),
     rodilla: build(
-      bilateral([
-        ...sideOuter.slice('muslo', 'rodilla'),
-        ...legInner.slice('rodilla', 'muslo'),
-      ]),
+      bilateral(
+        tramo(sideOuter, legInner, 'muslo', 'rodilla', CORTE.muslo, CORTE.rodilla),
+      ),
     ),
     pierna: build(
-      bilateral([
-        ...sideOuter.slice('rodilla', 'ankle'),
-        ...legInner.slice('ankle', 'rodilla'),
-      ]),
+      bilateral(
+        tramo(sideOuter, legInner, 'rodilla', 'ankle', CORTE.rodilla, CORTE.tobillo),
+      ),
     ),
     'tobillo-pie': build(
       bilateral([
         ...sideOuter.slice('ankle', 'toe'),
         ...footCap,
         ...legInner.slice('toe', 'ankle'),
+        ...rev(CORTE.tobillo),
       ]),
     ),
   };
@@ -223,90 +278,96 @@ function extremidades(
 
 const anteriorBase = extremidades([
   ...sideOuter.slice('hip', 'muslo'),
+  ...CORTE.muslo,
   ...legInner.slice('muslo', 'crotch'),
+  ...rev(CORTE.ingle),
 ]);
 
 const posteriorBase = extremidades([
   ...sideOuter.slice('gluteoFin', 'muslo'),
+  ...CORTE.muslo,
   ...legInner.slice('muslo', 'gluteoFin'),
+  ...rev(CORTE.pliegue),
 ]);
 
-const trapecio = armOuter.slice('N', 'P');
+const hombroBase = [...armOuter.slice('P', 'D'), ...CORTE.deltoides];
 
 const anterior: Record<string, Geometria> = {
   'cabeza-cuello': build(
-    symmetric([...headPts, ...neck.slice('chin', 'N'), CENTRO_ARRIBA(141)]),
+    symmetric([
+      ...head.slice('crown', 'jaw'),
+      ...neck.slice('jaw', 'N'),
+      ...CORTE.cuello,
+    ]),
   ),
-  hombro: build(bilateral([...armOuter.slice('P', 'D'), Q])),
+  hombro: build(bilateral([...hombroBase, ...CORTE.surco])),
   ...anteriorBase,
   torax: build(
     symmetric([
-      CENTRO_ARRIBA(141),
-      ...trapecio,
+      ...rev(CORTE.cuello),
+      ...armOuter.slice('N', 'P'),
+      ...rev(CORTE.surco),
       ...sideOuter.slice('Q', 'torax'),
-      CENTRO_ARRIBA(270),
+      ...CORTE.costal,
     ]),
   ),
   abdomen: build(
     symmetric([
-      CENTRO_ARRIBA(270),
+      ...rev(CORTE.costal),
       ...sideOuter.slice('torax', 'abdomen'),
-      CENTRO_ARRIBA(385),
+      ...CORTE.inguinal,
     ]),
   ),
   cadera: build(
     symmetric([
-      CENTRO_ARRIBA(385),
+      ...rev(CORTE.inguinal),
       ...sideOuter.slice('abdomen', 'hip'),
-      ...legInner.slice('crotch', 'crotch'),
-      CENTRO_ARRIBA(472),
+      ...CORTE.ingle,
+      C(456),
     ]),
   ),
 };
 
 const posterior: Record<string, Geometria> = {
-  'cabeza-cuello': build(symmetric([...headPts, CENTRO_ARRIBA(CHIN_CUT_Y)])),
+  'cabeza-cuello': build(symmetric([...head.slice('crown', 'jaw'), ...CORTE.nuca])),
   cervical: build(
     symmetric([
-      CENTRO_ARRIBA(CHIN_CUT_Y),
-      ...neck.slice('chin', 'N'),
-      ...trapecio,
-      [150, 172],
-      CENTRO_ARRIBA(172),
+      ...rev(CORTE.nuca),
+      ...neck.slice('jaw', 'N'),
+      ...armOuter.slice('N', 'P'),
+      ...CORTE.trapecio,
     ]),
   ),
   'hombro-escapula': build(
     bilateral([
-      ...armOuter.slice('P', 'D'),
+      ...hombroBase,
       ...sideOuter.slice('Q', 'R'),
-      [184, 262],
-      [184, 172],
-      [150, 172],
+      ...CORTE.escapula,
+      ...rev(CORTE.trapecio),
     ]),
   ),
   ...posteriorBase,
   dorsal: build(
     symmetric([
-      CENTRO_ARRIBA(172),
-      [184, 172],
-      [184, 262],
+      ...rev(CORTE.escapula),
       ...sideOuter.slice('R', 'lumbar'),
-      CENTRO_ARRIBA(330),
+      ...CORTE.dorsal,
     ]),
   ),
   lumbar: build(
     symmetric([
-      CENTRO_ARRIBA(330),
+      ...rev(CORTE.dorsal),
       ...sideOuter.slice('lumbar', 'gluteo'),
-      CENTRO_ARRIBA(405),
+      ...CORTE.cresta,
     ]),
   ),
   gluteo: build(
     symmetric([
-      CENTRO_ARRIBA(405),
+      ...rev(CORTE.cresta),
       ...sideOuter.slice('gluteo', 'gluteoFin'),
+      ...CORTE.pliegue,
       ...legInner.slice('gluteoFin', 'crotch'),
-      CENTRO_ARRIBA(472),
+      C(456),
     ]),
   ),
 };
@@ -350,5 +411,3 @@ export const ORDEN_REGIONES: Record<VistaId, string[]> = {
     'tobillo-pie',
   ],
 };
-
-export { P as PUNTO_HOMBRO };

@@ -70,10 +70,30 @@ export class Curve {
     return i <= j ? this.pts.slice(i, j + 1) : this.pts.slice(j, i + 1).reverse();
   }
 
+  /** Punto denso de una etiqueta. */
+  at(label: string): Pt {
+    return this.slice(label, label)[0];
+  }
+
   /** Todos los puntos, de la primera clave a la última. */
   all(): Pt[] {
     return [...this.pts];
   }
+}
+
+/** Corte curvo entre dos bordes (Bézier cuadrática a -> b con control c); incluye ambos extremos. */
+export function arco(a: Pt, b: Pt, c: Pt): Pt[] {
+  const n = Math.max(2, Math.ceil((dist(a, c) + dist(c, b)) / STEP));
+  const out: Pt[] = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    const u = 1 - t;
+    out.push([
+      u * u * a[0] + 2 * u * t * c[0] + t * t * b[0],
+      u * u * a[1] + 2 * u * t * c[1] + t * t * b[1],
+    ]);
+  }
+  return out;
 }
 
 export const mirror = (p: Pt): Pt => [400 - p[0], p[1]];
