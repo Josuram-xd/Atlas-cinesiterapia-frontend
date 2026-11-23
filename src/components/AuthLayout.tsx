@@ -23,7 +23,7 @@ export function AuthLayout({ titulo, descripcion, children, pie }: AuthLayoutPro
           <Marca className="size-8" />
           <Wordmark className="text-xl" />
         </div>
-        <FiguraVitrina className="entrada pointer-events-none absolute top-[6%] right-[4%] -z-10 h-[62%] max-lg:hidden" />
+        <FiguraVitrina className="entrada pointer-events-none absolute top-[5%] right-[5%] -z-10 h-[54%] max-lg:hidden" />
         <div className="revelar flex flex-col gap-5">
           <p className="font-display text-gigante max-w-[8ch] font-extrabold tracking-[-0.04em] max-lg:text-[2.6rem] max-lg:leading-none">
             El cuerpo es el menú.
