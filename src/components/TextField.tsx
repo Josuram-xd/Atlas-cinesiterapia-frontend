@@ -34,9 +34,7 @@ export function TextField({
           type={esPassword && visible ? 'text' : type}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className={`rounded-campo bg-fondo text-tinta block min-h-12 w-full border-2 px-4 py-2.5 ${
-            error ? 'border-error' : 'border-tinta'
-          } ${esPassword ? 'pr-24' : ''}`}
+          className={`campo ${esPassword ? 'pr-24' : ''}`}
           {...rest}
         />
         {esPassword ? (
@@ -44,7 +42,7 @@ export function TextField({
             type="button"
             onClick={() => setVisible((v) => !v)}
             aria-pressed={visible}
-            className="text-acento hover:text-tinta absolute inset-y-0 right-0 cursor-pointer px-4 font-semibold underline underline-offset-4"
+            className="text-acento hover:text-tinta absolute inset-y-1 right-1 cursor-pointer rounded-[calc(var(--radius-campo)-4px)] px-3 font-semibold underline underline-offset-4 transition-colors duration-200"
           >
             {visible ? 'Ocultar' : 'Mostrar'}
           </button>

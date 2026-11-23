@@ -2,18 +2,39 @@
 @import 'tailwindcss';
 
 /*
- * Tokens de diseño. Una paleta corta y plana: fondo, tinta y acento, más dos tonos
- * de fondo para superficies y estados. Sin gradientes ni sombras en reposo.
- * Contrastes medidos (WCAG): tinta/fondo 14.1:1, acento/fondo 5.7:1, fondo/acento 5.7:1.
+ * DIRECCIÓN DE ARTE — «Lámina viva»
+ * Idea: el écorché de yeso del aula de anatomía, iluminado sobre una peana oscura, es el menú.
+ * Referencias: el visor oscuro con el modelo iluminado de Complete Anatomy y BioDigital; las
+ * láminas rotuladas de Kenhub; las cifras grandes y tabulares de Whoop y Oura; la calma clínica
+ * de Hinge y Sword (credibilidad + momentos enérgicos). Nada de su marca: solo la lógica.
+ * 1. Dos superficies: «papel» (salvia hueso, para leer) y «escenario» (tinta verde-negra, para
+ *    mirar el cuerpo y en el panel de acceso). Lo oscuro siempre enmarca algo que se observa.
+ * 2. Un acento: verde clínico. En el escenario se usa su versión luminosa (`acento-vivo`).
+ * 3. Una familia: Bricolage Grotesque. Titulares enormes y apretados (-0.03em); texto 17px;
+ *    cifras con `tabular-nums`. Nada de etiquetas en mayúsculas espaciadas ni monoespaciada.
+ * 4. Superficies separadas por un paso de tono, no por líneas ni sombras. Sombra solo en lo que
+ *    flota (diálogos, desplegables). Sin gradientes en la interfaz; la luz vive dentro de la
+ *    ilustración del cuerpo (volumen, brillo de la región elegida) y en el foco del escenario.
+ * 5. Formas: botones y chips en píldora; campos con radio 0.75rem; superficies 1.25rem;
+ *    escenario 1.75rem. Radios concéntricos: lo interior siempre más cerrado.
+ * 6. Movimiento con masa: curva `ease-atlas`, 200–300 ms en controles, 500–850 ms en cámara y
+ *    entradas; escalonado de 60 ms; presionar = escala 0.97. Solo transform y opacidad.
+ *    Con `prefers-reduced-motion` todo es instantáneo y el contenido nunca queda oculto.
+ * 7. Contraste AA medido: tinta/papel 14:1, acento/papel 5.7:1, marfil/escenario 13:1.
  */
 @theme {
   --color-fondo: #e8ece6;
-  --color-fondo-2: #d9dfd5;
-  --color-fondo-3: #c4cdc0;
-  --color-tinta: #10201c;
+  --color-fondo-2: #dbe1d6;
+  --color-fondo-3: #c7d0c2;
+  --color-papel: #f5f7f2;
+  --color-tinta: #0f1e1a;
   --color-tinta-2: #3b4c47;
   --color-acento: #00675a;
   --color-acento-claro: #a9d1c8;
+  --color-acento-vivo: #3ccfae;
+  --color-escenario: #0f1e1a;
+  --color-escenario-2: #183029;
+  --color-marfil: #e9ede4;
   --color-error: #9b1c1c;
 
   /* Un solo tipo de letra: Bricolage Grotesque, con eje óptico automático. */
@@ -22,15 +43,27 @@
 
   --text-cuerpo: 1.0625rem;
   --text-cuerpo--line-height: 1.55;
-  --text-titulo: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
-  --text-titulo--line-height: 1.04;
-  --text-gigante: clamp(2.75rem, 1.6rem + 6vw, 6.5rem);
-  --text-gigante--line-height: 0.94;
+  --text-titulo: clamp(2.1rem, 1.4rem + 2.8vw, 3.6rem);
+  --text-titulo--line-height: 1;
+  --text-gigante: clamp(2.75rem, 1.4rem + 6.4vw, 7rem);
+  --text-gigante--line-height: 0.9;
 
-  --radius-campo: 0.25rem;
+  --radius-campo: 0.75rem;
+  --radius-superficie: 1.25rem;
+  --radius-escenario: 1.75rem;
   --spacing-gutter: clamp(1rem, 0.5rem + 2vw, 2.5rem);
 
   --ease-atlas: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-resorte: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --animate-entrada: entrada 560ms var(--ease-atlas) backwards;
+
+  @keyframes entrada {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
 }
 
 @layer base {
@@ -40,6 +73,7 @@
     font-family: var(--font-sans);
     font-optical-sizing: auto;
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -48,21 +82,33 @@
     font-size: var(--text-cuerpo);
     line-height: var(--text-cuerpo--line-height);
     text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1,
   h2,
   h3 {
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
     text-wrap: balance;
+  }
+
+  h1 {
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   a {
     color: var(--color-acento);
     text-decoration-line: underline;
-    text-decoration-thickness: 0.09em;
-    text-underline-offset: 0.2em;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.22em;
+    transition:
+      color 200ms var(--ease-atlas),
+      text-decoration-color 200ms var(--ease-atlas);
   }
 
   a:hover {
@@ -84,6 +130,7 @@
     *::before,
     *::after {
       animation-duration: 0.001ms !important;
+      animation-delay: 0ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
       scroll-behavior: auto !important;
@@ -91,44 +138,155 @@
   }
 }
 
-/* Regiones del cuerpo: color plano que cambia de tono con el cursor y el foco. */
-.region {
-  fill: var(--color-fondo-2);
-  stroke: var(--color-tinta);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  cursor: pointer;
-  outline: none;
-  transition: fill 150ms var(--ease-atlas);
+@layer components {
+  /* Caja de campo: superficie clara un paso por encima del papel; el foco engrosa el borde. */
+  .campo {
+    display: block;
+    width: 100%;
+    min-height: 3rem;
+    border-radius: var(--radius-campo);
+    border: 1.5px solid #8d9c95;
+    background-color: var(--color-papel);
+    color: var(--color-tinta);
+    padding: 0.625rem 1rem;
+    transition:
+      border-color 200ms var(--ease-atlas),
+      box-shadow 200ms var(--ease-atlas),
+      background-color 200ms var(--ease-atlas);
+  }
+
+  .campo:hover {
+    border-color: var(--color-tinta-2);
+  }
+
+  .campo:focus-visible {
+    outline: none;
+    border-color: var(--color-tinta);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px var(--color-acento-claro);
+  }
+
+  .campo[aria-invalid='true'] {
+    border-color: var(--color-error);
+  }
+
+  .campo::placeholder {
+    color: #5d6d67;
+  }
+
+  /* Superficie: un paso de tono sobre el papel, sin borde ni sombra. */
+  .superficie {
+    border-radius: var(--radius-superficie);
+    background-color: var(--color-fondo-2);
+  }
+
+  /* Fila navegable: tono que sube al pasar y un pequeño desplazamiento de la flecha. */
+  .fila-enlace {
+    transition:
+      background-color 220ms var(--ease-atlas),
+      transform 220ms var(--ease-atlas);
+  }
+
+  .fila-enlace:hover {
+    background-color: var(--color-fondo-3);
+  }
+
+  .fila-enlace:active {
+    transform: scale(0.99);
+  }
+
+  .fila-enlace .flecha {
+    display: inline-block;
+    transition: transform 260ms var(--ease-atlas);
+  }
+
+  .fila-enlace:hover .flecha {
+    transform: translateX(4px);
+  }
+
+  /* Chip de navegación en píldora; la página actual queda rellena. */
+  .chip {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.25rem 1rem;
+    color: var(--color-tinta-2);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 220ms var(--ease-atlas),
+      color 220ms var(--ease-atlas),
+      transform 160ms var(--ease-atlas);
+  }
+
+  .chip:hover {
+    background-color: var(--color-fondo-2);
+    color: var(--color-tinta);
+  }
+
+  .chip:active {
+    transform: scale(0.97);
+  }
+
+  .chip[aria-current='page'],
+  .chip[aria-pressed='true'] {
+    background-color: var(--color-tinta);
+    color: var(--color-fondo);
+  }
+
+  /* Entradas: el contenido sube 14px y aparece; los hijos de `.revelar` se escalonan. */
+  .entrada {
+    animation: var(--animate-entrada);
+  }
+
+  .revelar > * {
+    animation: var(--animate-entrada);
+  }
+
+  .revelar > :nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .revelar > :nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .revelar > :nth-child(4) {
+    animation-delay: 180ms;
+  }
+  .revelar > :nth-child(5) {
+    animation-delay: 240ms;
+  }
+  .revelar > :nth-child(n + 6) {
+    animation-delay: 300ms;
+  }
+
+  /* Cada página que entra por una ruta nueva aparece con la misma entrada. */
+  .transicion-ruta > * {
+    animation: var(--animate-entrada);
+  }
 }
 
-.region:hover {
-  fill: var(--color-acento-claro);
-}
+/* --- Escenario: la peana oscura donde se ilumina el cuerpo ------------------------------ */
 
-.region:focus-visible {
-  fill: var(--color-acento);
-  stroke-width: 3;
-}
-
-.region[aria-pressed='true'] {
-  fill: var(--color-acento-claro);
-  stroke-width: 3;
-}
-
-.region[aria-pressed='true']:focus-visible {
-  fill: var(--color-acento);
-}
-
-/* Superficies oscuras: el foco usa el color de fondo para mantener el contraste. */
-.superficie-oscura {
-  background-color: var(--color-tinta);
+.superficie-oscura,
+.escenario {
+  background-color: var(--color-escenario);
   color: var(--color-fondo);
 }
 
-.superficie-oscura :focus-visible {
-  outline-color: var(--color-fondo);
+/* El foco del escenario: un haz de luz cenital sobre la figura (la única luz de la interfaz). */
+.escenario {
+  background-image: radial-gradient(
+    ellipse 55% 60% at 50% 42%,
+    #1f3d35 0%,
+    var(--color-escenario) 100%
+  );
+}
+
+.superficie-oscura :focus-visible,
+.escenario :focus-visible {
+  outline-color: var(--color-acento-vivo);
 }
 
 .superficie-oscura a {
@@ -139,7 +297,123 @@
   color: var(--color-fondo);
 }
 
+/* --- Regiones del cuerpo: yeso marfil que se tiñe al apuntar y se ilumina al elegir ------ */
+
+.region {
+  fill: var(--color-marfil);
+  stroke: #7f938b;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  outline: none;
+  transition:
+    fill 260ms var(--ease-atlas),
+    stroke 260ms var(--ease-atlas),
+    filter 260ms var(--ease-atlas);
+}
+
+.region:hover {
+  fill: #bfe3d9;
+  stroke: var(--color-acento);
+}
+
+.region:focus-visible {
+  fill: var(--color-acento-vivo);
+  stroke: #fff;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 10px rgb(60 207 174 / 0.75));
+}
+
+.region[aria-pressed='true'] {
+  fill: var(--color-acento-vivo);
+  stroke: #d9fff4;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 14px rgb(60 207 174 / 0.7));
+}
+
+.region[aria-pressed='true']:focus-visible {
+  stroke: #fff;
+  stroke-width: 3;
+}
+
 /* Con la cámara acercada, el resto del cuerpo cede protagonismo (sigue siendo operable). */
 svg[data-zoom='si'] .region:not([aria-pressed='true']):not(:hover):not(:focus-visible) {
-  fill: var(--color-fondo);
+  fill: #93a69e;
+}
+
+/* Capas decorativas sobre las regiones: no reciben el puntero. */
+.cuerpo-detalle {
+  pointer-events: none;
+}
+
+/* Líneas anatómicas que se dibujan al montar el cuerpo. */
+.trazo-anatomico {
+  fill: none;
+  stroke: #4f655d;
+  stroke-opacity: 0.55;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+svg[data-zoom='si'] .trazo-anatomico {
+  stroke-opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .trazo-anatomico {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: dibujar 1400ms var(--ease-atlas) 250ms forwards;
+  }
+}
+
+@keyframes dibujar {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Diálogos y desplegables: lo único que flota, y lo único con sombra. */
+@media (prefers-reduced-motion: no-preference) {
+  .velo {
+    animation: aparecer 240ms var(--ease-atlas) backwards;
+  }
+
+  .dialogo {
+    animation: emerger 380ms var(--ease-resorte) backwards;
+  }
+
+  .desplegable {
+    animation: emerger 260ms var(--ease-atlas) backwards;
+    transform-origin: top center;
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes emerger {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+/* Vitrina de las pantallas de acceso: la misma figura, sin interacción. */
+.region-vitrina {
+  cursor: default;
+  pointer-events: none;
+  transition-duration: 700ms;
+}
+
+.region-vitrina[data-encendida] {
+  fill: var(--color-acento-vivo);
+  stroke: #d9fff4;
+  filter: drop-shadow(0 0 14px rgb(60 207 174 / 0.7));
 }

@@ -18,7 +18,7 @@ export function RolSelector({ value, onChange, error }: RolSelectorProps) {
         {ROLES_PERFIL.map((rol) => (
           <label
             key={rol.valor}
-            className="rounded-campo border-tinta has-[:checked]:bg-tinta has-[:checked]:text-fondo has-[:focus-visible]:outline-acento relative flex cursor-pointer flex-col border-2 px-4 py-3 transition-colors duration-150 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3"
+            className="rounded-campo bg-papel hover:bg-fondo-2 has-[:checked]:bg-tinta has-[:checked]:text-fondo has-[:focus-visible]:outline-acento relative flex cursor-pointer flex-col border-[1.5px] border-[#8d9c95] px-4 py-3 transition-[background-color,color,transform] duration-200 active:scale-[0.98] has-[:checked]:border-tinta has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3"
           >
             <input
               type="radio"

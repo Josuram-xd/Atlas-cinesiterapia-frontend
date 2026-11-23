@@ -1,7 +1,6 @@
 import { useId, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 
-const CAJA =
-  'rounded-campo bg-fondo text-tinta block min-h-12 w-full border-2 px-4 py-2.5';
+const CAJA = 'campo';
 
 function Mensajes({ id, error, ayuda }: { id: string; error?: string; ayuda?: string }) {
   return (
@@ -50,7 +49,7 @@ export function TextAreaField({
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(id, error, ayuda)}
         rows={4}
-        className={`${CAJA} ${error ? 'border-error' : 'border-tinta'} resize-y leading-normal`}
+        className={`${CAJA} resize-y leading-normal`}
         {...rest}
       />
       <Mensajes id={id} error={error} ayuda={ayuda} />
@@ -77,7 +76,7 @@ export function SelectField({
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(id, error, ayuda)}
-        className={`${CAJA} ${error ? 'border-error' : 'border-tinta'}`}
+        className={`${CAJA} cursor-pointer`}
         {...rest}
       >
         {children}

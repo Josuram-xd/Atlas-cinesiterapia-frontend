@@ -74,7 +74,7 @@ export function ListaFichasPage() {
         </div>
         <Link
           to="/admin/fichas/nueva"
-          className="rounded-campo bg-tinta text-fondo hover:bg-acento hover:text-fondo inline-flex min-h-12 items-center justify-center px-6 font-semibold no-underline"
+          className="bg-tinta text-fondo hover:bg-acento hover:text-fondo inline-flex min-h-12 items-center justify-center rounded-full px-6 font-semibold no-underline transition-[background-color,transform] duration-200 active:scale-[0.97]"
         >
           Nueva ficha
         </Link>
