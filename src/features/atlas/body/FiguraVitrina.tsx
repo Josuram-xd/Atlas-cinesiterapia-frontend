@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { prefersReducedMotion } from '@/lib/motion';
 import { BodyFondo, BodyRelieve } from './BodyDetalle';
-import { BODY_VIEWBOX, GEOMETRIA, ORDEN_REGIONES } from './geometry';
+import { BODY_VIEWBOX, GEOMETRIA, ORDEN_REGIONES, type VistaId } from './geometry';
 
 /** Regiones que se encienden por turnos: un recorrido de arriba abajo, sin repetir vecinas. */
 const RECORRIDO = [
@@ -15,24 +15,35 @@ const RECORRIDO = [
 ];
 const PASO_MS = 1800;
 
+interface FiguraVitrinaProps {
+  className?: string;
+  vista?: VistaId;
+  /** Región fija encendida (slug sin vista, ej. `rodilla`). Sin ella, el recorrido gira solo. */
+  region?: string;
+}
+
 /**
- * El cuerpo como vitrina (pantallas de acceso): solo decorativo, no se puede elegir nada.
- * Una región se ilumina cada pocos segundos para mostrar la idea del atlas. Sin movimiento
- * si la persona lo pidió: queda encendida la rodilla.
+ * El cuerpo como vitrina: solo decorativo, no se puede elegir nada. En las pantallas de acceso
+ * una región se ilumina cada pocos segundos para mostrar la idea del atlas (sin movimiento si
+ * la persona lo pidió: queda la rodilla); en la ficha marca la región del ejercicio.
  */
-export function FiguraVitrina({ className = '' }: { className?: string }) {
+export function FiguraVitrina({
+  className = '',
+  vista = 'anterior',
+  region,
+}: FiguraVitrinaProps) {
   const [paso, setPaso] = useState(1);
 
   useEffect(() => {
-    if (prefersReducedMotion()) return;
+    if (region || prefersReducedMotion()) return;
     const id = window.setInterval(
       () => setPaso((p) => (p + 1) % RECORRIDO.length),
       PASO_MS,
     );
     return () => window.clearInterval(id);
-  }, []);
+  }, [region]);
 
-  const encendida = RECORRIDO[paso];
+  const encendida = region ?? RECORRIDO[paso];
   return (
     <svg
       viewBox={`0 0 ${BODY_VIEWBOX.w} ${BODY_VIEWBOX.h}`}
@@ -40,16 +51,16 @@ export function FiguraVitrina({ className = '' }: { className?: string }) {
       focusable="false"
       className={className}
     >
-      <BodyFondo vista="anterior" />
-      {ORDEN_REGIONES.anterior.map((slug) => (
+      <BodyFondo vista={vista} />
+      {ORDEN_REGIONES[vista].map((slug) => (
         <path
           key={slug}
-          d={GEOMETRIA.anterior[slug].d}
+          d={GEOMETRIA[vista][slug].d}
           className="region region-vitrina"
           data-encendida={slug === encendida || undefined}
         />
       ))}
-      <BodyRelieve vista="anterior" />
+      <BodyRelieve vista={vista} />
     </svg>
   );
 }
